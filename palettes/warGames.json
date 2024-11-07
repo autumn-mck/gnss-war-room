@@ -1,0 +1,10 @@
+{
+	"background": "#000000",
+	"continentsBorder": "#63f68d",
+	"water": "#638af6",
+	"foreground": "#FFFFFF",
+	"highlight": "#FF0000",
+	"admin0Border": "#FFFFFF",
+	"admin1Border": "#FF0000",
+	"metadata": "#FFFFFF"
+}
