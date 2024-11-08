@@ -1,5 +1,6 @@
 import math
 import tempfile
+from mapdata.cities import getCities
 
 def prepareSvg(palette, options = {
 	"hideRivers": False,
@@ -36,6 +37,20 @@ def prepareSvg(palette, options = {
 	# inserting circle at focus point
 	svgData = svgData.replace('</svg>', f'<circle cx="{projectedX}" cy="{projectedY}" r="2" fill="{palette["highlight"]}" /></svg>')
 
+	# cities
+	if not options["hideCities"]:
+		cities = getCities()
+		cityDataStr = '<g id="Cities">'
+		for city in cities:
+			cityLat = float(city[4])
+			cityLong = float(city[5])
+			[cityX, cityY] = latLongToGallStereographic(cityLat, cityLong + xOffset, svgOrigWidth)
+			cityX += svgOrigWidth / 2
+			cityY += svgOrigHeight / 2
+			cityDataStr += f'<circle cx="{cityX}" cy="{cityY}" r="2" fill="{palette["cities"]}" />'
+
+		cityDataStr += '</g></svg>'
+		svgData = svgData.replace('</svg>', cityDataStr)
 
 	# waterbodies
 	svgData = svgData.replace('.st0{fill:#50C8F4;', f'.st0{{fill:{palette["water"]};')
