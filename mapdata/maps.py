@@ -27,14 +27,10 @@ def prepareSvg(palette, options = {
 	projectedX += svgOrigWidth / 2
 	projectedY += svgOrigHeight / 2
 
-	print(f"projectedX: {projectedX}, projectedY: {projectedY}")
-
 	newX = projectedX - (svgOrigWidth) / 2 / options["scaleFactor"]
 	newY = projectedY - (svgOrigHeight) / 2 / options["scaleFactor"]
-	print(f"newX: {newX}, newY: {newY}")
 
 	newViewBox = f"{newX} {newY} {newWidth} {newHeight}"
-	print(f"newViewBox: {newViewBox}")
 	svgData = svgData.replace('viewBox="0 0 3213.05005 2468.23999"', f'viewBox="{newViewBox}"')
 
 	# inserting circle at focus point
