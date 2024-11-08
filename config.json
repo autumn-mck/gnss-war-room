@@ -5,6 +5,7 @@
 		"hideLakes": true,
 		"hideAdmin1Borders": true,
 		"hideAdmin0Borders": true,
+		"hideCities": false,
 		"focusLat": 54.6,
 		"focusLong": -6.0,
 		"scaleFactor": 4
