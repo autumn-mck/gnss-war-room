@@ -18,7 +18,7 @@
 			"hideAdmin0Borders": false,
 			"hideCities": true,
 			"focusLat": 0,
-			"focusLong": 0,
+			"focusLong": 10,
 			"scaleFactor": 1
 		}
 	]
