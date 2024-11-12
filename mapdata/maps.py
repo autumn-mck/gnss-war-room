@@ -24,7 +24,7 @@ def prepareSvg(palette, options = {
 
 	xOffset = -10
 
-	[projectedX, projectedY] = latLongToGallStereographic(options["focusLat"], options["focusLong"] + xOffset, svgOrigWidth)
+	[projectedX, projectedY] = latLongToGallStereographic(options["focusLat"], options["focusLong"] + xOffset, svgOrigWidth, xOffset)
 	projectedX += svgOrigWidth / 2
 	projectedY += svgOrigHeight / 2
 
@@ -44,7 +44,7 @@ def prepareSvg(palette, options = {
 		for city in cities:
 			cityLat = float(city[4])
 			cityLong = float(city[5])
-			[cityX, cityY] = latLongToGallStereographic(cityLat, cityLong + xOffset, svgOrigWidth)
+			[cityX, cityY] = latLongToGallStereographic(cityLat, cityLong + xOffset, svgOrigWidth, xOffset)
 			cityX += svgOrigWidth / 2
 			cityY += svgOrigHeight / 2
 			cityDataStr += f'<circle cx="{cityX}" cy="{cityY}" r="2" fill="{palette["cities"]}" />'
@@ -98,8 +98,14 @@ def prepareSvg(palette, options = {
 
 	return temp.name
 
-def latLongToGallStereographic(lat: float, long: float, mapWidth: float) -> tuple[float, float]:
+def latLongToGallStereographic(lat: float, long: float, mapWidth: float, xOffset: float) -> tuple[float, float]:
 	"""Convert latitude and longitude to Gall Stereographic coordinates."""
+	# wrap around the world as the map is not centered at 0
+	if long < -180 - xOffset:
+		long += 360
+	elif long > 180 - xOffset:
+		long -= 360
+
 	R = mapWidth / (2 * math.pi)
 	latRad = math.radians(lat)
 	longRad = math.radians(long)
