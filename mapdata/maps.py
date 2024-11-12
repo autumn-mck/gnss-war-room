@@ -52,6 +52,10 @@ def prepareSvg(palette, options = {
 		cityDataStr += '</g></svg>'
 		svgData = svgData.replace('</svg>', cityDataStr)
 
+	# continent border width
+	continentBorderWidth = 6 / options["scaleFactor"]
+	admin0BorderWidth = 2 / options["scaleFactor"]
+
 	# waterbodies
 	svgData = svgData.replace('.st0{fill:#50C8F4;', f'.st0{{fill:{palette["water"]};')
 	svgData = svgData.replace('.st3{fill:none;stroke:#50C8F4;', f'.st3{{fill:none;stroke:{palette["water"]};')
@@ -61,8 +65,10 @@ def prepareSvg(palette, options = {
 
 	# admin0 borders
 	svgData = svgData.replace('.st2{fill:none;stroke:#000000;', f'.st2{{fill:none;stroke:{palette["admin0Border"]};')
+	svgData = svgData.replace('.st2{', f'.st2{{stroke-width:{admin0BorderWidth};')
 
 	# continent borders
+	svgData = svgData.replace('stroke-width:2;', f'stroke-width:{continentBorderWidth};');
 	svgData = svgData.replace('.st4{fill:none;stroke:#000000;', f'.st4{{fill:none;stroke:{palette["continentsBorder"]};')
 
 	# metadata
