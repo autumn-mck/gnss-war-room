@@ -28,14 +28,13 @@ with open("config.json", "r") as f:
 
 palette = loadPalette(appConfig["paletteName"])
 
-multiScreen = False
 screens = app.screens()
 windows = []
 count = 0
 for windowConfig in appConfig["windows"]:
-	window = MainWindow(palette, windowConfig, multiScreen)
+	window = MainWindow(palette, windowConfig, appConfig["multiScreen"])
 	windows.append(window)
-	if multiScreen:
+	if appConfig["multiScreen"]:
 		screen = screens[count]
 		qr = screen.geometry()
 		window.move(qr.left(), qr.top())

@@ -1,5 +1,6 @@
 {
 	"paletteName": "warGames",
+	"multiScreen": false,
 	"windows": [
 		{
 			"hideRivers": true,
