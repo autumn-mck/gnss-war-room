@@ -75,6 +75,6 @@ def readCountryInfo():
 	return countryInfo
 
 def readTSV(filename: str) -> list[list[str]]:
-	with open(filename, "r") as f:
+	with open(filename, "r", encoding="utf8") as f:
 		rd = csv.reader(f, delimiter="\t")
 		return [row for row in rd]
