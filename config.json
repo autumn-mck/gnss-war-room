@@ -1,13 +1,25 @@
 {
 	"paletteName": "warGames",
-	"mapConfig": {
-		"hideRivers": true,
-		"hideLakes": true,
-		"hideAdmin1Borders": true,
-		"hideAdmin0Borders": true,
-		"hideCities": false,
-		"focusLat": 54.6,
-		"focusLong": -6.0,
-		"scaleFactor": 4
-	}
+	"windows": [
+		{
+			"hideRivers": true,
+			"hideLakes": true,
+			"hideAdmin1Borders": true,
+			"hideAdmin0Borders": true,
+			"hideCities": false,
+			"focusLat": 54.6,
+			"focusLong": -6.0,
+			"scaleFactor": 4
+		},
+		{
+			"hideRivers": true,
+			"hideLakes": true,
+			"hideAdmin1Borders": true,
+			"hideAdmin0Borders": false,
+			"hideCities": true,
+			"focusLat": 0,
+			"focusLong": 0,
+			"scaleFactor": 1
+		}
+	]
 }
