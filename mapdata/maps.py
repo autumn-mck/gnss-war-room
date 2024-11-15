@@ -2,7 +2,11 @@ import math
 import tempfile
 from mapdata.cities import getCities
 
-def prepareSvg(palette, options = {
+def readBaseSvg() -> str:
+	with open("mapdata/1981.svg", "r") as f:
+		return f.read()
+
+def prepareSvg(svgData, palette, options = {
 	"hideRivers": False,
 	"hideAdmin0Borders": False,
 	"hideAdmin1Borders": False,
@@ -11,31 +15,8 @@ def prepareSvg(palette, options = {
 	"focusLong": 0.0,
 	"scaleFactor": 1
 }) -> str:
-	svgIn = open("mapdata/1981.svg", "r")
-	svgData = svgIn.read()
-	svgIn.close()
-
 	svgOrigWidth = 3213.05005
 	svgOrigHeight = 2468.23999
-
-	# focus on a specific location
-	newWidth = svgOrigWidth / options["scaleFactor"]
-	newHeight = svgOrigHeight / options["scaleFactor"]
-
-	xOffset = -10
-
-	[projectedX, projectedY] = latLongToGallStereographic(options["focusLat"], options["focusLong"] + xOffset, svgOrigWidth, xOffset)
-	projectedX += svgOrigWidth / 2
-	projectedY += svgOrigHeight / 2
-
-	newX = projectedX - (svgOrigWidth) / 2 / options["scaleFactor"]
-	newY = projectedY - (svgOrigHeight) / 2 / options["scaleFactor"]
-
-	newViewBox = f"{newX} {newY} {newWidth} {newHeight}"
-	svgData = svgData.replace('viewBox="0 0 3213.05005 2468.23999"', f'viewBox="{newViewBox}"')
-
-	# inserting circle at focus point
-	svgData = svgData.replace('</svg>', f'<circle cx="{projectedX}" cy="{projectedY}" r="2" fill="{palette["highlight"]}" /></svg>')
 
 	# cities
 	if not options["hideCities"]:
@@ -44,7 +25,7 @@ def prepareSvg(palette, options = {
 		for city in cities:
 			cityLat = float(city[4])
 			cityLong = float(city[5])
-			[cityX, cityY] = latLongToGallStereographic(cityLat, cityLong + xOffset, svgOrigWidth, xOffset)
+			[cityX, cityY] = latLongToGallStereographic(cityLat, cityLong, svgOrigWidth)
 			cityX += svgOrigWidth / 2
 			cityY += svgOrigHeight / 2
 			cityDataStr += f'<circle cx="{cityX}" cy="{cityY}" r="2" fill="{palette["cities"]}" />'
@@ -91,19 +72,65 @@ def prepareSvg(palette, options = {
 
 	# hide metadata
 	svgData = svgData.replace('g id="MetaData"', 'g id="MetaData" style="display:none"')
+	return svgData
 
+def saveTempSvg(svgData: str) -> str:
 	temp = tempfile.NamedTemporaryFile(delete=False)
 	with open(temp.name, "w") as f:
 		f.write(svgData)
-
 	return temp.name
 
-def latLongToGallStereographic(lat: float, long: float, mapWidth: float, xOffset: float) -> tuple[float, float]:
+def focusOnPoint(svgData, options, desiredWidth, desiredHeight) -> str:
+	svgOrigWidth = 3213.05005
+	svgOrigHeight = 2468.23999
+	xOffset = -10
+
+	match options["scaleMethod"]:
+		case "constantScale":
+			newWidth = desiredWidth / options["scaleFactor"] * 3
+			newHeight = desiredHeight / options["scaleFactor"] * 3
+		case "withWidth":
+			newWidth = svgOrigWidth / options["scaleFactor"]
+			newHeight = newWidth * desiredHeight / desiredWidth
+		case "withHeight":
+			newHeight = svgOrigHeight / options["scaleFactor"]
+			newWidth = newHeight * desiredWidth / desiredHeight
+		case "fit":
+			if desiredWidth / svgOrigWidth < desiredHeight / svgOrigHeight:
+				newWidth = svgOrigWidth / options["scaleFactor"]
+				newHeight = newWidth * desiredHeight / desiredWidth
+			else:
+				newHeight = svgOrigHeight / options["scaleFactor"]
+				newWidth = newHeight * desiredWidth / desiredHeight
+
+	[projectedX, projectedY] = latLongToGallStereographic(options["focusLat"], options["focusLong"], svgOrigWidth)
+	projectedX += svgOrigWidth / 2
+	projectedY += svgOrigHeight / 2
+
+	# inserting circle at focus point
+	svgData = svgData.replace('</svg>', f'<circle cx="{projectedX}" cy="{projectedY}" r="2" fill="red" /></svg>')
+
+	newX = projectedX - newWidth / 2
+	newY = projectedY - newHeight / 2
+
+	viewboxLen = len('viewBox="')
+	newViewbox = f"{newX} {newY} {newWidth} {newHeight}"
+	# find location of original viewbox
+	viewBoxStart = svgData.find('viewBox="')
+	viewBoxEnd = svgData.find('"', viewBoxStart + viewboxLen)
+
+	return svgData[:viewBoxStart + viewboxLen] + newViewbox + svgData[viewBoxEnd:]
+
+
+def latLongToGallStereographic(lat: float, long: float, mapWidth: float) -> tuple[float, float]:
 	"""Convert latitude and longitude to Gall Stereographic coordinates."""
+	longOffset = -10
+	long += longOffset
+
 	# wrap around the world as the map is not centered at 0
-	if long < -180 - xOffset:
+	if long < -180 - longOffset:
 		long += 360
-	elif long > 180 - xOffset:
+	elif long > 180 - longOffset:
 		long -= 360
 
 	R = mapWidth / (2 * math.pi)

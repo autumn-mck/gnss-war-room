@@ -10,7 +10,8 @@
 			"hideCities": false,
 			"focusLat": 54.6,
 			"focusLong": -6.0,
-			"scaleFactor": 4
+			"scaleFactor": 4,
+			"scaleMethod": "constantScale"
 		},
 		{
 			"hideRivers": true,
@@ -20,7 +21,8 @@
 			"hideCities": true,
 			"focusLat": 0,
 			"focusLong": 10,
-			"scaleFactor": 1
+			"scaleFactor": 1,
+			"scaleMethod": "fit"
 		}
 	]
 }
