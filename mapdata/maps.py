@@ -1,25 +1,36 @@
 import math
 import tempfile
+from dataclasses import dataclass
+from palettes.palette import Palette
 from mapdata.cities import getCities
 
+@dataclass
+class MapConfig:
+	"""Configuration for the map."""
+	scaleFactor: float
+	scaleMethod: str
+
+	focusLat: float
+	focusLong: float
+
+	hideCities: bool
+	hideAdmin0Borders: bool
+	hideAdmin1Borders: bool
+	hideRivers: bool
+	hideLakes: bool
+
 def readBaseSvg() -> str:
-	with open("mapdata/1981.svg", "r") as f:
+	"""Read the base SVG map file."""
+	with open("mapdata/1981.svg", "r", encoding="utf8") as f:
 		return f.read()
 
-def prepareSvg(svgData, palette, options = {
-	"hideRivers": False,
-	"hideAdmin0Borders": False,
-	"hideAdmin1Borders": False,
-	"hideLakes": False,
-	"focusLat": 0.0,
-	"focusLong": 0.0,
-	"scaleFactor": 1
-}) -> str:
+def prepareSvg(mapSvg: str, palette: Palette, options: MapConfig) -> str:
+	"""Apply color palette and other options to the SVG map."""
 	svgOrigWidth = 3213.05005
 	svgOrigHeight = 2468.23999
 
 	# cities
-	if not options["hideCities"]:
+	if not options.hideCities:
 		cities = getCities()
 		cityDataStr = '<g id="Cities">'
 		for city in cities:
@@ -28,99 +39,112 @@ def prepareSvg(svgData, palette, options = {
 			[cityX, cityY] = latLongToGallStereographic(cityLat, cityLong, svgOrigWidth)
 			cityX += svgOrigWidth / 2
 			cityY += svgOrigHeight / 2
-			cityDataStr += f'<circle cx="{cityX}" cy="{cityY}" r="2" fill="{palette["cities"]}" />'
+			cityDataStr += f'<circle cx="{cityX}" cy="{cityY}" r="2" fill="{palette.cities}" />'
 
 		cityDataStr += '</g></svg>'
-		svgData = svgData.replace('</svg>', cityDataStr)
+		mapSvg = mapSvg.replace('</svg>', cityDataStr)
 
 	# continent border width
-	continentBorderWidth = 6 / options["scaleFactor"]
-	admin0BorderWidth = 2 / options["scaleFactor"]
+	continentBorderWidth = 6 / options.scaleFactor
+	admin0BorderWidth = 2 / options.scaleFactor
 
 	# waterbodies
-	svgData = svgData.replace('.st0{fill:#50C8F4;', f'.st0{{fill:{palette["water"]};')
-	svgData = svgData.replace('.st3{fill:none;stroke:#50C8F4;', f'.st3{{fill:none;stroke:{palette["water"]};')
+	mapSvg = mapSvg.replace('.st0{fill:#50C8F4;', f'.st0{{fill:{palette.water};')
+	mapSvg = mapSvg.replace('.st3{fill:none;stroke:#50C8F4;', f'.st3{{fill:none;stroke:{palette.water};')
 
 	# admin1 borders
-	svgData = svgData.replace('.st1{fill:none;stroke:#808080;', f'.st1{{fill:none;stroke:{palette["admin1Border"]};')
+	mapSvg = mapSvg.replace('.st1{fill:none;stroke:#808080;', f'.st1{{fill:none;stroke:{palette.admin1Border};')
 
 	# admin0 borders
-	svgData = svgData.replace('.st2{fill:none;stroke:#000000;', f'.st2{{fill:none;stroke:{palette["admin0Border"]};')
-	svgData = svgData.replace('.st2{', f'.st2{{stroke-width:{admin0BorderWidth};')
+	mapSvg = mapSvg.replace('.st2{fill:none;stroke:#000000;', f'.st2{{fill:none;stroke:{palette.admin0Border};')
+	mapSvg = mapSvg.replace('.st2{', f'.st2{{stroke-width:{admin0BorderWidth};')
 
 	# continent borders
-	svgData = svgData.replace('stroke-width:2;', f'stroke-width:{continentBorderWidth};');
-	svgData = svgData.replace('.st4{fill:none;stroke:#000000;', f'.st4{{fill:none;stroke:{palette["continentsBorder"]};')
+	mapSvg = mapSvg.replace('stroke-width:2;', f'stroke-width:{continentBorderWidth};')
+	mapSvg = mapSvg.replace('.st4{fill:none;stroke:#000000;', f'.st4{{fill:none;stroke:{palette.continentsBorder};')
 
 	# metadata
-	svgData = svgData.replace('.st5{fill:#221F1F;', f'.st5{{fill:{palette["metadata"]};')
-	svgData = svgData.replace('.st12{fill:none;stroke:#231F20;', f'.st12{{fill:none;stroke:{palette["metadata"]};')
+	mapSvg = mapSvg.replace('.st5{fill:#221F1F;', f'.st5{{fill:{palette.metadata};')
+	mapSvg = mapSvg.replace('.st12{fill:none;stroke:#231F20;', f'.st12{{fill:none;stroke:{palette.metadata};')
 
-	if options["hideAdmin0Borders"]:
-		svgData = svgData.replace('g id="Admin_0_Polygon"', 'g id="Admin_0_Polygon" style="display:none"')
-		svgData = svgData.replace('g id="Admin_x5F_0_x5F_lines"', 'g id="Admin_x5F_0_x5F_lines" style="display:none"')
+	if options.hideAdmin0Borders:
+		mapSvg = mapSvg.replace('g id="Admin_0_Polygon"', 'g id="Admin_0_Polygon" style="display:none"')
+		mapSvg = mapSvg.replace('g id="Admin_x5F_0_x5F_lines"', 'g id="Admin_x5F_0_x5F_lines" style="display:none"')
 
-	if options["hideAdmin1Borders"]:
-		svgData = svgData.replace('g id="Admin_1_Polygon"', 'g id="Admin_1_Polygon" style="display:none"')
-		svgData = svgData.replace('g id="Admin_x5F_1_x5F_lines"', 'g id="Admin_x5F_1_x5F_lines" style="display:none"')
+	if options.hideAdmin1Borders:
+		mapSvg = mapSvg.replace('g id="Admin_1_Polygon"', 'g id="Admin_1_Polygon" style="display:none"')
+		mapSvg = mapSvg.replace('g id="Admin_x5F_1_x5F_lines"', 'g id="Admin_x5F_1_x5F_lines" style="display:none"')
 
-	if options["hideRivers"]:
-		svgData = svgData.replace('g id="Rivers"', 'g id="Rivers" style="display:none"')
+	if options.hideRivers:
+		mapSvg = mapSvg.replace('g id="Rivers"', 'g id="Rivers" style="display:none"')
 
-	if options["hideLakes"]:
-		svgData = svgData.replace('g id="Waterbodies"', 'g id="Waterbodies" style="display:none"')
+	if options.hideLakes:
+		mapSvg = mapSvg.replace('g id="Waterbodies"', 'g id="Waterbodies" style="display:none"')
 
 	# hide metadata
-	svgData = svgData.replace('g id="MetaData"', 'g id="MetaData" style="display:none"')
-	return svgData
+	mapSvg = mapSvg.replace('g id="MetaData"', 'g id="MetaData" style="display:none"')
+	return mapSvg
 
-def saveTempSvg(svgData: str) -> str:
-	temp = tempfile.NamedTemporaryFile(delete=False)
-	with open(temp.name, "w") as f:
-		f.write(svgData)
+def saveToTempFile(string: str) -> str:
+	"""Save a string to a temporary file and return its file path."""
+	with tempfile.NamedTemporaryFile(delete=False) as temp:
+		with open(temp.name, "w", encoding="utf8") as f:
+			f.write(string)
 	return temp.name
 
-def focusOnPoint(svgData, options, desiredWidth, desiredHeight) -> str:
+def focusOnPoint(mapSvg: str, options: MapConfig, desiredWidth: float, desiredHeight: float) -> str:
+	"""Focus map on a given Lat/Long."""
 	svgOrigWidth = 3213.05005
 	svgOrigHeight = 2468.23999
-	xOffset = -10
 
-	match options["scaleMethod"]:
-		case "constantScale":
-			newWidth = desiredWidth / options["scaleFactor"] * 3
-			newHeight = desiredHeight / options["scaleFactor"] * 3
-		case "withWidth":
-			newWidth = svgOrigWidth / options["scaleFactor"]
-			newHeight = newWidth * desiredHeight / desiredWidth
-		case "withHeight":
-			newHeight = svgOrigHeight / options["scaleFactor"]
-			newWidth = newHeight * desiredWidth / desiredHeight
-		case "fit":
-			if desiredWidth / svgOrigWidth < desiredHeight / svgOrigHeight:
-				newWidth = svgOrigWidth / options["scaleFactor"]
-				newHeight = newWidth * desiredHeight / desiredWidth
-			else:
-				newHeight = svgOrigHeight / options["scaleFactor"]
-				newWidth = newHeight * desiredWidth / desiredHeight
-
-	[projectedX, projectedY] = latLongToGallStereographic(options["focusLat"], options["focusLong"], svgOrigWidth)
+	[projectedX, projectedY] = latLongToGallStereographic(options.focusLat, options.focusLong, svgOrigWidth)
 	projectedX += svgOrigWidth / 2
 	projectedY += svgOrigHeight / 2
 
-	# inserting circle at focus point
-	svgData = svgData.replace('</svg>', f'<circle cx="{projectedX}" cy="{projectedY}" r="2" fill="red" /></svg>')
+	[newWidth, newHeight] = calcNewDimensions(svgOrigWidth, svgOrigHeight,
+																					 options.scaleMethod, options.scaleFactor,
+																					 desiredWidth, desiredHeight)
 
 	newX = projectedX - newWidth / 2
 	newY = projectedY - newHeight / 2
 
 	viewboxLen = len('viewBox="')
-	newViewbox = f"{newX} {newY} {newWidth} {newHeight}"
 	# find location of original viewbox
-	viewBoxStart = svgData.find('viewBox="')
-	viewBoxEnd = svgData.find('"', viewBoxStart + viewboxLen)
+	viewBoxStart = mapSvg.find('viewBox="')
+	viewBoxEnd = mapSvg.find('"', viewBoxStart + viewboxLen)
 
-	return svgData[:viewBoxStart + viewboxLen] + newViewbox + svgData[viewBoxEnd:]
+	return mapSvg[:viewBoxStart + viewboxLen] + f"{newX} {newY} {newWidth} {newHeight}" + mapSvg[viewBoxEnd:]
 
+def calcNewDimensions(svgOrigWidth: float,
+											svgOrigHeight: float,
+											scaleMethod: str,
+											scaleFactor: float,
+											desiredWidth: float,
+											desiredHeight: float
+											) -> tuple[float, float]:
+	"""Calculate new dimensions for the map based on the given options."""
+
+	match scaleMethod:
+		case "constantScale":
+			newWidth = desiredWidth / scaleFactor * 3
+			newHeight = desiredHeight / scaleFactor * 3
+		case "withWidth":
+			newWidth = svgOrigWidth / scaleFactor
+			newHeight = newWidth * desiredHeight / desiredWidth
+		case "withHeight":
+			newHeight = svgOrigHeight / scaleFactor
+			newWidth = newHeight * desiredWidth / desiredHeight
+		case "fit":
+			if desiredWidth / svgOrigWidth < desiredHeight / svgOrigHeight:
+				newWidth = svgOrigWidth / scaleFactor
+				newHeight = newWidth * desiredHeight / desiredWidth
+			else:
+				newHeight = svgOrigHeight / scaleFactor
+				newWidth = newHeight * desiredWidth / desiredHeight
+		case _:
+			raise ValueError(f"Invalid scale method: {scaleMethod}")
+
+	return (newWidth, newHeight)
 
 def latLongToGallStereographic(lat: float, long: float, mapWidth: float) -> tuple[float, float]:
 	"""Convert latitude and longitude to Gall Stereographic coordinates."""
@@ -133,11 +157,11 @@ def latLongToGallStereographic(lat: float, long: float, mapWidth: float) -> tupl
 	elif long > 180 - longOffset:
 		long -= 360
 
-	R = mapWidth / (2 * math.pi)
+	radius = mapWidth / (2 * math.pi)
 	latRad = math.radians(lat)
 	longRad = math.radians(long)
 
-	x = R * longRad # the formula should divide by sqrt(2) here but for some reason that gives the wrong result
-	y = -R * (math.sqrt(2) + 1) * math.tan(latRad / 2)
+	x = radius * longRad # the formula should divide by sqrt(2) here but for some reason that gives the wrong result
+	y = -radius * (math.sqrt(2) + 1) * math.tan(latRad / 2)
 
 	return (x, y)

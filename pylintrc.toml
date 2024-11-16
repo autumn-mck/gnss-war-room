@@ -1,0 +1,34 @@
+[tool.pylint.main]
+py-version = "3.12"
+
+[tool.pylint.basic]
+# camelCase is more readable to me
+argument-naming-style = "camelCase"
+attr-naming-style = "camelCase"
+function-naming-style = "camelCase"
+method-naming-style = "camelCase"
+module-naming-style = "camelCase"
+variable-naming-style = "camelCase"
+class-naming-style = "PascalCase"
+
+docstring-min-length = 6 # on shorter functions, case by case basis
+
+[tool.pylint.design]
+min-public-methods = 0 # PyQt windows generate false positives otherwise
+max-args = 6           # default of 5 seems slightly too low
+max-attributes = 12    # default of 7 seems slightly too low
+
+[tool.pylint.format]
+indent-string = "\t"
+max-line-length = 120
+
+[tool.pylint.refactoring]
+max-nested-blocks = 2
+
+# warnings to disable
+[tool.pylint.messages_control]
+disable = [
+	"missing-module-docstring",      # i don't see a need for this
+	"no-name-in-module",             # false positive on laptop with external packages
+	"too-many-positional-arguments", # i don't see a need for this
+]

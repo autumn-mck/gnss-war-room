@@ -3,8 +3,9 @@ import itertools
 
 # see https://download.geonames.org/export/dump/ (readme at bottom)
 
-def getCities() -> list:
-	cities = []
+def getCities() -> list[list[str]]:
+	"""Get a filtered list of cities to display on the map"""
+	cities: list[list[str]] = []
 
 	citiesByCountry = readCityInfo()
 	countriesInfo = readCountryInfo()
@@ -16,7 +17,9 @@ def getCities() -> list:
 		citiesInCountry = filterToMinPop(citiesInCountry, 100000)
 		citiesInCountry = sortCitiesByPop(citiesInCountry)
 		citiesInCountry = filterToMaxNumCities(citiesInCountry, countryInfo)
-		citiesInCountry = filterToPopPercent(citiesInCountry, countryInfo, 0.2, 3) # does this one do much at this point?
+
+		# does this one do much at this point?
+		citiesInCountry = filterToPopPercent(citiesInCountry, countryInfo, 0.2, 3)
 
 		cities += citiesInCountry
 
@@ -25,7 +28,11 @@ def getCities() -> list:
 def filterToMinPop(citiesInCountry: list[list[str]], minPop: int) -> list[list[str]]:
 	return [city for city in citiesInCountry if int(city[14]) > minPop]
 
-def filterToPopPercent(citiesInCountry: list[list[str]], countryInfo: list[str], percent: float, minCities: int) -> list[list[str]]:
+def filterToPopPercent(citiesInCountry: list[list[str]],
+											 countryInfo: list[str],
+											 percent: float,
+											 minCities: int
+											 ) -> list[list[str]]:
 	""":param citiesInCountry: sorted list of cities in a country"""
 	countryPop = float(countryInfo[7])
 	addedPop = 0
@@ -50,8 +57,8 @@ def filterToMaxNumCities(citiesInCountry: list[list[str]], countryInfo: list[str
 def sortCitiesByPop(citiesInCountry: list[list[str]]):
 	return sorted(citiesInCountry, key=lambda x: int(x[14]), reverse=True)
 
-def calcMaxNumCitiesToInclude(countryInfo) -> int:
-	# proportional to area and population
+def calcMaxNumCitiesToInclude(countryInfo: list[str]) -> int:
+	"""Calculate the maximum number of cities to include in a country, based on both its population and area"""
 	extraCityPerMillion = 0.05
 	extraCityPerThousandKm2 = 0.05
 
@@ -59,7 +66,8 @@ def calcMaxNumCitiesToInclude(countryInfo) -> int:
 	popMillions = int(countryInfo[7]) / 1000000
 	return int(popMillions * extraCityPerMillion + area * extraCityPerThousandKm2)
 
-def readCityInfo():
+def readCityInfo() -> dict[str, list[list[str]]]:
+	"""Read the city info from the file and group it by country"""
 	rawCityInfo = readTSV("./mapdata/cities15000.txt")
 	cityInfo = {
 		country: list(cities)
@@ -67,14 +75,14 @@ def readCityInfo():
 	}
 	return cityInfo
 
-def readCountryInfo():
+def readCountryInfo() -> dict[str, list[str]]:
 	rawCountryInfo = readTSV("./mapdata/countryInfo.txt")
 	countryInfo = {
-		row[0]: row for row in rawCountryInfo
+		row[0]: row for row in rawCountryInfo # key is the country code
 	}
 	return countryInfo
 
 def readTSV(filename: str) -> list[list[str]]:
 	with open(filename, "r", encoding="utf8") as f:
 		rd = csv.reader(f, delimiter="\t")
-		return [row for row in rd]
+		return list(rd)
