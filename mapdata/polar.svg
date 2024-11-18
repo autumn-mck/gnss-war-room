@@ -1,0 +1,13 @@
+<svg version="1.1" viewBox="0 0 94 94" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<rect width="94" height="94" fill="#fff"/>
+	<g stroke="#aaa" stroke-width=".5" fill="none">
+		<circle cx="47" cy="47" r="32"/>
+		<circle cx="47" cy="47" r="48"/>
+	</g>
+	<use transform="rotate(180 47 47)" xlink:href="#a"/>
+	<g id="a" fill="none" stroke-width=".5">
+		<path d="m71 6-24 41 41-24m-82 0 41 24-24-41" stroke="#aaa"/>
+		<path d="m49 15h-4m-30 30v4m32-50 0 48-48 0" stroke="#000"/>
+	</g>
+	<circle cx="47" cy="47" r="16" stroke="#aaa" stroke-width=".5" fill="none"/>
+</svg>

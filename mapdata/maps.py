@@ -1,11 +1,13 @@
 import math
 import tempfile
 from dataclasses import dataclass
+from dataclass_wizard import JSONWizard
 from palettes.palette import Palette
 from mapdata.cities import getCities
+from nmea import getSatelitesGroupedByPrn, getSatelliteLatLong
 
 @dataclass
-class MapConfig:
+class MapConfig(JSONWizard):
 	"""Configuration for the map."""
 	scaleFactor: float
 	scaleMethod: str
@@ -18,6 +20,14 @@ class MapConfig:
 	hideAdmin1Borders: bool
 	hideRivers: bool
 	hideLakes: bool
+
+	class _(JSONWizard.Meta):
+		tag = "worldMap"
+
+@dataclass
+class PolalGridConfig(JSONWizard):
+	class _(JSONWizard.Meta):
+		tag = "satellitePolarGrid"
 
 def readBaseSvg() -> str:
 	"""Read the base SVG map file."""
@@ -43,6 +53,9 @@ def prepareSvg(mapSvg: str, palette: Palette, options: MapConfig) -> str:
 
 		cityDataStr += '</g></svg>'
 		mapSvg = mapSvg.replace('</svg>', cityDataStr)
+
+	# satellites
+	mapSvg = insertSatellitePositions(mapSvg, svgOrigWidth, svgOrigHeight)
 
 	# continent border width
 	continentBorderWidth = 6 / options.scaleFactor
@@ -84,6 +97,20 @@ def prepareSvg(mapSvg: str, palette: Palette, options: MapConfig) -> str:
 	# hide metadata
 	mapSvg = mapSvg.replace('g id="MetaData"', 'g id="MetaData" style="display:none"')
 	return mapSvg
+
+def insertSatellitePositions(mapSvg: str, svgOrigWidth: float, svgOrigHeight: float) -> str:
+	"""Insert satellite positions into the SVG"""
+	sateliteStr = '<g id="Satellites">'
+	satellites = getSatelitesGroupedByPrn()
+	for _, satellites in satellites.items():
+		for satellite in satellites:
+			lat, long = getSatelliteLatLong(satellite)
+			[x, y] = latLongToGallStereographic(lat, long, svgOrigWidth)
+			x += svgOrigWidth / 2
+			y += svgOrigHeight / 2
+			sateliteStr += f'<circle cx="{x}" cy="{y}" r="3" fill="red" />'
+	sateliteStr += '</g></svg>'
+	return mapSvg.replace('</svg>', sateliteStr)
 
 def saveToTempFile(string: str) -> str:
 	"""Save a string to a temporary file and return its file path."""

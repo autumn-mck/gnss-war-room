@@ -3,6 +3,7 @@
 	"multiScreen": false,
 	"windows": [
 		{
+			"type": "worldMap",
 			"hideRivers": true,
 			"hideLakes": true,
 			"hideAdmin1Borders": true,
@@ -14,6 +15,7 @@
 			"scaleMethod": "constantScale"
 		},
 		{
+			"type": "worldMap",
 			"hideRivers": true,
 			"hideLakes": true,
 			"hideAdmin1Borders": true,
@@ -23,6 +25,9 @@
 			"focusLong": 10,
 			"scaleFactor": 1,
 			"scaleMethod": "fit"
+		},
+		{
+			"type": "satellitePolarGrid"
 		}
 	]
 }
