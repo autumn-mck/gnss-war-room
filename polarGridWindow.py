@@ -68,10 +68,10 @@ def prepareSvg(svgData, palette) -> str:
 	return svgData
 
 def azimuthToPolarCoords(azimuth: float, elevation: float, scale: float):
-	radius = math.cos(math.radians(elevation))
+	radius = math.cos(math.radians(elevation)) * scale / 2
 	angle = math.radians(azimuth)
-	x = radius * math.sin(angle) * scale / 2 + scale / 2
-	y = radius * math.cos(angle) * scale / 2 + scale / 2
+	x = radius * math.sin(angle) + scale / 2
+	y = scale / 2 - radius * math.cos(angle)
 	return (x, y)
 
 
