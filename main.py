@@ -7,6 +7,7 @@ from palettes.palette import loadPalette
 from mapdata.maps import MapConfig, PolalGridConfig
 from mapWindow import MapWindow
 from polarGridWindow import PolarGridWindow
+import pyjson5
 
 @dataclass
 class Config(JSONWizard):
@@ -22,8 +23,8 @@ def main():
 	"""Main function"""
 	app = QApplication(sys.argv)
 
-	with open("config.json", "r", encoding="utf8") as f:
-		appConfig = Config.from_json(f.read())
+	with open("config.json5", "r", encoding="utf8") as f:
+		appConfig = Config.from_dict(pyjson5.decode(f.read()))
 		if isinstance(appConfig, list):
 			appConfig = appConfig[0]
 
