@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 from dataclasses import dataclass
 from dataclass_wizard import JSONWizard
