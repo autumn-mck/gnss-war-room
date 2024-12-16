@@ -102,13 +102,31 @@ def insertSatellitePositions(mapSvg: str, svgOrigWidth: float, svgOrigHeight: fl
 	"""Insert satellite positions into the SVG"""
 	sateliteStr = '<g id="Satellites">'
 	satellites = getSatelitesGroupedByPrn()
+
+	colours = [
+		"#ff0000",
+		"#ff00ff",
+		"#00ff00",
+		"#0000ff",
+		"#ffff00",
+		"#00ffff",
+		"#ffffff"
+	]
+	colourCount = 0
+
 	for _, satellites in satellites.items():
+		colour = colours[colourCount % len(colours)]
+		colourCount += 1
 		for satellite in satellites:
 			lat, long = getSatelliteLatLong(satellite)
+			# hardcoded measure position for now
+			lat += 54.5
+			long += -5.9
+
 			[x, y] = latLongToGallStereographic(lat, long, svgOrigWidth)
 			x += svgOrigWidth / 2
 			y += svgOrigHeight / 2
-			sateliteStr += f'<circle cx="{x}" cy="{y}" r="3" fill="red" />'
+			sateliteStr += f'<circle cx="{x}" cy="{y}" r="30" fill="{colour}" />'
 	sateliteStr += '</g></svg>'
 	return mapSvg.replace('</svg>', sateliteStr)
 
@@ -177,6 +195,14 @@ def latLongToGallStereographic(lat: float, long: float, mapWidth: float) -> tupl
 	"""Convert latitude and longitude to Gall Stereographic coordinates."""
 	longOffset = -10
 	long += longOffset
+
+	# "bounce" off the top when wrapping over the poles
+	if lat > 90:
+		lat = 180 - lat
+		long += 180
+	elif lat < -90:
+		lat = -180 - lat
+		long += 180
 
 	# wrap around the world as the map is not centered at 0
 	if long < -180 - longOffset:
