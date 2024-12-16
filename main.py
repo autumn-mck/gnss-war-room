@@ -3,13 +3,13 @@
 import sys
 from dataclasses import dataclass
 from dataclass_wizard import JSONWizard
+import pyjson5
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtWidgets import QMainWindow
 from palettes.palette import loadPalette
 from mapdata.maps import MapConfig, PolalGridConfig
 from mapWindow import MapWindow
 from polarGridWindow import PolarGridWindow
-import pyjson5
 
 @dataclass
 class Config(JSONWizard):
@@ -27,8 +27,6 @@ def main():
 
 	with open("config.json5", "r", encoding="utf8") as f:
 		appConfig = Config.from_dict(pyjson5.decode(f.read()))
-		if isinstance(appConfig, list):
-			appConfig = appConfig[0]
 
 	palette = loadPalette(appConfig.paletteName)
 	screens = app.screens()
