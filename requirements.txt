@@ -4,3 +4,5 @@ PyQt6==6.7.1
 pynmeagps==1.0.43
 pyserial==3.5
 pyjson5==1.6.7
+paho-mqtt==2.1.0
+python-dotenv==1.0.1

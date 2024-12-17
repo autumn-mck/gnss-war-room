@@ -1,0 +1,4 @@
+topic read gnss/#
+
+user gnssreceiver
+topic write gnss/#
