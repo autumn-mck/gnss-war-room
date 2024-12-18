@@ -1,44 +1,13 @@
-import itertools
 import math
 from dataclasses import dataclass
-from pynmeagps import NMEAReader, NMEAMessage
 
 @dataclass
 class SatelliteInView:
 	prnNumber: int
+	network: str
 	elevation: float
 	azimuth: float
 	snr: float
-
-def parseSatelliteInMessage(parsedData: NMEAMessage) -> list[SatelliteInView]:
-	"""Parse a GSV message into a list of SatelliteInView objects"""
-	if parsedData.msgID != 'GSV':
-		raise ValueError(f"Expected GSV message, got {parsedData.msgID}")
-
-	return [
-		SatelliteInView(
-			prnNumber=getattr(parsedData, f'svid_0{satNum+1}'),
-			elevation=getattr(parsedData, f'elv_0{satNum+1}'),
-			azimuth=getattr(parsedData, f'az_0{satNum+1}'),
-			snr=getattr(parsedData, f'cno_0{satNum+1}')
-		)
-		for satNum in range(3)
-		if hasattr(parsedData, f'svid_0{satNum+1}')
-	]
-
-def parseNmeaFile(filename: str) -> list[NMEAMessage]:
-	with open(filename, 'rb') as stream:
-		nmr = NMEAReader(stream, nmeaonly=True)
-		return [
-			parsedData for rawData, parsedData in nmr
-			if isinstance(parsedData, NMEAMessage)
-		]
-
-def selectGSV(nmeaMessages: list[NMEAMessage]) -> list[NMEAMessage]:
-	return [
-		parsedData for parsedData in nmeaMessages
-		if parsedData.msgID == 'GSV'
-	]
 
 def groupSatellitesByPrn(satellites: list[SatelliteInView]) -> dict[int, list[SatelliteInView]]:
 	"""Group satellites by PRN number"""
@@ -49,16 +18,19 @@ def groupSatellitesByPrn(satellites: list[SatelliteInView]) -> dict[int, list[Sa
 		satellitesByPrn[satellite.prnNumber].append(satellite)
 	return satellitesByPrn
 
-def getSatelitesGroupedByPrn() -> dict[int, list[SatelliteInView]]:
-	"""Get satellites grouped by PRN number"""
-	nmeaMessages = parseNmeaFile('test.nmea')
-	gsvMessages = selectGSV(nmeaMessages)
-	allSatelliteData = list(
-		itertools.chain.from_iterable(
-		parseSatelliteInMessage(gsvMessage)
-		for gsvMessage in gsvMessages))
-	satellitesByPrn = groupSatellitesByPrn(allSatelliteData)
-	return satellitesByPrn
+def colourForNetwork(network: str) -> str:
+	match network:
+		case "GA": # Galileo
+			return "#ff0000"
+		case "GP": # GPS
+			return "#ff00ff"
+		case "GL": # GLONASS
+			return "#00ff00"
+		case "BD" | "GB": # BeiDou
+			return "#0000ff"
+		case _: # something else I need to add
+			print(network)
+			return "#ffffff"
 
 def azimuthToWorldXyz(azimuth: float, elevation: float) -> tuple[float, float, float]:
 	"""Projecting from the azimuth and elevation to the world xyz coordinates

@@ -6,6 +6,7 @@ from dataclass_wizard import JSONWizard
 import pyjson5
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtWidgets import QMainWindow
+from mqtt import createMqttClient
 from palettes.palette import loadPalette
 from mapdata.maps import MapConfig, PolalGridConfig
 from mapWindow import MapWindow
@@ -42,7 +43,8 @@ def main():
 			handleMultiScreen(screens, window, count)
 		count += 1
 
-	app.exec()
+	createMqttClient(windows)
+	app.exec() # blocks until the app is closed
 
 def handleMultiScreen(screens: list, window: QMainWindow, index: int):
 	"""Handle multi-screen setup"""

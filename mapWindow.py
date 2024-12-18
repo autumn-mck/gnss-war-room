@@ -3,6 +3,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QResizeEvent, QKeyEvent
 from mapdata.maps import readBaseSvg, prepareSvg, focusOnPoint, saveToTempFile, MapConfig
+from gnss.satellite import SatelliteInView
 from palettes.palette import Palette
 
 class MapWindow(QMainWindow):
@@ -14,6 +15,7 @@ class MapWindow(QMainWindow):
 		defaultHeight = 500
 
 		self.windowConfig = windowConfig
+		self.customPalette = palette
 
 		self.setWindowTitle("GNSS War Room")
 
@@ -21,7 +23,8 @@ class MapWindow(QMainWindow):
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
 
 		mapSvg = readBaseSvg()
-		mapSvg = prepareSvg(mapSvg, palette, windowConfig)
+		initialSatellites = [] # wait for initial satellites to be received
+		mapSvg = prepareSvg(mapSvg, palette, windowConfig, initialSatellites)
 		mapSvg = focusOnPoint(mapSvg, windowConfig, defaultWidth, defaultHeight)
 
 		self.svgFile = saveToTempFile(mapSvg)
@@ -76,3 +79,12 @@ class MapWindow(QMainWindow):
 			self.moveMapBy(0, -toMove)
 		if event.key() == Qt.Key.Key_D:
 			self.moveMapBy(0, toMove)
+
+	def onSatellitesReceived(self, satellites: list[SatelliteInView]):
+		"""Handle new satellite data"""
+		mapSvg = readBaseSvg()
+
+		mapSvg = prepareSvg(mapSvg, self.customPalette, self.windowConfig, satellites)
+		mapSvg = focusOnPoint(mapSvg, self.windowConfig, self.map.width(), self.map.height())
+		self.svgFile = saveToTempFile(mapSvg)
+		self.map.load(self.svgFile)

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from dataclass_wizard import JSONWizard
 from palettes.palette import Palette
 from mapdata.cities import getCities
-from nmea import getSatelitesGroupedByPrn, getSatelliteLatLong
+from gnss.satellite import SatelliteInView, colourForNetwork, getSatelliteLatLong
 
 @dataclass
 class MapConfig(JSONWizard):
@@ -34,7 +34,7 @@ def readBaseSvg() -> str:
 	with open("mapdata/1981.svg", "r", encoding="utf8") as f:
 		return f.read()
 
-def prepareSvg(mapSvg: str, palette: Palette, options: MapConfig) -> str:
+def prepareSvg(mapSvg: str, palette: Palette, options: MapConfig, currentSatellites: list[SatelliteInView]) -> str:
 	"""Apply color palette and other options to the SVG map."""
 	svgOrigWidth = 3213.05005
 	svgOrigHeight = 2468.23999
@@ -55,7 +55,7 @@ def prepareSvg(mapSvg: str, palette: Palette, options: MapConfig) -> str:
 		mapSvg = mapSvg.replace('</svg>', cityDataStr)
 
 	# satellites
-	mapSvg = insertSatellitePositions(mapSvg, svgOrigWidth, svgOrigHeight)
+	mapSvg = insertSatellitePositions(mapSvg, svgOrigWidth, svgOrigHeight, currentSatellites)
 
 	# continent border width
 	continentBorderWidth = 6 / options.scaleFactor
@@ -98,35 +98,25 @@ def prepareSvg(mapSvg: str, palette: Palette, options: MapConfig) -> str:
 	mapSvg = mapSvg.replace('g id="MetaData"', 'g id="MetaData" style="display:none"')
 	return mapSvg
 
-def insertSatellitePositions(mapSvg: str, svgOrigWidth: float, svgOrigHeight: float) -> str:
+def insertSatellitePositions(mapSvg: str,
+			     svgOrigWidth: float,
+					 svgOrigHeight: float,
+					 satellites: list[SatelliteInView]
+					 ) -> str:
 	"""Insert satellite positions into the SVG"""
 	sateliteStr = '<g id="Satellites">'
-	satellites = getSatelitesGroupedByPrn()
 
-	colours = [
-		"#ff0000",
-		"#ff00ff",
-		"#00ff00",
-		"#0000ff",
-		"#ffff00",
-		"#00ffff",
-		"#ffffff"
-	]
-	colourCount = 0
+	for satellite in satellites:
+		colour = colourForNetwork(satellite.network)
+		lat, long = getSatelliteLatLong(satellite)
+		# hardcoded measure position for now
+		lat += 54.5
+		long += -5.9
 
-	for _, satellites in satellites.items():
-		colour = colours[colourCount % len(colours)]
-		colourCount += 1
-		for satellite in satellites:
-			lat, long = getSatelliteLatLong(satellite)
-			# hardcoded measure position for now
-			lat += 54.5
-			long += -5.9
-
-			[x, y] = latLongToGallStereographic(lat, long, svgOrigWidth)
-			x += svgOrigWidth / 2
-			y += svgOrigHeight / 2
-			sateliteStr += f'<circle cx="{x}" cy="{y}" r="30" fill="{colour}" />'
+		[x, y] = latLongToGallStereographic(lat, long, svgOrigWidth)
+		x += svgOrigWidth / 2
+		y += svgOrigHeight / 2
+		sateliteStr += f'<circle cx="{x}" cy="{y}" r="30" fill="{colour}" />'
 	sateliteStr += '</g></svg>'
 	return mapSvg.replace('</svg>', sateliteStr)
 

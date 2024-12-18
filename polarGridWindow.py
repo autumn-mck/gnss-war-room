@@ -4,7 +4,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtGui import QResizeEvent
 from palettes.palette import Palette
 from mapdata.maps import saveToTempFile
-from nmea import getSatelitesGroupedByPrn
+from gnss.satellite import SatelliteInView, colourForNetwork
 
 class PolarGridWindow(QMainWindow):
 	"""Window for displaying the positions of satellites"""
@@ -12,11 +12,13 @@ class PolarGridWindow(QMainWindow):
 		super().__init__()
 		self.setWindowTitle("Polar Grid")
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
+		self.customPalette = palette
 
 		with open("mapdata/polar.svg", "r", encoding="utf8") as f:
 			svgData = f.read()
 
-		svgData = prepareSvg(svgData, palette)
+		initialSatellites = [] # wait for data
+		svgData = prepareSvg(svgData, palette, initialSatellites)
 		self.svgFile = saveToTempFile(svgData)
 		self.map = QSvgWidget(self.svgFile, parent=self)
 		self.map.setGeometry(0, 0, 400, 400)
@@ -30,8 +32,16 @@ class PolarGridWindow(QMainWindow):
 		minSize = min(newX, newY)
 		self.map.setGeometry(0, 0, minSize, minSize)
 
+	def onSatellitesReceived(self, satellites: list[SatelliteInView]):
+		"""Update the positions of satellites"""
+		with open("mapdata/polar.svg", "r", encoding="utf8") as f:
+			svgData = f.read()
+		svgData = prepareSvg(svgData, self.customPalette, satellites)
+		self.svgFile = saveToTempFile(svgData)
+		self.map.load(self.svgFile)
 
-def prepareSvg(svgData, palette) -> str:
+
+def prepareSvg(svgData, palette, satelites: list[SatelliteInView]) -> str:
 	"""Apply color palette to the SVG and add satellite positions"""
 	svgData = svgData.replace('fill="#fff"', f'fill="{palette.background}"')
 	svgData = svgData.replace('stroke="#aaa"', f'stroke="{palette.foreground}"')
@@ -39,28 +49,13 @@ def prepareSvg(svgData, palette) -> str:
 
 	scale = 94
 
-	colours = [
-		"#ff0000",
-		"#ff00ff",
-		"#00ff00",
-		"#0000ff",
-		"#ffff00",
-		"#00ffff",
-		"#ffffff"
-	]
-
-	satelites = getSatelitesGroupedByPrn()
 	sateliteStr: str = '<g id="Satellites">'
-	count = 0
-	for _, satelites in satelites.items():
-		for satelite in satelites:
-			azimuth = satelite.azimuth
-			elevation = satelite.elevation
-			(x, y) = azimuthToPolarCoords(azimuth, elevation, scale)
-			sateliteStr += f'<circle cx="{x}" cy="{y}" r="2" fill="{colours[count]}" />'
-		count += 1
-		if count % len(colours) == 0:
-			count = 0
+	for satelite in satelites:
+		colour = colourForNetwork(satelite.network)
+		azimuth = satelite.azimuth
+		elevation = satelite.elevation
+		(x, y) = azimuthToPolarCoords(azimuth, elevation, scale)
+		sateliteStr += f'<circle cx="{x}" cy="{y}" r="2" fill="{colour}" />'
 	sateliteStr += '</g></svg>'
 
 	svgData = svgData.replace('</svg>', sateliteStr)

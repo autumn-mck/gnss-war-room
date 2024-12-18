@@ -11,7 +11,7 @@
 			"hideCities": false,
 			"focusLat": 54.6,
 			"focusLong": -6.0,
-			"scaleFactor": 4,
+			"scaleFactor": 2,
 			"scaleMethod": "constantScale"
 		},
 		{
