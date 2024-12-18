@@ -5,9 +5,6 @@ import paho.mqtt.client as mqtt
 import paho.mqtt.enums as mqttEnums
 from dotenv import load_dotenv
 
-def reconnectOnDisconnect(client, _userdata, _rc, _reasonCode, _properties):
-	client.reconnect()
-
 def createMqttClient():
 	"""Create a new MQTT client"""
 	mqttClient = mqtt.Client(mqttEnums.CallbackAPIVersion.VERSION2, client_id="publisher")
@@ -17,21 +14,24 @@ def createMqttClient():
 	mqttClient.loop_start()
 	return mqttClient
 
-def parseThroughLinesOnTime(lines: list[str], mqttClient: mqtt.Client):
+def reconnectOnDisconnect(client, _userdata, _rc, _reasonCode, _properties):
+	client.reconnect()
+
+def parseAndPublishLines(lines: list[str], mqttClient: mqtt.Client):
 	"""Parse a list of lines, waiting for the timestamp to pass"""
 	lastTimestamp = None
 
 	for line in lines:
 		data = line.split('\t')
 		timestamp = data[0]
-		nmeaMessage = data[1]
+		nmeaMessage = data[1].strip()
 		parsedTimestamp = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S.%f")
 
 		if lastTimestamp is not None:
 			delta = parsedTimestamp - lastTimestamp
 			sleep(delta.total_seconds())
-		print(nmeaMessage.strip())
-		mqttClient.publish("gnss/rawMessages", nmeaMessage.strip(), qos=2)
+		print(nmeaMessage)
+		mqttClient.publish("gnss/rawMessages", nmeaMessage, qos=2)
 		lastTimestamp = parsedTimestamp
 
 def main():
@@ -40,7 +40,7 @@ def main():
 	mqttClient = createMqttClient()
 	with open('test.nmea', 'r', encoding='utf-8') as f:
 		lines = f.readlines()
-	parseThroughLinesOnTime(lines, mqttClient)
+	parseAndPublishLines(lines, mqttClient)
 
 if __name__ == "__main__":
 	main()
