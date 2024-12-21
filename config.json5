@@ -1,6 +1,8 @@
 {
 	"paletteName": "warGames",
 	"multiScreen": false,
+	"mqttHost": "localhost",
+	"mqttPort": 1883,
 	"windows": [
 		{
 			"type": "worldMap",

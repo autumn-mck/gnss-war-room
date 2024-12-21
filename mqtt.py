@@ -5,17 +5,18 @@ import paho.mqtt.enums as mqttEnums
 from paho.mqtt.client import Client as MqttClient, MQTTMessage
 from PyQt6.QtWidgets import QMainWindow
 from pynmeagps import NMEAReader, NMEAMessage
+from config import Config
 
 from mapWindow import MapWindow
 from gnss.nmea import parseSatelliteInMessage
 from gnss.satellite import SatelliteInView
 from polarGridWindow import PolarGridWindow
 
-def createMqttClient(windows: list[QMainWindow]) -> MqttClient:
+def createMqttClient(windows: list[QMainWindow], config: Config) -> MqttClient:
 	"""Create a new MQTT client"""
 	mqttClient = MqttClient(mqttEnums.CallbackAPIVersion.VERSION2)
 	mqttClient.on_message = createOnMessageCallback(windows)
-	mqttClient.connect("localhost")
+	mqttClient.connect(config.mqttHost, config.mqttPort)
 	mqttClient.subscribe("gnss/rawMessages")
 	mqttClient.loop_start()
 	return mqttClient

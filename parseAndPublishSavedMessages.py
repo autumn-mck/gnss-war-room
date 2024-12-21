@@ -5,12 +5,15 @@ import paho.mqtt.client as mqtt
 import paho.mqtt.enums as mqttEnums
 from dotenv import load_dotenv
 
+from config import loadConfig
+
 def createMqttClient():
 	"""Create a new MQTT client"""
+	appConfig = loadConfig()
 	mqttClient = mqtt.Client(mqttEnums.CallbackAPIVersion.VERSION2, client_id="publisher")
 	mqttClient.on_disconnect = reconnectOnDisconnect
 	mqttClient.username_pw_set("gnssreceiver", os.environ.get("RECEIVER_MQTT_PASSWORD"))
-	mqttClient.connect("localhost")
+	mqttClient.connect(appConfig.mqttHost, appConfig.mqttPort)
 	mqttClient.loop_start()
 	return mqttClient
 
@@ -29,7 +32,7 @@ def parseAndPublishLines(lines: list[str], mqttClient: mqtt.Client):
 
 		if lastTimestamp is not None:
 			delta = parsedTimestamp - lastTimestamp
-			sleep(delta.total_seconds())
+			sleep(delta.total_seconds() / 240)
 		print(nmeaMessage)
 		mqttClient.publish("gnss/rawMessages", nmeaMessage, qos=2)
 		lastTimestamp = parsedTimestamp
