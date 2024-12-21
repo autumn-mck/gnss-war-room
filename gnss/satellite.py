@@ -32,7 +32,21 @@ def colourForNetwork(network: str) -> str:
 			print(network)
 			return "#ffffff"
 
-def azimuthToWorldXyz(azimuth: float, elevation: float) -> tuple[float, float, float]:
+def orbitHeightForNetwork(network: str) -> float:
+	match network:
+		case "GA": # Galileo
+			return 23.222
+		case "GP": # GPS
+			return 20.18
+		case "GL": # GLONASS
+			return 19.13
+		case "BD" | "GB": # BeiDou (todo: there appears to be satellites at a few different orbit heights)
+			return 21.528
+		case _: # something else I need to add
+			print(network)
+			return 21.0 # in the middle-ish
+
+def azimuthToWorldXyz(satellite: SatelliteInView) -> tuple[float, float, float]:
 	"""Projecting from the azimuth and elevation to the world xyz coordinates
 	:param azimuth: azimuth in radians
 	:param elevation: elevation in radians
@@ -40,8 +54,11 @@ def azimuthToWorldXyz(azimuth: float, elevation: float) -> tuple[float, float, f
 	# https://www.desmos.com/3d/jxqcoesfg3 for visualisation of 3d,
 	# https://www.desmos.com/calculator/9ihgqyaqkw for 2d
 
-	orbit = 19.13
+	orbit = orbitHeightForNetwork(satellite.network)
 	ground = 6.37
+
+	elevation = satellite.elevation
+	azimuth = satellite.azimuth
 
 	x1, x2 = calcX(elevation, orbit, ground)
 	x1 *= math.cos(math.radians(azimuth))
@@ -102,8 +119,6 @@ def xyzToLatLong(x: float, y: float, z: float) -> tuple[float, float]:
 
 def getSatelliteLatLong(satellite: SatelliteInView) -> tuple[float, float]:
 	"""Get the lat long coordinates of a satellite"""
-	azimuth = satellite.azimuth
-	elevation = satellite.elevation
-	x, y, z = azimuthToWorldXyz(azimuth, elevation)
+	x, y, z = azimuthToWorldXyz(satellite)
 	lat, long = xyzToLatLong(x, y, z)
 	return (lat, long)
