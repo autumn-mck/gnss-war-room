@@ -1,0 +1,56 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"type": "object",
+	"properties": {
+		"background": {
+			"type": "string"
+		},
+		"foreground": {
+			"type": "string"
+		},
+		"water": {
+			"type": "string"
+		},
+		"admin0Border": {
+			"type": "string"
+		},
+		"admin1Border": {
+			"type": "string"
+		},
+		"continentsBorder": {
+			"type": "string"
+		},
+		"metadata": {
+			"$ref": "#/definitions/colour"
+		},
+		"cities": {
+			"$ref": "#/definitions/colour"
+		},
+		"satelliteNetworks": {
+			"type": "object",
+			"patternProperties": {
+				"^[A-Za-z]+$": {
+					"$ref": "#/definitions/colour"
+				}
+			},
+			"additionalProperties": false
+		}
+	},
+	"required": [
+		"background",
+		"foreground",
+		"water",
+		"admin0Border",
+		"admin1Border",
+		"continentsBorder",
+		"metadata",
+		"cities",
+		"satelliteNetworks"
+	],
+	"definitions": {
+		"colour": {
+			"type": "string",
+			"pattern": "^#[0-9a-fA-F]{6}$"
+		}
+	}
+}

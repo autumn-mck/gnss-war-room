@@ -1,0 +1,19 @@
+{
+	"$schema": "./schema.json",
+	"background": "#eff1f5",
+	"continentsBorder": "#40a02b",
+	"water": "#1e66f5",
+	"foreground": "#4c4f69",
+	"highlight": "#d20f39",
+	"admin0Border": "#4c4f69",
+	"admin1Border": "#ff0000",
+	"metadata": "#4c4f69",
+	"cities": "#4c4f69",
+	"satelliteNetworks": {
+		"Galileo": "#1e66f5",
+		"GPS": "#179299",
+		"Glonass": "#d20f39",
+		"BeiDou": "#df8e1d",
+		"Unknown": "#dc8a78"
+	}
+}

@@ -1,4 +1,5 @@
 {
+	"$schema": "./schema.json",
 	"background": "#000000",
 	"continentsBorder": "#63f68d",
 	"water": "#638af6",
@@ -9,7 +10,7 @@
 	"metadata": "#FFFFFF",
 	"cities": "#FFFFFF",
 	"satelliteNetworks": {
-		"Galileo": "#00309A",
+		"Galileo": "#FF00FF",
 		"GPS": "#28FEF7",
 		"Glonass": "#FF2016",
 		"BeiDou": "#F7FE8F",
