@@ -32,7 +32,7 @@ def parseAndPublishLines(lines: list[str], mqttClient: mqtt.Client):
 
 		if lastTimestamp is not None:
 			delta = parsedTimestamp - lastTimestamp
-			sleep(delta.total_seconds() / 240)
+			sleep(delta.total_seconds() / 6)
 		print(nmeaMessage)
 		mqttClient.publish("gnss/rawMessages", nmeaMessage, qos=2)
 		lastTimestamp = parsedTimestamp

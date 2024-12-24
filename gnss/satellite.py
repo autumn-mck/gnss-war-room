@@ -24,8 +24,7 @@ def colourForNetwork(network: str, palette: Palette) -> str:
 	networkName = networkCodeToName(network)
 	if networkName in palette.satelliteNetworks:
 		return palette.satelliteNetworks[networkName]
-	else:
-		return palette.satelliteNetworks["Unknown"]
+	return palette.satelliteNetworks["Unknown"]
 
 def networkCodeToName(networkCode: str) -> str:
 	match networkCode:

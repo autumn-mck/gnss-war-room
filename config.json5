@@ -2,6 +2,7 @@
 	"paletteName": "warGames",
 	"multiScreen": false,
 	"mqttHost": "localhost",
+	// "mqttHost": "gnss.mck.is",
 	"mqttPort": 1883,
 	"windows": [
 		{

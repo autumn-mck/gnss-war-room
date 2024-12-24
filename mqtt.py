@@ -37,7 +37,8 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 		latestSatellitePositions = updateSatellitePositions(latestSatellitePositions, parsedMessage)
 
 		timeSinceLastUpdate = datetime.now() - lastUpdateTime
-		timeSinceStartup = datetime.now() - startupTime # wait a few seconds for startup, otherwise PyQt runs into issues and SIGSEGVs
+		# wait a few seconds for startup, otherwise PyQt runs into issues and SIGSEGVs
+		timeSinceStartup = datetime.now() - startupTime
 		if timeSinceLastUpdate < timedelta(seconds=0.5) or timeSinceStartup < timedelta(seconds=2):
 			return
 		lastUpdateTime = datetime.now()

@@ -1,5 +1,5 @@
-import pyjson5
 from dataclasses import dataclass
+import pyjson5
 from dataclass_wizard import JSONWizard
 from mapdata.maps import MapConfig, PolalGridConfig
 

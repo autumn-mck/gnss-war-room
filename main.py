@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import QMainWindow
 from config import loadConfig
 from mqtt import createMqttClient
 from palettes.palette import loadPalette
-from mapdata.maps import MapConfig, PolalGridConfig
+from mapdata.maps import MapConfig
 from mapWindow import MapWindow
 from polarGridWindow import PolarGridWindow
 

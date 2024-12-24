@@ -41,20 +41,7 @@ def prepareSvg(mapSvg: str, palette: Palette, options: MapConfig, currentSatelli
 
 	# cities
 	if not options.hideCities:
-		cities = getCities()
-		cityDataStr = '<g id="Cities">'
-		for city in cities:
-			cityLat = float(city[4])
-			cityLong = float(city[5])
-			[cityX, cityY] = latLongToGallStereographic(cityLat, cityLong, svgOrigWidth)
-			cityX += svgOrigWidth / 2
-			cityY += svgOrigHeight / 2
-
-			radius = 5 / options.scaleFactor
-			cityDataStr += f'<circle cx="{cityX}" cy="{cityY}" r="{radius}" fill="{palette.cities}" />'
-
-		cityDataStr += '</g></svg>'
-		mapSvg = mapSvg.replace('</svg>', cityDataStr)
+		mapSvg = mapSvg.replace('</svg>', genCitiesGroup(svgOrigWidth, svgOrigHeight, options, palette) + '\n</svg>')
 
 	# satellites
 	mapSvg = insertSatellitePositions(mapSvg, svgOrigWidth, svgOrigHeight, currentSatellites, options, palette)
@@ -99,6 +86,24 @@ def prepareSvg(mapSvg: str, palette: Palette, options: MapConfig, currentSatelli
 	# hide metadata
 	mapSvg = mapSvg.replace('g id="MetaData"', 'g id="MetaData" style="display:none"')
 	return mapSvg
+
+def genCitiesGroup(svgOrigWidth: float, svgOrigHeight: float, options: MapConfig, palette: Palette) -> str:
+	"""Insert cities into the SVG"""
+	cities = getCities()
+	cityDataStr = '<g id="Cities">'
+	for city in cities:
+		cityLat = float(city[4])
+		cityLong = float(city[5])
+		[cityX, cityY] = latLongToGallStereographic(cityLat, cityLong, svgOrigWidth)
+		cityX += svgOrigWidth / 2
+		cityY += svgOrigHeight / 2
+
+		radius = 5 / options.scaleFactor
+		cityDataStr += f'<circle cx="{cityX}" cy="{cityY}" r="{radius}" fill="{palette.cities}" />'
+
+	cityDataStr += '</g>'
+
+	return cityDataStr
 
 def insertSatellitePositions(mapSvg: str,
 			     svgOrigWidth: float,
