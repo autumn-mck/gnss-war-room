@@ -49,7 +49,9 @@ def prepareSvg(mapSvg: str, palette: Palette, options: MapConfig, currentSatelli
 			[cityX, cityY] = latLongToGallStereographic(cityLat, cityLong, svgOrigWidth)
 			cityX += svgOrigWidth / 2
 			cityY += svgOrigHeight / 2
-			cityDataStr += f'<circle cx="{cityX}" cy="{cityY}" r="2" fill="{palette.cities}" />'
+
+			radius = 5 / options.scaleFactor
+			cityDataStr += f'<circle cx="{cityX}" cy="{cityY}" r="{radius}" fill="{palette.cities}" />'
 
 		cityDataStr += '</g></svg>'
 		mapSvg = mapSvg.replace('</svg>', cityDataStr)
@@ -118,7 +120,8 @@ def insertSatellitePositions(mapSvg: str,
 		[x, y] = latLongToGallStereographic(lat, long, svgOrigWidth)
 		x += svgOrigWidth / 2
 		y += svgOrigHeight / 2
-		sateliteStr += f'<circle cx="{x}" cy="{y}" r="30" fill="{colour}" />'
+		radius = 30 / options.scaleFactor
+		sateliteStr += f'<circle cx="{x}" cy="{y}" r="{radius}" fill="{colour}" />'
 	sateliteStr += '</g></svg>'
 	return mapSvg.replace('</svg>', sateliteStr)
 
