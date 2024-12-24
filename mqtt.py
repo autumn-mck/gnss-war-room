@@ -24,6 +24,7 @@ def createMqttClient(windows: list[QMainWindow], config: Config) -> MqttClient:
 def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient, Any, MQTTMessage], None]:
 	"""Create a callback for the MQTT client to handle incoming messages"""
 	latestSatellitePositions: list[SatelliteInView] = []
+	startupTime = datetime.now()
 	lastUpdateTime = datetime.now()
 
 	def onMessage(_client: MqttClient, _userdata: Any, message: MQTTMessage):
@@ -36,7 +37,8 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 		latestSatellitePositions = updateSatellitePositions(latestSatellitePositions, parsedMessage)
 
 		timeSinceLastUpdate = datetime.now() - lastUpdateTime
-		if timeSinceLastUpdate < timedelta(seconds=1):
+		timeSinceStartup = datetime.now() - startupTime # wait a few seconds for startup, otherwise PyQt runs into issues and SIGSEGVs
+		if timeSinceLastUpdate < timedelta(seconds=0.5) or timeSinceStartup < timedelta(seconds=2):
 			return
 		lastUpdateTime = datetime.now()
 		updateAllWindows(windows, latestSatellitePositions)
