@@ -41,7 +41,7 @@ class PolarGridWindow(QMainWindow):
 		self.map.load(self.svgFile)
 
 
-def prepareSvg(svgData, palette, satelites: list[SatelliteInView]) -> str:
+def prepareSvg(svgData, palette, satellites: list[SatelliteInView]) -> str:
 	"""Apply color palette to the SVG and add satellite positions"""
 	svgData = svgData.replace('fill="#fff"', f'fill="{palette.background}"')
 	svgData = svgData.replace('stroke="#aaa"', f'stroke="{palette.foreground}"')
@@ -49,16 +49,16 @@ def prepareSvg(svgData, palette, satelites: list[SatelliteInView]) -> str:
 
 	scale = 94
 
-	sateliteStr: str = '<g id="Satellites">'
-	for satelite in satelites:
-		colour = colourForNetwork(satelite.network, palette)
-		azimuth = satelite.azimuth
-		elevation = satelite.elevation
+	satelliteStr: str = '<g id="Satellites">'
+	for satellite in satellites:
+		colour = colourForNetwork(satellite.network, palette)
+		azimuth = satellite.azimuth
+		elevation = satellite.elevation
 		(x, y) = azimuthToPolarCoords(azimuth, elevation, scale)
-		sateliteStr += f'<circle cx="{x}" cy="{y}" r="2" fill="{colour}" />'
-	sateliteStr += '</g></svg>'
+		satelliteStr += f'<circle cx="{x}" cy="{y}" r="2" fill="{colour}" />'
+	satelliteStr += '</g></svg>'
 
-	svgData = svgData.replace('</svg>', sateliteStr)
+	svgData = svgData.replace('</svg>', satelliteStr)
 
 	return svgData
 

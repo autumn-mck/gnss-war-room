@@ -108,7 +108,7 @@ def insertSatellitePositions(mapSvg: str,
 					 palette: Palette
 					 ) -> str:
 	"""Insert satellite positions into the SVG"""
-	sateliteStr = '<g id="Satellites">'
+	satelliteStr = '<g id="Satellites">'
 
 	for satellite in satellites:
 		colour = colourForNetwork(satellite.network, palette)
@@ -121,9 +121,9 @@ def insertSatellitePositions(mapSvg: str,
 		x += svgOrigWidth / 2
 		y += svgOrigHeight / 2
 		radius = 30 / options.scaleFactor
-		sateliteStr += f'<circle cx="{x}" cy="{y}" r="{radius}" fill="{colour}" />'
-	sateliteStr += '</g></svg>'
-	return mapSvg.replace('</svg>', sateliteStr)
+		satelliteStr += f'<circle cx="{x}" cy="{y}" r="{radius}" fill="{colour}" />'
+	satelliteStr += '</g></svg>'
+	return mapSvg.replace('</svg>', satelliteStr)
 
 def saveToTempFile(string: str) -> str:
 	"""Save a string to a temporary file and return its file path."""
