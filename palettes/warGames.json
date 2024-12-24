@@ -2,10 +2,17 @@
 	"background": "#000000",
 	"continentsBorder": "#63f68d",
 	"water": "#638af6",
-	"foreground": "#FFFFFF",
+	"foreground": "#296CFC",
 	"highlight": "#FF0000",
 	"admin0Border": "#FFFFFF",
 	"admin1Border": "#FF0000",
 	"metadata": "#FFFFFF",
-	"cities": "#FFFFFF"
+	"cities": "#FFFFFF",
+	"satelliteNetworks": {
+		"Galileo": "#00309A",
+		"GPS": "#28FEF7",
+		"Glonass": "#FF2016",
+		"BeiDou": "#F7FE8F",
+		"Unknown": "#E0E0E0"
+	}
 }

@@ -1,6 +1,8 @@
 import math
 from dataclasses import dataclass
 
+from palettes.palette import Palette
+
 @dataclass
 class SatelliteInView:
 	prnNumber: int
@@ -18,19 +20,25 @@ def groupSatellitesByPrn(satellites: list[SatelliteInView]) -> dict[int, list[Sa
 		satellitesByPrn[satellite.prnNumber].append(satellite)
 	return satellitesByPrn
 
-def colourForNetwork(network: str) -> str:
-	match network:
-		case "GA": # Galileo
-			return "#ff0000"
-		case "GP": # GPS
-			return "#ff00ff"
-		case "GL": # GLONASS
-			return "#00ff00"
-		case "BD" | "GB": # BeiDou
-			return "#0000ff"
-		case _: # something else I need to add
-			print(network)
-			return "#ffffff"
+def colourForNetwork(network: str, palette: Palette) -> str:
+	networkName = networkCodeToName(network)
+	if networkName in palette.satelliteNetworks:
+		return palette.satelliteNetworks[networkName]
+	else:
+		return palette.satelliteNetworks["Unknown"]
+
+def networkCodeToName(networkCode: str) -> str:
+	match networkCode:
+		case "GA":
+			return "Galileo"
+		case "GP":
+			return "GPS"
+		case "GL":
+			return "GLONASS"
+		case "BD" | "GB":
+			return "BeiDou"
+		case _:
+			return "Unknown"
 
 def orbitHeightForNetwork(network: str) -> float:
 	match network:

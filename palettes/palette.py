@@ -12,6 +12,7 @@ class Palette(JSONWizard):
 	continentsBorder: str
 	metadata: str
 	cities: str
+	satelliteNetworks: dict[str, str]
 
 def loadPalette(paletteName = "warGames") -> Palette:
 	"""Load the palette with the given name."""

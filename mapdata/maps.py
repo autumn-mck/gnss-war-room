@@ -55,7 +55,7 @@ def prepareSvg(mapSvg: str, palette: Palette, options: MapConfig, currentSatelli
 		mapSvg = mapSvg.replace('</svg>', cityDataStr)
 
 	# satellites
-	mapSvg = insertSatellitePositions(mapSvg, svgOrigWidth, svgOrigHeight, currentSatellites)
+	mapSvg = insertSatellitePositions(mapSvg, svgOrigWidth, svgOrigHeight, currentSatellites, options, palette)
 
 	# continent border width
 	continentBorderWidth = 6 / options.scaleFactor
@@ -101,13 +101,15 @@ def prepareSvg(mapSvg: str, palette: Palette, options: MapConfig, currentSatelli
 def insertSatellitePositions(mapSvg: str,
 			     svgOrigWidth: float,
 					 svgOrigHeight: float,
-					 satellites: list[SatelliteInView]
+					 satellites: list[SatelliteInView],
+					 options: MapConfig,
+					 palette: Palette
 					 ) -> str:
 	"""Insert satellite positions into the SVG"""
 	sateliteStr = '<g id="Satellites">'
 
 	for satellite in satellites:
-		colour = colourForNetwork(satellite.network)
+		colour = colourForNetwork(satellite.network, palette)
 		lat, long = getSatelliteLatLong(satellite)
 		# hardcoded measure position for now
 		lat += 54.5

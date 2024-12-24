@@ -51,7 +51,7 @@ def prepareSvg(svgData, palette, satelites: list[SatelliteInView]) -> str:
 
 	sateliteStr: str = '<g id="Satellites">'
 	for satelite in satelites:
-		colour = colourForNetwork(satelite.network)
+		colour = colourForNetwork(satelite.network, palette)
 		azimuth = satelite.azimuth
 		elevation = satelite.elevation
 		(x, y) = azimuthToPolarCoords(azimuth, elevation, scale)
