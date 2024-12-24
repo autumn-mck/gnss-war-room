@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtCore import Qt
@@ -22,6 +23,7 @@ class MapWindow(QMainWindow):
 		self.setGeometry(defaultWidth * windowIndex, 100, defaultWidth, defaultHeight)
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
 
+		self.lastUpdateTime = datetime.now()
 		mapSvg = readBaseSvg()
 		initialSatellites = [] # wait for initial satellites to be received
 		mapSvg = prepareSvg(mapSvg, palette, windowConfig, initialSatellites)
@@ -31,6 +33,7 @@ class MapWindow(QMainWindow):
 		self.map = QSvgWidget(self.svgFile, parent=self)
 		self.map.setGeometry(0, 0, defaultWidth, defaultHeight)
 
+
 		if multiScreen:
 			self.showFullScreen()
 		else:
@@ -38,6 +41,7 @@ class MapWindow(QMainWindow):
 
 	def resizeEvent(self, event: QResizeEvent):
 		"""Resize map when window is resized"""
+		self.lastUpdateTime = datetime.now()
 		newX = event.size().width()
 		newY = event.size().height()
 
@@ -67,6 +71,7 @@ class MapWindow(QMainWindow):
 	# key bindings
 	def keyPressEvent(self, event: QKeyEvent):
 		"""Handle keybinds"""
+		self.lastUpdateTime = datetime.now()
 		toMove = 2 / self.windowConfig.scaleFactor
 		if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
 			toMove *= 5
@@ -82,6 +87,10 @@ class MapWindow(QMainWindow):
 
 	def onSatellitesReceived(self, satellites: list[SatelliteInView]):
 		"""Handle new satellite data"""
+		timeSinceLastUpdate = datetime.now() - self.lastUpdateTime
+		if timeSinceLastUpdate < timedelta(seconds=1):
+			return
+
 		mapSvg = readBaseSvg()
 
 		mapSvg = prepareSvg(mapSvg, self.customPalette, self.windowConfig, satellites)

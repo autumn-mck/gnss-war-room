@@ -1,4 +1,5 @@
 import math
+from datetime import datetime, timedelta
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtGui import QResizeEvent
@@ -23,10 +24,13 @@ class PolarGridWindow(QMainWindow):
 		self.map = QSvgWidget(self.svgFile, parent=self)
 		self.map.setGeometry(0, 0, 400, 400)
 
+		self.lastUpdateTime = datetime.now()
+
 		self.show()
 
 	def resizeEvent(self, event: QResizeEvent):
 		"""Resize map when window is resized"""
+		self.lastUpdateTime = datetime.now()
 		newX = event.size().width()
 		newY = event.size().height()
 		minSize = min(newX, newY)
@@ -34,6 +38,10 @@ class PolarGridWindow(QMainWindow):
 
 	def onSatellitesReceived(self, satellites: list[SatelliteInView]):
 		"""Update the positions of satellites"""
+		timeSinceLastUpdate = datetime.now() - self.lastUpdateTime
+		if timeSinceLastUpdate < timedelta(seconds=1):
+			return
+
 		with open("mapdata/polar.svg", "r", encoding="utf8") as f:
 			svgData = f.read()
 		svgData = prepareSvg(svgData, self.customPalette, satellites)
