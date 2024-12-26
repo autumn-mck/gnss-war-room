@@ -59,7 +59,7 @@ def azimuthToWorldXyz(satellite: SatelliteInView) -> tuple[float, float, float]:
 	:param elevation: elevation in radians
 	"""
 	# https://www.desmos.com/3d/jxqcoesfg3 for visualisation of 3d,
-	# https://www.desmos.com/calculator/9ihgqyaqkw for 2d
+	# https://www.desmos.com/calculator/oskkcd5rdb for 2d
 
 	orbit = orbitHeightForNetwork(satellite.network)
 	ground = 6.37
