@@ -1,7 +1,6 @@
-from datetime import datetime, timedelta
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QResizeEvent, QKeyEvent
 from mapdata.maps import readBaseSvg, prepareSvg, focusOnPoint, saveToTempFile, MapConfig
 from gnss.satellite import SatelliteInView
@@ -9,31 +8,40 @@ from palettes.palette import Palette
 
 class MapWindow(QMainWindow):
 	"""Configurable map window"""
+	satelliteReceivedEvent = pyqtSignal()
+	defaultWidth = 700
+	defaultHeight = 500
+
 	def __init__(self, palette: Palette, windowConfig: MapConfig, multiScreen: bool, windowIndex: int):
 		super().__init__()
 
-		defaultWidth = 700
-		defaultHeight = 500
-
 		self.windowConfig = windowConfig
 		self.customPalette = palette
+		self.latestSatellites = []
+
+		self.baseSvg = readBaseSvg()
+		self.svgFile = self.generateNewMap()
+		self.map = QSvgWidget(self.svgFile, parent=self)
+		self.map.setGeometry(0, 0, self.defaultWidth, self.defaultHeight)
+
+		self.satelliteReceivedEvent.connect(self.newSatelliteDataEvent)
+		self.handleMultiScreen(multiScreen)
 
 		self.setWindowTitle("GNSS War Room")
-
-		self.setGeometry(defaultWidth * windowIndex, 100, defaultWidth, defaultHeight)
+		self.setGeometry(self.defaultWidth * windowIndex, 100, self.defaultWidth, self.defaultHeight)
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
 
-		self.lastUpdateTime = datetime.now()
-		mapSvg = readBaseSvg()
-		initialSatellites = [] # wait for initial satellites to be received
-		mapSvg = prepareSvg(mapSvg, palette, windowConfig, initialSatellites)
-		mapSvg = focusOnPoint(mapSvg, windowConfig, defaultWidth, defaultHeight)
+	def generateNewMap(self):
+		mapSvg = prepareSvg(self.baseSvg, self.customPalette, self.windowConfig, [])
+		mapSvg = focusOnPoint(mapSvg, self.windowConfig, self.defaultWidth, self.defaultHeight)
+		return saveToTempFile(mapSvg)
 
-		self.svgFile = saveToTempFile(mapSvg)
-		self.map = QSvgWidget(self.svgFile, parent=self)
-		self.map.setGeometry(0, 0, defaultWidth, defaultHeight)
+	def updateMap(self):
+		mapSvg = prepareSvg(self.baseSvg, self.customPalette, self.windowConfig, self.latestSatellites)
+		mapSvg = focusOnPoint(mapSvg, self.windowConfig, self.map.width(), self.map.height())
+		return saveToTempFile(mapSvg)
 
-
+	def handleMultiScreen(self, multiScreen: bool):
 		if multiScreen:
 			self.showFullScreen()
 		else:
@@ -41,7 +49,6 @@ class MapWindow(QMainWindow):
 
 	def resizeEvent(self, event: QResizeEvent):
 		"""Resize map when window is resized"""
-		self.lastUpdateTime = datetime.now()
 		newX = event.size().width()
 		newY = event.size().height()
 
@@ -71,7 +78,6 @@ class MapWindow(QMainWindow):
 	# key bindings
 	def keyPressEvent(self, event: QKeyEvent):
 		"""Handle keybinds"""
-		self.lastUpdateTime = datetime.now()
 		toMove = 2 / self.windowConfig.scaleFactor
 		if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
 			toMove *= 5
@@ -87,13 +93,11 @@ class MapWindow(QMainWindow):
 
 	def onSatellitesReceived(self, satellites: list[SatelliteInView]):
 		"""Handle new satellite data"""
-		timeSinceLastUpdate = datetime.now() - self.lastUpdateTime
-		if timeSinceLastUpdate < timedelta(seconds=1):
-			return
+		self.latestSatellites = satellites.copy()
+		self.satelliteReceivedEvent.emit()
 
-		mapSvg = readBaseSvg()
-
-		mapSvg = prepareSvg(mapSvg, self.customPalette, self.windowConfig, satellites)
+	def newSatelliteDataEvent(self):
+		mapSvg = prepareSvg(self.baseSvg, self.customPalette, self.windowConfig, self.latestSatellites)
 		mapSvg = focusOnPoint(mapSvg, self.windowConfig, self.map.width(), self.map.height())
 		self.svgFile = saveToTempFile(mapSvg)
 		self.map.load(self.svgFile)

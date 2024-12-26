@@ -1,62 +1,66 @@
 import math
-from datetime import datetime, timedelta
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtGui import QResizeEvent
+from PyQt6.QtCore import pyqtSignal
 from palettes.palette import Palette
 from mapdata.maps import saveToTempFile
 from gnss.satellite import SatelliteInView, colourForNetwork
 
 class PolarGridWindow(QMainWindow):
 	"""Window for displaying the positions of satellites"""
+	satelliteReceivedEvent = pyqtSignal()
+
 	def __init__(self, palette: Palette):
 		super().__init__()
-		self.setWindowTitle("Polar Grid")
-		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
+
 		self.customPalette = palette
+		self.latestSatellites = []
 
-		with open("mapdata/polar.svg", "r", encoding="utf8") as f:
-			svgData = f.read()
-
-		initialSatellites = [] # wait for data
-		svgData = prepareSvg(svgData, palette, initialSatellites)
-		self.svgFile = saveToTempFile(svgData)
+		self.svgFile = self.generateNewGrid()
 		self.map = QSvgWidget(self.svgFile, parent=self)
 		self.map.setGeometry(0, 0, 400, 400)
 
-		self.lastUpdateTime = datetime.now()
+		self.satelliteReceivedEvent.connect(self.newSatelliteDataEvent)
 
+		self.setWindowTitle("Polar Grid")
+		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
 		self.show()
+
+	def generateNewGrid(self):
+		with open("mapdata/polar.svg", "r", encoding="utf8") as f:
+			svgData = f.read()
+		svgData = prepareSvg(svgData, self.customPalette, [])
+		return saveToTempFile(svgData)
+
+	def updateGrid(self):
+		with open("mapdata/polar.svg", "r", encoding="utf8") as f:
+			svgData = f.read()
+		svgData = prepareSvg(svgData, self.customPalette, self.latestSatellites)
+		return saveToTempFile(svgData)
 
 	def resizeEvent(self, event: QResizeEvent):
 		"""Resize map when window is resized"""
-		self.lastUpdateTime = datetime.now()
 		newX = event.size().width()
 		newY = event.size().height()
 		minSize = min(newX, newY)
 		self.map.setGeometry(0, 0, minSize, minSize)
 
 	def onSatellitesReceived(self, satellites: list[SatelliteInView]):
-		"""Update the positions of satellites"""
-		timeSinceLastUpdate = datetime.now() - self.lastUpdateTime
-		if timeSinceLastUpdate < timedelta(seconds=1):
-			return
+		self.latestSatellites = satellites
+		self.satelliteReceivedEvent.emit()
 
-		with open("mapdata/polar.svg", "r", encoding="utf8") as f:
-			svgData = f.read()
-		svgData = prepareSvg(svgData, self.customPalette, satellites)
-		self.svgFile = saveToTempFile(svgData)
+	def newSatelliteDataEvent(self):
+		self.svgFile = self.updateGrid()
 		self.map.load(self.svgFile)
 
-
-def prepareSvg(svgData, palette, satellites: list[SatelliteInView]) -> str:
+def prepareSvg(svgData: str, palette: Palette, satellites: list[SatelliteInView]) -> str:
 	"""Apply color palette to the SVG and add satellite positions"""
 	svgData = svgData.replace('fill="#fff"', f'fill="{palette.background}"')
 	svgData = svgData.replace('stroke="#aaa"', f'stroke="{palette.foreground}"')
 	svgData = svgData.replace('stroke="#000"', f'stroke="{palette.foreground}" style="display:none"')
 
 	scale = 94
-
 	satelliteStr: str = '<g id="Satellites">'
 	for satellite in satellites:
 		colour = colourForNetwork(satellite.network, palette)
@@ -76,7 +80,6 @@ def azimuthToPolarCoords(azimuth: float, elevation: float, scale: float):
 	x = radius * math.sin(angle) + scale / 2
 	y = scale / 2 - radius * math.cos(angle)
 	return (x, y)
-
 
 def readBaseSvg() -> str:
 	with open("mapdata/polar.svg", "r", encoding="utf8") as f:
