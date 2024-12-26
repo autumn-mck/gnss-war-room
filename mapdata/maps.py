@@ -34,7 +34,12 @@ def readBaseSvg() -> str:
 	with open("mapdata/1981.svg", "r", encoding="utf8") as f:
 		return f.read()
 
-def prepareSvg(mapSvg: str, palette: Palette, options: MapConfig, currentSatellites: list[SatelliteInView]) -> str:
+def addSatellites(mapSvg: str, currentSatellites: list[SatelliteInView], options: MapConfig, palette: Palette) -> str:
+	svgOrigWidth = 3213.05005
+	svgOrigHeight = 2468.23999
+	return insertSatellitePositions(mapSvg, svgOrigWidth, svgOrigHeight, currentSatellites, options, palette)
+
+def prepareInitialSvg(mapSvg: str, palette: Palette, options: MapConfig) -> str:
 	"""Apply color palette and other options to the SVG map."""
 	svgOrigWidth = 3213.05005
 	svgOrigHeight = 2468.23999
@@ -42,9 +47,6 @@ def prepareSvg(mapSvg: str, palette: Palette, options: MapConfig, currentSatelli
 	# cities
 	if not options.hideCities:
 		mapSvg = mapSvg.replace('</svg>', genCitiesGroup(svgOrigWidth, svgOrigHeight, options, palette) + '\n</svg>')
-
-	# satellites
-	mapSvg = insertSatellitePositions(mapSvg, svgOrigWidth, svgOrigHeight, currentSatellites, options, palette)
 
 	# continent border width
 	continentBorderWidth = 6 / options.scaleFactor

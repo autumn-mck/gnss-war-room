@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QResizeEvent, QKeyEvent
-from mapdata.maps import readBaseSvg, prepareSvg, focusOnPoint, saveToTempFile, MapConfig
+from mapdata.maps import readBaseSvg, addSatellites, prepareInitialSvg, focusOnPoint, saveToTempFile, MapConfig
 from gnss.satellite import SatelliteInView
 from palettes.palette import Palette
 
@@ -20,7 +20,8 @@ class MapWindow(QMainWindow):
 		self.latestSatellites = []
 
 		self.baseSvg = readBaseSvg()
-		self.svgFile = self.generateNewMap()
+		self.initialSvg = self.generateNewMap()
+		self.svgFile = saveToTempFile(self.initialSvg)
 		self.map = QSvgWidget(self.svgFile, parent=self)
 		self.map.setGeometry(0, 0, self.defaultWidth, self.defaultHeight)
 
@@ -32,12 +33,12 @@ class MapWindow(QMainWindow):
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
 
 	def generateNewMap(self):
-		mapSvg = prepareSvg(self.baseSvg, self.customPalette, self.windowConfig, [])
+		mapSvg = prepareInitialSvg(self.baseSvg, self.customPalette, self.windowConfig)
 		mapSvg = focusOnPoint(mapSvg, self.windowConfig, self.defaultWidth, self.defaultHeight)
-		return saveToTempFile(mapSvg)
+		return mapSvg
 
 	def updateMap(self):
-		mapSvg = prepareSvg(self.baseSvg, self.customPalette, self.windowConfig, self.latestSatellites)
+		mapSvg = addSatellites(self.initialSvg, self.latestSatellites, self.windowConfig, self.customPalette)
 		mapSvg = focusOnPoint(mapSvg, self.windowConfig, self.map.width(), self.map.height())
 		return saveToTempFile(mapSvg)
 
@@ -97,7 +98,5 @@ class MapWindow(QMainWindow):
 		self.satelliteReceivedEvent.emit()
 
 	def newSatelliteDataEvent(self):
-		mapSvg = prepareSvg(self.baseSvg, self.customPalette, self.windowConfig, self.latestSatellites)
-		mapSvg = focusOnPoint(mapSvg, self.windowConfig, self.map.width(), self.map.height())
-		self.svgFile = saveToTempFile(mapSvg)
+		self.svgFile = self.updateMap()
 		self.map.load(self.svgFile)
