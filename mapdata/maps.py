@@ -29,15 +29,15 @@ class PolalGridConfig(JSONWizard):
 	class _(JSONWizard.Meta):
 		tag = "satellitePolarGrid"
 
+@dataclass
+class MiscStatsConfig(JSONWizard):
+	class _(JSONWizard.Meta):
+		tag = "miscStats"
+
 def readBaseSvg() -> str:
 	"""Read the base SVG map file."""
 	with open("mapdata/1981.svg", "r", encoding="utf8") as f:
 		return f.read()
-
-def addSatellites(mapSvg: str, currentSatellites: list[SatelliteInView], options: MapConfig, palette: Palette) -> str:
-	svgOrigWidth = 3213.05005
-	svgOrigHeight = 2468.23999
-	return insertSatellitePositions(mapSvg, svgOrigWidth, svgOrigHeight, currentSatellites, options, palette)
 
 def prepareInitialSvg(mapSvg: str, palette: Palette, options: MapConfig) -> str:
 	"""Apply color palette and other options to the SVG map."""
@@ -107,22 +107,25 @@ def genCitiesGroup(svgOrigWidth: float, svgOrigHeight: float, options: MapConfig
 
 	return cityDataStr
 
-def insertSatellitePositions(mapSvg: str,
-			     svgOrigWidth: float,
-					 svgOrigHeight: float,
+def addSatellites(
+			     mapSvg: str,
 					 satellites: list[SatelliteInView],
 					 options: MapConfig,
-					 palette: Palette
+					 palette: Palette,
+					 measuredLatitude: float,
+					 measuredLongitude: float
 					 ) -> str:
 	"""Insert satellite positions into the SVG"""
+	svgOrigWidth = 3213.05005
+	svgOrigHeight = 2468.23999
+
 	satelliteStr = '<g id="Satellites">'
 
 	for satellite in satellites:
 		colour = colourForNetwork(satellite.network, palette)
 		lat, long = getSatelliteLatLong(satellite)
-		# hardcoded measure position for now
-		lat += 54.5
-		long += -5.9
+		lat += measuredLatitude
+		long += measuredLongitude
 
 		[x, y] = latLongToGallStereographic(lat, long, svgOrigWidth)
 		x += svgOrigWidth / 2

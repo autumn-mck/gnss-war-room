@@ -46,7 +46,7 @@ class PolarGridWindow(QMainWindow):
 		minSize = min(newX, newY)
 		self.map.setGeometry(0, 0, minSize, minSize)
 
-	def onSatellitesReceived(self, satellites: list[SatelliteInView]):
+	def onNewData(self, satellites: list[SatelliteInView]):
 		self.latestSatellites = satellites
 		self.satelliteReceivedEvent.emit()
 

@@ -11,6 +11,7 @@ from mapWindow import MapWindow
 from gnss.nmea import parseSatelliteInMessage
 from gnss.satellite import SatelliteInView
 from polarGridWindow import PolarGridWindow
+from miscStatsWindow import MiscStatsWindow
 
 def createMqttClient(windows: list[QMainWindow], config: Config) -> MqttClient:
 	"""Create a new MQTT client"""
@@ -26,31 +27,82 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 	latestSatellitePositions: list[SatelliteInView] = []
 	lastUpdateTime = datetime.now()
 
+	latitude = 0
+	longitude = 0
+
+	date = datetime.now()
+	time = date.time()
+
+	altitude = 0 # TODO: unit as well? seems to just give meters atm so that's what I'm assuming for now
+	geoidSeparation = 0
+	horizontalDilutionOfPrecision = 0
+	fixQuality = 0 # https://receiverhelp.trimble.com/alloy-gnss/en-us/NMEA-0183messages_GGA.html for meanings
+
 	def onMessage(_client: MqttClient, _userdata: Any, message: MQTTMessage):
 		nonlocal latestSatellitePositions
 		nonlocal lastUpdateTime
+
+		nonlocal latitude
+		nonlocal longitude
+
+		nonlocal date
+		nonlocal time
+
+		nonlocal altitude
+		nonlocal geoidSeparation
+		nonlocal horizontalDilutionOfPrecision
+		nonlocal fixQuality
 		parsedMessage = NMEAReader.parse(message.payload)
-		if not isinstance(parsedMessage, NMEAMessage) or parsedMessage.msgID != 'GSV':
+		if not isinstance(parsedMessage, NMEAMessage):
 			return
 
-		latestSatellitePositions = updateSatellitePositions(latestSatellitePositions, parsedMessage)
+		# no clue what's up with the typing here, it's fine though so ignore
+		match parsedMessage.msgID:
+			case "GSV":
+				latestSatellitePositions = updateSatellitePositions(latestSatellitePositions, parsedMessage)
+			case "GLL":
+				latitude = parsedMessage.lat
+				longitude = parsedMessage.lon
+				time = parsedMessage.time # type: ignore
+			case "RMC":
+				latitude = parsedMessage.lat
+				longitude = parsedMessage.lon
+				date = parsedMessage.date # type: ignore
+				time = parsedMessage.time # type: ignore
+			case "GGA":
+				latitude = parsedMessage.lat
+				longitude = parsedMessage.lon
+				geoidSeparation = parsedMessage.sep # type: ignore
+				altitude = parsedMessage.alt # type: ignore
+				horizontalDilutionOfPrecision = parsedMessage.HDOP # type: ignore
+				fixQuality = parsedMessage.quality # type: ignore
+			case "VTG":
+				# seems useless
+				pass
+			case "GSA":
+				# will get back to this later
+				pass
+			case _:
+				print(f"Unknown message type: {parsedMessage.msgID}")
 
 		timeSinceLastUpdate = datetime.now() - lastUpdateTime
-		if timeSinceLastUpdate < timedelta(seconds=0.5):
+		if timeSinceLastUpdate < timedelta(seconds=0.1):
 			return
 		lastUpdateTime = datetime.now()
-		updateAllWindows(windows, latestSatellitePositions)
+		updateAllWindows(windows, latestSatellitePositions, latitude, longitude)
 
 	return onMessage
 
-def updateAllWindows(windows: list[QMainWindow], satellites: list[SatelliteInView]):
+def updateAllWindows(windows: list[QMainWindow], satellites: list[SatelliteInView], latitude: float, longitude: float):
 	"""Update all windows with the latest satellite positions"""
 	for window in windows:
 		match window:
 			case MapWindow():
-				window.onSatellitesReceived(satellites)
+				window.onNewData(satellites, latitude, longitude)
 			case PolarGridWindow():
-				window.onSatellitesReceived(satellites)
+				window.onNewData(satellites)
+			case MiscStatsWindow():
+				pass
 			case _:
 				print("Unknown window type")
 

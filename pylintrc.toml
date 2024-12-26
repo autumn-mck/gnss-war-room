@@ -14,12 +14,13 @@ class-naming-style = "PascalCase"
 docstring-min-length = 6 # on shorter functions, case by case basis
 
 # allow generated members with pyjson5, otherwise pylint complains
-generated-members = ["pyjson5.*"]
+generated-members = ["pyjson5.*", "pynmeagps.*"]
 
 [tool.pylint.design]
 min-public-methods = 0 # PyQt windows generate false positives otherwise
 max-args = 6           # default of 5 seems slightly too low
 max-attributes = 12    # default of 7 seems slightly too low
+max-locals = 20        # default of 15 seems slightly too low
 
 [tool.pylint.format]
 indent-string = "\t"

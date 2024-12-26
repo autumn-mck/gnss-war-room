@@ -19,6 +19,9 @@ class MapWindow(QMainWindow):
 		self.customPalette = palette
 		self.latestSatellites = []
 
+		self.latitude = 0
+		self.longitude = 0
+
 		self.baseSvg = readBaseSvg()
 		self.initialSvg = self.generateNewMap()
 		self.svgFile = saveToTempFile(self.initialSvg)
@@ -38,7 +41,15 @@ class MapWindow(QMainWindow):
 		return mapSvg
 
 	def updateMap(self):
-		mapSvg = addSatellites(self.initialSvg, self.latestSatellites, self.windowConfig, self.customPalette)
+		"""Update the map with newest data"""
+		mapSvg = addSatellites(
+			self.initialSvg,
+			self.latestSatellites,
+			self.windowConfig,
+			self.customPalette,
+			self.latitude,
+			self.longitude
+		)
 		mapSvg = focusOnPoint(mapSvg, self.windowConfig, self.map.width(), self.map.height())
 		return saveToTempFile(mapSvg)
 
@@ -92,9 +103,11 @@ class MapWindow(QMainWindow):
 		if event.key() == Qt.Key.Key_D:
 			self.moveMapBy(0, toMove)
 
-	def onSatellitesReceived(self, satellites: list[SatelliteInView]):
+	def onNewData(self, satellites: list[SatelliteInView], latitude: float, longitude: float):
 		"""Handle new satellite data"""
 		self.latestSatellites = satellites.copy()
+		self.latitude = latitude
+		self.longitude = longitude
 		self.satelliteReceivedEvent.emit()
 
 	def newSatelliteDataEvent(self):

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import pyjson5
 from dataclass_wizard import JSONWizard
-from mapdata.maps import MapConfig, PolalGridConfig
+from mapdata.maps import MapConfig, PolalGridConfig, MiscStatsConfig
 
 @dataclass
 class Config(JSONWizard):
@@ -13,7 +13,7 @@ class Config(JSONWizard):
 	multiScreen: bool
 	mqttHost: str
 	mqttPort: int
-	windows: list[MapConfig | PolalGridConfig]
+	windows: list[MapConfig | PolalGridConfig | MiscStatsConfig]
 
 def loadConfig() -> Config:
 	"""Load the configuration from a file"""

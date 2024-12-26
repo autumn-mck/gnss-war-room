@@ -7,9 +7,10 @@ from PyQt6.QtWidgets import QMainWindow
 from config import loadConfig
 from mqtt import createMqttClient
 from palettes.palette import loadPalette
-from mapdata.maps import MapConfig
+from mapdata.maps import MapConfig, PolalGridConfig, MiscStatsConfig
 from mapWindow import MapWindow
 from polarGridWindow import PolarGridWindow
+from miscStatsWindow import MiscStatsWindow
 
 def main():
 	"""Main function"""
@@ -24,8 +25,12 @@ def main():
 	for windowConfig in appConfig.windows:
 		if isinstance(windowConfig, MapConfig):
 			window = MapWindow(palette, windowConfig, appConfig.multiScreen, count)
-		else:
+		elif isinstance(windowConfig, PolalGridConfig):
 			window = PolarGridWindow(palette)
+		elif isinstance(windowConfig, MiscStatsConfig):
+			window = MiscStatsWindow(palette)
+		else:
+			raise ValueError(f"Unknown window type: {windowConfig.type}")
 		windows.append(window)
 		if appConfig.multiScreen:
 			handleMultiScreen(screens, window, count)
