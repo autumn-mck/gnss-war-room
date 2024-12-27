@@ -34,7 +34,7 @@ def parseAndPublishLines(lines: list[str], mqttClient: mqtt.Client):
 			delta = parsedTimestamp - lastTimestamp
 			sleep(delta.total_seconds() / 6)
 		print(nmeaMessage)
-		mqttClient.publish("gnss/rawMessages", nmeaMessage, qos=2)
+		mqttClient.publish("gnss/rawMessages", nmeaMessage, qos=0)
 		lastTimestamp = parsedTimestamp
 
 def main():
