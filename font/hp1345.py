@@ -10,6 +10,8 @@
 # This file reads the ROMS and procduces list of delta-vectors
 #
 
+# pylint: skip-file
+
 import math
 from hp1345Font import Font
 

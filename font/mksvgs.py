@@ -9,6 +9,9 @@
 #
 # This file produces a .SVG table of the HP1345A character rom
 
+# pylint: skip-file
+
+import io
 from io import TextIOWrapper
 from hp1345Font import Font
 
@@ -71,10 +74,16 @@ def writePolylines(svg: TextIOWrapper, ind: int, l: list[tuple[int, str, int, in
 	for _, b, x0, y0, x1, y1 in l:
 		svg.write(f'{" " * ind}<polyline points="{x0},{y0} {x1},{y1}" {b} />\n')
 
-def makeSvg(fileName: str, font: Font, s, scale = 10, offset = 1, border = 5):
-
+def makeSvgString(font: Font,
+		  s,
+			scale = 10,
+			offset = 1,
+			border = 5,
+			addGrid = False,
+			drawShadow = False,
+			fontThickness = 0.8,
+			fontColour = "#000000") -> tuple[str, int, int]:
 	ss = bytearray(s)
-
 
 	boundingBox = [0,0,0,0]
 	x1,y1 = 0,0
@@ -84,7 +93,7 @@ def makeSvg(fileName: str, font: Font, s, scale = 10, offset = 1, border = 5):
 	width = scale * (offset + 2 * border + boundingBox[2] - boundingBox[0])
 	height = scale * (offset + 2 * border + boundingBox[3] - boundingBox[1])
 
-	svg = open(fileName, "w")
+	svg = io.StringIO()
 	svg.write('<?xml version="1.0" standalone="no"?>\n')
 	svg.write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"\n')
 	svg.write(' "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n')
@@ -99,38 +108,80 @@ def makeSvg(fileName: str, font: Font, s, scale = 10, offset = 1, border = 5):
 		scale * (border + offset + boundingBox[3])))
 	svg.write('>\n')
 
-	svg.write('	<g stroke-width=".2" stroke="#cccccc">\n')
-	createGrid(svg, 6,
-		boundingBox[0] - border, boundingBox[1] - border,
-		boundingBox[2] + border, boundingBox[3] + border,
-		[
-		( 1, ''),
-		( 5, 'stroke="#aaaaaa"'),
-		(10, 'stroke="#888888"'),
-		]
-	)
-	svg.write('	</g>\n')
+	if addGrid:
+		svg.write('	<g stroke-width=".2" stroke="#cccccc">\n')
+		createGrid(svg, 6,
+			boundingBox[0] - border, boundingBox[1] - border,
+			boundingBox[2] + border, boundingBox[3] + border,
+			[
+			( 1, ''),
+			( 5, 'stroke="#aaaaaa"'),
+			(10, 'stroke="#888888"'),
+			]
+		)
+		svg.write('	</g>\n')
 
-	svg.write('	<g stroke-width=".8" stroke="#000000">\n')
+	svg.write(f'	<g stroke-width="{fontThickness}" stroke="{fontColour}">\n')
 	x,y = 0,0
+
+	if drawShadow:
+		shadow = 'stroke-width=".4" stroke="#99eeee"'
+	else:
+		shadow = None
+
 	for char in ss:
 		x,y = polylines(svg, 6, font, char, x=x, y=y,
-			shadow='stroke-width=".4" stroke="#99eeee"')
+			shadow=shadow)
+		if chr(char) == '\r':
+			x = 0
 	svg.write('	</g>\n')
-	svg.write('	<circle cx="0" cy="0" r=".7" fill="green" />\n')
-	svg.write(f'	<circle cx="{x}" cy="{y}" r=".3" fill="red" />\n')
-	svg.write('</g></svg>\n')
-	svg.close()
+
+	if drawShadow:
+		svg.write('	<circle cx="0" cy="0" r=".7" fill="green" />\n')
+		svg.write(f'	<circle cx="{x}" cy="{y}" r=".3" fill="red" />\n')
+
+	svg.write('  </g>\n</svg>\n')
+	return svg.getvalue(), width, height
+
+def makeSvg(fileName: str,
+	    font: Font,
+			s,
+			scale = 10,
+			offset = 1,
+			border = 5,
+			addGrid = True,
+			drawShadow = True,
+			fontThickness = 0.8,
+			fontColour = "#000000"):
+	svg, width, height = makeSvgString(font,
+				    s,
+				    scale = scale,
+				    offset = offset,
+				    border = border,
+				    addGrid = addGrid,
+				    drawShadow = drawShadow,
+				    fontThickness = fontThickness,
+				    fontColour = fontColour)
+	with open(fileName, "w", encoding="utf8") as f:
+		f.write(svg)
 	return True, width, height
 
 def main():
 	font = Font()
-	makeSvg("fig_wg.svg", font, "HP1345A (and WarGames)".encode('ascii'),
-		scale=2, border=4, offset=0)
+	makeSvg("fig_wg.svg", font, "HP1345A\n\r(and WarGames)\r\ntesting more".encode('ascii'),
+		scale=2, border=4, offset=0, addGrid=True, drawShadow=True, fontThickness=2, fontColour="#ff0000")
+
+	diffBetweenFonts()
+	saveEachChar(font)
+	saveCharsToTable(font)
+
+def diffBetweenFonts():
+	font = Font()
 	font2 = Font("01347-80001.bin")
 	font2.v[0x2e] = font.v[0x2c]
 	makeSvg("fig_commas.svg", font2, ",.".encode('ascii'), border=5, offset=0)
 
+def saveEachChar(font: Font):
 	for char in range(256):
 		v = font.vectors(char)
 		if len(v) == 1:
@@ -138,6 +189,7 @@ def main():
 		makeSvg(f"_wargames_{char:02x}.svg", font, [char,],
 	 		scale=10, border=5, offset=5)
 
+def saveCharsToTable(font: Font):
 	grid = 40
 	width = 17 * grid
 	height = 17 * grid

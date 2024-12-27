@@ -10,6 +10,8 @@
 # This file reads the ROMS and procduces list of delta-vectors
 #
 
+# pylint: skip-file
+
 class Font:
 	def __init__(self, romfile = "01347-80012.bin"):
 		self.v: list[list[list[tuple[int, int]]]] = [[]] * 256
@@ -76,6 +78,8 @@ class Font:
 		for i in self.v[char]:
 			for dx,dy in i:
 				x += dx
+				if chr(char) == '\r':
+					x = 0
 				y += dy
 				bbox[0] = int(min(bbox[0], x))
 				bbox[1] = int(min(bbox[1], y))
