@@ -10,24 +10,22 @@
 # This file reads the ROMS and procduces list of delta-vectors
 #
 
-from __future__ import print_function
-
-class font(object):
+class Font:
 	def __init__(self, romfile = "01347-80012.bin"):
-		self.v = [[]] * 256
+		self.v: list[list[list[tuple[int, int]]]] = [[]] * 256
 
 		stroke = bytearray(open(romfile, "rb").read())
 		idx = bytearray(open("1816-1500.bin", "rb").read())
 		used = [False] * len(stroke)
 
-		def buildchar(ch):
+		def buildchar(char: int):
 			# Address permutation of index ROM
-			ia = (ch & 0x1f) | ((ch & 0xe0) << 1)
+			ia = (char & 0x1f) | ((char & 0xe0) << 1)
 
 			# Address permutation of stroke ROM
 			sa = idx[ia] << 2
-			sa |= ((1 ^ (ch >> 5) ^ (ch >> 6)) & 1) << 10
-			sa |= ((ch >> 7) & 1) << 11
+			sa |= ((1 ^ (char >> 5) ^ (char >> 6)) & 1) << 10
+			sa |= ((char >> 7) & 1) << 11
 
 			if not stroke[sa] and not stroke[sa + 1]:
 				return
@@ -60,7 +58,7 @@ class font(object):
 
 				sa += 2
 
-			self.v[ch] = l
+			self.v[char] = l
 
 		for i in range(128):
 			buildchar(i)
@@ -69,13 +67,13 @@ class font(object):
 		for i in range(128, 256):
 			buildchar(i)
 
-	def vectors(self, ch):
-		return self.v[ch]
+	def vectors(self, char: int):
+		return self.v[char]
 
-	def bbox(self, ch, bbox = None, x = 0, y = 0):
-		if bbox == None:
+	def boundingBox(self, char: int, bbox: list[int] | None = None, x = 0, y = 0) -> tuple[list[int], int, int]:
+		if bbox is None:
 			bbox = [0,0,-999,-999]
-		for i in self.v[ch]:
+		for i in self.v[char]:
 			for dx,dy in i:
 				x += dx
 				y += dy
@@ -85,19 +83,21 @@ class font(object):
 				bbox[3] = int(max(bbox[3], y))
 		return bbox, x, y
 
-
-if __name__ == "__main__":
-	f = font()
-	fo = open("/tmp/_wargames.txt", "w")
+def main():
+	font = Font()
+	file = open("/tmp/_wargames.txt", "w", encoding="utf8")
 	for ox in range(16):
 		for oy in range(16):
 			i = oy + ox * 16
-			fo.write("# %02x\n" % i)
+			file.write(f'# {i:02x}\n')
 			x = ox * 64
 			y = oy * 64
-			for j in f.v[i]:
+			for j in font.v[i]:
 				for dx,dy in j:
 					x += dx
 					y += dy
-					fo.write("%d %d\n" % (x, y))
-				fo.write("\n")
+					file.write(f'{x} {y}\n')
+				file.write("\n")
+
+if __name__ == "__main__":
+	main()

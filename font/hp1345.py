@@ -10,16 +10,13 @@
 # This file reads the ROMS and procduces list of delta-vectors
 #
 
-from __future__ import print_function
-
 import math
-
-import hp1345_font
+from hp1345Font import Font
 
 def vectorlist(wl):
-	f = hp1345_font.font()
-	last_x = 0
-	x = y = 0
+	font = Font()
+	lastX = 0
+	x, y = 0, 0
 	dx = 1
 	rot = [ 1, 0, 0, 1 ]
 	siz = 1.0
@@ -37,9 +34,9 @@ def vectorlist(wl):
 			dx = (x - ox) / l
 			dy = (y - oy) / l
 			if attr[1] == 2:
-				dl = (400. / 13.)
+				dl = 400. / 13.
 			else:
-				dl = (400. / 31.)
+				dl = 400. / 31.
 			ddx = dx * dl
 			ddy = dy * dl
 			while l > dl:
@@ -75,7 +72,7 @@ def vectorlist(wl):
 				][(a >> 9) & 3]
 				siz = 1.0 + .5 * ((a >> 11) & 3)
 				siz = int(siz * 2)
-			tl = f.vectors(a & 0x0ff)
+			tl = font.vectors(a & 0x0ff)
 			for i in tl:
 				l = [ii]
 				for dx,dy in i:
@@ -90,8 +87,8 @@ def vectorlist(wl):
 			b = a & 0x7ff
 			if a & 0x1000:
 				if a & 0x800:
-					vl.append((ii, (last_x, y), (x, b)))
-				last_x = x
+					vl.append((ii, (lastX, y), (x, b)))
+				lastX = x
 				x += dx
 				y = b
 			else:
@@ -101,63 +98,54 @@ def vectorlist(wl):
 			b = a & 0x7ff
 			if a & 0x1000:
 				if a & 0x0800:
-					line(last_x, b)
+					line(lastX, b)
 				else:
-					move(last_x, b)
-				x = last_x
+					move(lastX, b)
+				x = lastX
 				y = b
 			else:
-				last_x = b
+				lastX = b
 
 	return vl
 
-def svg(fn, wl, scale=.25):
-	fo = open(fn, "w")
-	fo.write('<?xml version="1.0" standalone="no"?>\n')
-	fo.write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"\n')
-	fo.write(' "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n')
-	fo.write('<svg version="1.1"')
-	wid = 2048
-	asp = 0.74
-	ht = wid * asp
-	off = 5
-	fo.write(' width="%d" height="%d"' % (
-		scale * wid + 2 * off, scale * ht + 2 * off)
-	)
-	fo.write(' xmlns="http://www.w3.org/2000/svg">\n')
-	fo.write('<g stroke-linecap="round" fill="none" stroke="black"')
-	fo.write(' stroke-width = "%.1f"' % (5.0 * scale))
-	fo.write('>\n')
+def writeSvg(fileName: str, wl, scale=.25):
+	svg = open(fileName, "w", encoding="utf8")
+	svg.write('<?xml version="1.0" standalone="no"?>\n')
+	svg.write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"\n')
+	svg.write(' "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n')
+	svg.write('<svg version="1.1"')
+	width = 2048
+	aspectRatio = 0.74
+	height = width * aspectRatio
+	offset = 5
+	svg.write(f' width="{scale * width + 2 * offset}" height="{scale * height + 2 * offset}"')
+	svg.write(' xmlns="http://www.w3.org/2000/svg">\n')
+	svg.write('<g stroke-linecap="round" fill="none" stroke="black"')
+	svg.write(f' stroke-width="{(scale * 5):.1f}"')
+	svg.write('>\n')
 	for i in vectorlist(wl):
 		if i[0] <= 1.0:
 			c = 255 - int(255 * i[0])
-			fo.write('  <polyline points="')
+			svg.write('  <polyline points="')
 			for x,y in i[1:]:
-				fo.write(" %.1f,%.1f" % (
-					off + scale * x,
-					scale * (ht - y * asp) + off
-				))
-			fo.write('" stroke="#%02x%02x%02x"' % (c,c,c))
-			fo.write('/>\n')
+				svg.write(f" {(offset + scale * x):.1f},{(scale * (height - y * aspectRatio) + offset):.1f}")
+			svg.write(f'" stroke="#{c:02x}{c:02x}{c:02x}"')
+			svg.write('/>\n')
 		elif i[0] == 2.0:
 			x,y = i[1]
-			fo.write('  <circle cx="%d" cy="%d"' % (
-				off + scale * x,
-				scale * (ht - y * asp) + off
-			))
-			fo.write(' r="%.1f" fill="black" />\n' % (5 * scale))
+			svg.write(f'  <circle cx="{offset + scale * x}" cy="{scale * (height - y * aspectRatio) + offset}"')
+			svg.write(f' r="{(5 * scale):.1f}" fill="black" />\n')
 
-	fo.write('</g>\n')
-	fo.write('</svg>\n')
+	svg.write('</g>\n')
+	svg.write('</svg>\n')
+	svg.close()
 
-
-if __name__ == "__main__":
-
+def main():
 	b = bytearray(open("01347-80010.bin", "rb").read())
 	l = []
 	for a in range(0x31e, 0x400, 2):
 		l.append((b[a] << 8) | b[a + 1])
-	svg("_focus.svg", l, .3)
+	writeSvg("_focus.svg", l, .3)
 
 	l = []
 	for a in range(0x122, 0x150, 2):
@@ -166,4 +154,7 @@ if __name__ == "__main__":
 		l.append((b[a] << 8) | b[a + 1])
 	for a in range(0x222, 0x2c8, 2):
 		l.append((b[a] << 8) | b[a + 1])
-	svg("_align.svg", l, .3)
+	writeSvg("_align.svg", l, .3)
+
+if __name__ == "__main__":
+	main()
