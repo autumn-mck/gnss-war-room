@@ -13,7 +13,7 @@
 
 import io
 from io import TextIOWrapper
-from hp1345Font import Font
+from font.hp1345Font import Font
 
 def polylines(svg: TextIOWrapper,
 	      indent: int,

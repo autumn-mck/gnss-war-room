@@ -17,7 +17,7 @@ class Font:
 		self.v: list[list[list[tuple[int, int]]]] = [[]] * 256
 
 		stroke = bytearray(open(romfile, "rb").read())
-		idx = bytearray(open("1816-1500.bin", "rb").read())
+		idx = bytearray(open("./font/1816-1500.bin", "rb").read())
 		used = [False] * len(stroke)
 
 		def buildchar(char: int):
