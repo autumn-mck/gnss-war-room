@@ -34,6 +34,12 @@ class MiscStatsConfig(JSONWizard):
 	class _(JSONWizard.Meta):
 		tag = "miscStats"
 
+@dataclass
+class RawMessageConfig(JSONWizard):
+	logToConsole: bool
+	class _(JSONWizard.Meta):
+		tag = "rawMessages"
+
 def readBaseSvg() -> str:
 	"""Read the base SVG map file."""
 	with open("mapdata/1981.svg", "r", encoding="utf8") as f:

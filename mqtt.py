@@ -12,6 +12,7 @@ from gnss.nmea import parseSatelliteInMessage
 from gnss.satellite import SatelliteInView
 from polarGridWindow import PolarGridWindow
 from miscStatsWindow import MiscStatsWindow
+from rawMessageWindow import RawMessageWindow
 
 def createMqttClient(windows: list[QMainWindow], config: Config) -> MqttClient:
 	"""Create a new MQTT client"""
@@ -83,6 +84,10 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 			case _:
 				print(f"Unknown message type: {parsedMessage.msgID}")
 
+		for window in windows:
+			if isinstance(window, RawMessageWindow):
+				window.onNewData(message.payload)
+
 		# limit how often we update the windows, otherwise pyqt mostly freezes
 		timeSinceLastUpdate = datetime.now() - lastUpdateTime
 		if timeSinceLastUpdate < timedelta(seconds=0.1):
@@ -104,6 +109,9 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 						geoidSeparation,
 						horizontalDilutionOfPrecision,
 						fixQuality)
+				case RawMessageWindow():
+					# is updated above
+					pass
 				case _:
 					print("Unknown window type")
 	return onMessage

@@ -38,5 +38,9 @@
 		{
 			"type": "miscStats"
 		},
+		{
+			"type": "rawMessages",
+			"logToConsole": false
+		}
 	]
 }

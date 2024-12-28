@@ -9,10 +9,11 @@ from PyQt6.QtWidgets import QMainWindow
 from config import loadConfig
 from mqtt import createMqttClient
 from palettes.palette import loadPalette
-from mapdata.maps import MapConfig, PolalGridConfig, MiscStatsConfig
+from mapdata.maps import MapConfig, PolalGridConfig, MiscStatsConfig, RawMessageConfig
 from mapWindow import MapWindow
 from polarGridWindow import PolarGridWindow
 from miscStatsWindow import MiscStatsWindow
+from rawMessageWindow import RawMessageWindow
 
 def main():
 	"""Main function"""
@@ -33,6 +34,8 @@ def main():
 			window = PolarGridWindow(palette)
 		elif isinstance(windowConfig, MiscStatsConfig):
 			window = MiscStatsWindow(palette)
+		elif isinstance(windowConfig, RawMessageConfig):
+			window = RawMessageWindow(palette, windowConfig)
 		else:
 			raise ValueError(f"Unknown window type: {windowConfig.type}")
 		windows.append(window)
