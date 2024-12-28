@@ -31,7 +31,6 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 	longitude = 0
 
 	date = datetime.now()
-	time = date.time()
 
 	altitude = 0 # TODO: unit as well? seems to just give meters atm so that's what I'm assuming for now
 	geoidSeparation = 0
@@ -46,7 +45,6 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 		nonlocal longitude
 
 		nonlocal date
-		nonlocal time
 
 		nonlocal altitude
 		nonlocal geoidSeparation
@@ -63,12 +61,12 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 			case "GLL":
 				latitude = parsedMessage.lat
 				longitude = parsedMessage.lon
-				time = parsedMessage.time # type: ignore
+				date = datetime.combine(date, parsedMessage.time) # type: ignore
 			case "RMC":
 				latitude = parsedMessage.lat
 				longitude = parsedMessage.lon
 				date = parsedMessage.date # type: ignore
-				time = parsedMessage.time # type: ignore
+				date = datetime.combine(date, parsedMessage.time) # type: ignore
 			case "GGA":
 				latitude = parsedMessage.lat
 				longitude = parsedMessage.lon
@@ -85,26 +83,30 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 			case _:
 				print(f"Unknown message type: {parsedMessage.msgID}")
 
+		# limit how often we update the windows, otherwise pyqt mostly freezes
 		timeSinceLastUpdate = datetime.now() - lastUpdateTime
 		if timeSinceLastUpdate < timedelta(seconds=0.1):
 			return
 		lastUpdateTime = datetime.now()
-		updateAllWindows(windows, latestSatellitePositions, latitude, longitude)
 
+		for window in windows:
+			match window:
+				case MapWindow():
+					window.onNewData(latestSatellitePositions, latitude, longitude)
+				case PolarGridWindow():
+					window.onNewData(latestSatellitePositions)
+				case MiscStatsWindow():
+					window.onNewData(latestSatellitePositions,
+						latitude,
+						longitude,
+						date,
+						altitude,
+						geoidSeparation,
+						horizontalDilutionOfPrecision,
+						fixQuality)
+				case _:
+					print("Unknown window type")
 	return onMessage
-
-def updateAllWindows(windows: list[QMainWindow], satellites: list[SatelliteInView], latitude: float, longitude: float):
-	"""Update all windows with the latest satellite positions"""
-	for window in windows:
-		match window:
-			case MapWindow():
-				window.onNewData(satellites, latitude, longitude)
-			case PolarGridWindow():
-				window.onNewData(satellites)
-			case MiscStatsWindow():
-				pass
-			case _:
-				print("Unknown window type")
 
 def updateSatellitePositions(satellites: list[SatelliteInView], nmeaSentence: NMEAMessage) -> list[SatelliteInView]:
 	"""Update the satellite positions in the windows"""
