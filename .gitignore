@@ -1,5 +1,11 @@
 passwd
 
+# font files
+01347-80001.bin
+01347-80010.bin
+01347-80012.bin
+1816-1500.bin
+
 # https://raw.githubusercontent.com/github/gitignore/refs/heads/main/Python.gitignore
 # Byte-compiled / optimized / DLL files
 __pycache__/
