@@ -5,6 +5,7 @@
 	// "mqttHost": "gnss.mck.is",
 	"mqttPort": 1883,
 	"windows": [
+		// map focused mostly on NI/europe
 		{
 			"type": "worldMap",
 			"hideRivers": true,
@@ -17,6 +18,8 @@
 			"scaleFactor": 2,
 			"scaleMethod": "constantScale"
 		},
+
+		// map of the whole world at once
 		{
 			"type": "worldMap",
 			"hideRivers": true,
@@ -31,6 +34,9 @@
 		},
 		{
 			"type": "satellitePolarGrid"
-		}
+		},
+		{
+			"type": "miscStats"
+		},
 	]
 }
