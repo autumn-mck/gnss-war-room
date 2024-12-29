@@ -1,18 +1,13 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any, Callable
 
 import paho.mqtt.enums as mqttEnums
 from paho.mqtt.client import Client as MqttClient, MQTTMessage
-from PyQt6.QtWidgets import QMainWindow
 from pynmeagps import NMEAReader, NMEAMessage
 from config import Config
 
-from mapWindow import MapWindow
 from gnss.nmea import parseSatelliteInMessage
 from gnss.satellite import SatelliteInView
-from polarGridWindow import PolarGridWindow
-from miscStatsWindow import MiscStatsWindow
-from rawMessageWindow import RawMessageWindow
 
 class GnssData:
 	"""Data from GNSS receiver"""
@@ -86,54 +81,6 @@ def createOnMessageCallback(onNewDataCallback: Callable[[bytes, GnssData], None]
 				print(f"Unknown message type: {parsedMessage.msgID}")
 		onNewDataCallback(message.payload, gnssData)
 	return onMessage
-
-def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData], None]:
-	windows = windows
-	lastUpdateTime = datetime.now()
-	lastMessageUpdateTime = datetime.now()
-
-	def updateWindowsOnNewData(rawMessage: bytes, gnssData: GnssData):
-		nonlocal windows
-		nonlocal lastUpdateTime
-		nonlocal lastMessageUpdateTime
-
-		# limit how often we update the windows, otherwise pyqt mostly freezes
-		timeSinceLastRawMessageUpdate = datetime.now() - lastMessageUpdateTime
-		if timeSinceLastRawMessageUpdate < timedelta(seconds=0.01):
-			return
-
-		for window in windows:
-			if isinstance(window, RawMessageWindow):
-				window.onNewData(rawMessage)
-		lastMessageUpdateTime = datetime.now()
-
-		timeSinceLastUpdate = datetime.now() - lastUpdateTime
-		if timeSinceLastUpdate < timedelta(seconds=0.5):
-			return
-		lastUpdateTime = datetime.now()
-
-		for window in windows:
-			match window:
-				case MapWindow():
-					window.onNewData(gnssData.satellites, gnssData.latitude, gnssData.longitude)
-				case PolarGridWindow():
-					window.onNewData(gnssData.satellites)
-				case MiscStatsWindow():
-					window.onNewData(gnssData.satellites,
-						gnssData.latitude,
-						gnssData.longitude,
-						gnssData.date,
-						gnssData.altitude,
-						gnssData.geoidSeparation,
-						gnssData.hdop,
-						gnssData.fixQuality)
-				case RawMessageWindow():
-					# is updated above
-					pass
-				case _:
-					print("Unknown window type")
-
-	return updateWindowsOnNewData
 
 def updateSatellitePositions(satellites: list[SatelliteInView], nmeaSentence: NMEAMessage) -> list[SatelliteInView]:
 	"""Update the satellite positions in the windows"""

@@ -2,12 +2,14 @@
 
 import os
 import sys
+from typing import Callable
 import urllib.request
+from datetime import datetime, timedelta
 
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtWidgets import QMainWindow
 from config import loadConfig, MapConfig, PolalGridConfig, MiscStatsConfig, RawMessageConfig
-from mqtt import createMqttClient, genWindowCallback
+from mqtt import GnssData, createMqttClient
 from palettes.palette import loadPalette
 from mapWindow import MapWindow
 from polarGridWindow import PolarGridWindow
@@ -51,6 +53,54 @@ def handleMultiScreen(screens: list, window: QMainWindow, index: int):
 	screen = screens[index]
 	qr = screen.geometry()
 	window.move(qr.left(), qr.top())
+
+def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData], None]:
+	windows = windows
+	lastUpdateTime = datetime.now()
+	lastMessageUpdateTime = datetime.now()
+
+	def updateWindowsOnNewData(rawMessage: bytes, gnssData: GnssData):
+		nonlocal windows
+		nonlocal lastUpdateTime
+		nonlocal lastMessageUpdateTime
+
+		# limit how often we update the windows, otherwise pyqt mostly freezes
+		timeSinceLastRawMessageUpdate = datetime.now() - lastMessageUpdateTime
+		if timeSinceLastRawMessageUpdate < timedelta(seconds=0.01):
+			return
+
+		for window in windows:
+			if isinstance(window, RawMessageWindow):
+				window.onNewData(rawMessage)
+		lastMessageUpdateTime = datetime.now()
+
+		timeSinceLastUpdate = datetime.now() - lastUpdateTime
+		if timeSinceLastUpdate < timedelta(seconds=0.5):
+			return
+		lastUpdateTime = datetime.now()
+
+		for window in windows:
+			match window:
+				case MapWindow():
+					window.onNewData(gnssData.satellites, gnssData.latitude, gnssData.longitude)
+				case PolarGridWindow():
+					window.onNewData(gnssData.satellites)
+				case MiscStatsWindow():
+					window.onNewData(gnssData.satellites,
+						gnssData.latitude,
+						gnssData.longitude,
+						gnssData.date,
+						gnssData.altitude,
+						gnssData.geoidSeparation,
+						gnssData.hdop,
+						gnssData.fixQuality)
+				case RawMessageWindow():
+					# is updated above
+					pass
+				case _:
+					print("Unknown window type")
+
+	return updateWindowsOnNewData
 
 def fetchHp1345FilesIfNeeded():
 	"""Download the HP1345A font files if they don't exist"""
