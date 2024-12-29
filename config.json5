@@ -1,8 +1,8 @@
 {
 	"paletteName": "warGames",
 	"multiScreen": false,
-	"mqttHost": "localhost",
-	// "mqttHost": "gnss.mck.is",
+	// "mqttHost": "localhost",
+	"mqttHost": "gnss-mqtt.mck.is",
 	"mqttPort": 1883,
 	"logRawMessages": false,
 	"windows": [

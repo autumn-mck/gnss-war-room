@@ -14,45 +14,45 @@ from polarGridWindow import PolarGridWindow
 from miscStatsWindow import MiscStatsWindow
 from rawMessageWindow import RawMessageWindow
 
-def createMqttClient(windows: list[QMainWindow], config: Config) -> MqttClient:
+class GnssData:
+	"""Data from GNSS receiver"""
+	satellites: list[SatelliteInView]
+	latitude: float
+	longitude: float
+	date: datetime
+	altitude: float
+	geoidSeparation: float
+	hdop: float
+	fixQuality: int
+	"""https://receiverhelp.trimble.com/alloy-gnss/en-us/NMEA-0183messages_GGA.html for meanings"""
+
+	def __init__(self):
+		self.satellites = []
+		self.latitude = 0
+		self.longitude = 0
+		self.date = datetime.now()
+		self.altitude = 0
+		self.geoidSeparation = 0
+		self.hdop = 0
+		self.fixQuality = 0
+
+def createMqttClient(config: Config, onNewDataCallback: Callable[[bytes, GnssData], None]) -> MqttClient:
 	"""Create a new MQTT client"""
 	mqttClient = MqttClient(mqttEnums.CallbackAPIVersion.VERSION2)
-	mqttClient.on_message = createOnMessageCallback(windows)
+	mqttClient.on_message = createOnMessageCallback(onNewDataCallback)
 	mqttClient.connect(config.mqttHost, config.mqttPort)
 	mqttClient.subscribe("gnss/rawMessages")
 	mqttClient.loop_start()
 	return mqttClient
 
-def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient, Any, MQTTMessage], None]:
+def createOnMessageCallback(onNewDataCallback: Callable[[bytes, GnssData], None]
+					) -> Callable[[MqttClient, Any, MQTTMessage], None]:
 	"""Create a callback for the MQTT client to handle incoming messages"""
-	latestSatellitePositions: list[SatelliteInView] = []
-	lastUpdateTime = datetime.now()
-	lastMessageUpdateTime = datetime.now()
-
-	latitude = 0
-	longitude = 0
-
-	date = datetime.now()
-
-	altitude = 0 # TODO: unit as well? seems to just give meters atm so that's what I'm assuming for now
-	geoidSeparation = 0
-	horizontalDilutionOfPrecision = 0
-	fixQuality = 0 # https://receiverhelp.trimble.com/alloy-gnss/en-us/NMEA-0183messages_GGA.html for meanings
+	gnssData = GnssData()
 
 	def onMessage(_client: MqttClient, _userdata: Any, message: MQTTMessage):
-		nonlocal latestSatellitePositions
-		nonlocal lastUpdateTime
-		nonlocal lastMessageUpdateTime
-
-		nonlocal latitude
-		nonlocal longitude
-
-		nonlocal date
-
-		nonlocal altitude
-		nonlocal geoidSeparation
-		nonlocal horizontalDilutionOfPrecision
-		nonlocal fixQuality
+		nonlocal gnssData
+		nonlocal onNewDataCallback
 		parsedMessage = NMEAReader.parse(message.payload)
 		if not isinstance(parsedMessage, NMEAMessage):
 			return
@@ -60,23 +60,22 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 		# no clue what's up with the typing here, it's fine though so ignore
 		match parsedMessage.msgID:
 			case "GSV":
-				latestSatellitePositions = updateSatellitePositions(latestSatellitePositions, parsedMessage)
+				gnssData.satellites = updateSatellitePositions(gnssData.satellites, parsedMessage)
 			case "GLL":
-				latitude = parsedMessage.lat
-				longitude = parsedMessage.lon
-				date = datetime.combine(date, parsedMessage.time) # type: ignore
+				gnssData.latitude = parsedMessage.lat
+				gnssData.longitude = parsedMessage.lon
+				gnssData.date = datetime.combine(gnssData.date, parsedMessage.time) # type: ignore
 			case "RMC":
-				latitude = parsedMessage.lat
-				longitude = parsedMessage.lon
-				date = parsedMessage.date # type: ignore
-				date = datetime.combine(date, parsedMessage.time) # type: ignore
+				gnssData.latitude = parsedMessage.lat
+				gnssData.longitude = parsedMessage.lon
+				gnssData.date = parsedMessage.date # type: ignore
 			case "GGA":
-				latitude = parsedMessage.lat
-				longitude = parsedMessage.lon
-				geoidSeparation = parsedMessage.sep # type: ignore
-				altitude = parsedMessage.alt # type: ignore
-				horizontalDilutionOfPrecision = parsedMessage.HDOP # type: ignore
-				fixQuality = parsedMessage.quality # type: ignore
+				gnssData.latitude = parsedMessage.lat
+				gnssData.longitude = parsedMessage.lon
+				gnssData.geoidSeparation = parsedMessage.sep # type: ignore
+				gnssData.altitude = parsedMessage.alt # type: ignore
+				gnssData.hdop = parsedMessage.HDOP # type: ignore
+				gnssData.fixQuality = parsedMessage.quality # type: ignore
 			case "VTG":
 				# seems useless
 				pass
@@ -85,6 +84,18 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 				pass
 			case _:
 				print(f"Unknown message type: {parsedMessage.msgID}")
+		onNewDataCallback(message.payload, gnssData)
+	return onMessage
+
+def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData], None]:
+	windows = windows
+	lastUpdateTime = datetime.now()
+	lastMessageUpdateTime = datetime.now()
+
+	def updateWindowsOnNewData(rawMessage: bytes, gnssData: GnssData):
+		nonlocal windows
+		nonlocal lastUpdateTime
+		nonlocal lastMessageUpdateTime
 
 		# limit how often we update the windows, otherwise pyqt mostly freezes
 		timeSinceLastRawMessageUpdate = datetime.now() - lastMessageUpdateTime
@@ -93,7 +104,7 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 
 		for window in windows:
 			if isinstance(window, RawMessageWindow):
-				window.onNewData(message.payload)
+				window.onNewData(rawMessage)
 		lastMessageUpdateTime = datetime.now()
 
 		timeSinceLastUpdate = datetime.now() - lastUpdateTime
@@ -104,24 +115,25 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 		for window in windows:
 			match window:
 				case MapWindow():
-					window.onNewData(latestSatellitePositions, latitude, longitude)
+					window.onNewData(gnssData.satellites, gnssData.latitude, gnssData.longitude)
 				case PolarGridWindow():
-					window.onNewData(latestSatellitePositions)
+					window.onNewData(gnssData.satellites)
 				case MiscStatsWindow():
-					window.onNewData(latestSatellitePositions,
-						latitude,
-						longitude,
-						date,
-						altitude,
-						geoidSeparation,
-						horizontalDilutionOfPrecision,
-						fixQuality)
+					window.onNewData(gnssData.satellites,
+						gnssData.latitude,
+						gnssData.longitude,
+						gnssData.date,
+						gnssData.altitude,
+						gnssData.geoidSeparation,
+						gnssData.hdop,
+						gnssData.fixQuality)
 				case RawMessageWindow():
 					# is updated above
 					pass
 				case _:
 					print("Unknown window type")
-	return onMessage
+
+	return updateWindowsOnNewData
 
 def updateSatellitePositions(satellites: list[SatelliteInView], nmeaSentence: NMEAMessage) -> list[SatelliteInView]:
 	"""Update the satellite positions in the windows"""

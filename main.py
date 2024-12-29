@@ -7,7 +7,7 @@ import urllib.request
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtWidgets import QMainWindow
 from config import loadConfig, MapConfig, PolalGridConfig, MiscStatsConfig, RawMessageConfig
-from mqtt import createMqttClient
+from mqtt import createMqttClient, genWindowCallback
 from palettes.palette import loadPalette
 from mapWindow import MapWindow
 from polarGridWindow import PolarGridWindow
@@ -42,7 +42,8 @@ def main():
 			handleMultiScreen(screens, window, count)
 		count += 1
 
-	createMqttClient(windows, appConfig)
+	onNewDataCallback = genWindowCallback(windows)
+	createMqttClient(appConfig, onNewDataCallback)
 	app.exec() # blocks until the app is closed
 
 def handleMultiScreen(screens: list, window: QMainWindow, index: int):
