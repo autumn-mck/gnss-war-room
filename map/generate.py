@@ -38,10 +38,6 @@ def prepareInitialSvg(mapSvg: str, palette: Palette, options: MapConfig) -> str:
 	mapSvg = mapSvg.replace('stroke-width:2;', f'stroke-width:{continentBorderWidth};')
 	mapSvg = mapSvg.replace('.st4{fill:none;stroke:#000000;', f'.st4{{fill:none;stroke:{palette.continentsBorder};')
 
-	# metadata
-	mapSvg = mapSvg.replace('.st5{fill:#221F1F;', f'.st5{{fill:{palette.metadata};')
-	mapSvg = mapSvg.replace('.st12{fill:none;stroke:#231F20;', f'.st12{{fill:none;stroke:{palette.metadata};')
-
 	if options.hideAdmin0Borders:
 		mapSvg = mapSvg.replace('g id="Admin_0_Polygon"', 'g id="Admin_0_Polygon" style="display:none"')
 		mapSvg = mapSvg.replace('g id="Admin_x5F_0_x5F_lines"', 'g id="Admin_x5F_0_x5F_lines" style="display:none"')
@@ -63,7 +59,7 @@ def prepareInitialSvg(mapSvg: str, palette: Palette, options: MapConfig) -> str:
 def genCitiesGroup(svgOrigWidth: float, svgOrigHeight: float, options: MapConfig, palette: Palette) -> str:
 	"""Insert cities into the SVG"""
 	cities = getCities()
-	cityDataStr = '<g id="Cities">'
+	cityDataStr = f'\t<g id="Cities" fill="{palette.cities}">\n'
 	for city in cities:
 		cityLat = float(city[4])
 		cityLong = float(city[5])
@@ -72,8 +68,8 @@ def genCitiesGroup(svgOrigWidth: float, svgOrigHeight: float, options: MapConfig
 		cityY += svgOrigHeight / 2
 
 		radius = 5 / options.scaleFactor
-		cityDataStr += f'<circle cx="{cityX}" cy="{cityY}" r="{radius}" fill="{palette.cities}" />'
+		cityDataStr += f'\t\t<circle cx="{int(cityX)}" cy="{int(cityY)}" r="{radius}" />\n'
 
-	cityDataStr += '</g>'
+	cityDataStr += '\t</g>\n'
 
 	return cityDataStr

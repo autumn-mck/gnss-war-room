@@ -18,7 +18,7 @@ class MiscStatsWindow(QMainWindow):
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
 		self.customPalette = palette
 
-		self.satelliteReceivedEvent.connect(self.newSatelliteDataEvent)
+		self.satelliteReceivedEvent.connect(self.updateWithNewData)
 
 		self.latestSatellites = []
 		self.latitude = 0
@@ -26,13 +26,13 @@ class MiscStatsWindow(QMainWindow):
 		self.date = datetime.now()
 		self.altitude = 0
 		self.geoidSeparation = 0
-		self.horizontalDilutionOfPrecision = 0
+		self.hdop = 0
 		self.fixQuality = 0
 
-		self.svgFont = Font("./font/01347-80012.bin")
+		self.svgFont = Font()
 		svgStr, width, height = makeSvgString(self.svgFont,
 			"Waiting for data...".encode('ascii'),
-			scale=2, border=4, offset=0, addGrid=False, drawShadow=False, fontThickness=1.4, fontColour="#ffffff")
+			fontThickness=2, fontColour=palette.foreground)
 		svgFile = saveToTempFile(svgStr)
 		self.svg = QSvgWidget(svgFile, parent=self)
 		self.svg.setGeometry(0, 0, width, height)
@@ -41,7 +41,7 @@ class MiscStatsWindow(QMainWindow):
 		self.show()
 
 	def onNewData(self,
-	       satellites: list[SatelliteInView],
+				 satellites: list[SatelliteInView],
 				 latitude: float,
 				 longitude: float,
 				 date: datetime,
@@ -56,41 +56,45 @@ class MiscStatsWindow(QMainWindow):
 		self.date = date
 		self.altitude = altitude
 		self.geoidSeparation = geoidSeparation
-		self.horizontalDilutionOfPrecision = horizontalDilutionOfPrecision
+		self.hdop = horizontalDilutionOfPrecision
 		self.fixQuality = fixQuality
 
 		self.satelliteReceivedEvent.emit()
 
-	def newSatelliteDataEvent(self):
+	def updateWithNewData(self):
+		"""Update the misc stats window with new data"""
 		strToDisplay = f"Lat: {self.latitude:.6f}\n\rLong: {self.longitude:.6f}\n\r"
 		strToDisplay += f"Date: {self.date.strftime('%Y-%m-%d')}\n\r"
 		strToDisplay += f"Time: {self.date.strftime('%H:%M:%S')}\n\r"
 		strToDisplay += f"Altitude: {self.altitude:.1f}\n\r"
 		strToDisplay += f"Geoid Separation: {self.geoidSeparation:.1f}\n\r"
-		strToDisplay += f"HDOP: {self.horizontalDilutionOfPrecision:.2f} ({classifyHDOP(self.horizontalDilutionOfPrecision)})\n\r"
+		strToDisplay += f"HDOP: {self.hdop:.2f} ({classifyDOP(self.hdop)})\n\r"
 		strToDisplay += f"Fix Quality: {self.fixQuality} ({classifyFixQuality(self.fixQuality)})\n\r"
 
 		svgStr, width, height = makeSvgString(self.svgFont,
 			strToDisplay.encode('ascii'),
-			scale=2, border=4, offset=0, addGrid=False, drawShadow=False, fontThickness=2, fontColour="#ffffff")
+			fontThickness=2,
+			fontColour=self.customPalette.foreground)
 		svgFile = saveToTempFile(svgStr)
 		self.svg.load(svgFile)
 		self.svg.setGeometry(0, 0, width, height)
 
-def classifyHDOP(hdop: float) -> str:
-	if hdop < 1:
+def classifyDOP(dop: float) -> str:
+	"""Classify the dilution of precision"""
+	if dop < 1:
 		return "Ideal"
-	if hdop < 2:
+	if dop < 2:
 		return "Excellent"
-	if hdop < 5:
+	if dop < 5:
 		return "Good"
-	if hdop < 10:
+	if dop < 10:
 		return "Moderate"
-	if hdop < 20:
+	if dop < 20:
 		return "Fair"
 	return "Poor"
 
 def classifyFixQuality(fixQuality: int) -> str:
+	"""Classify the GGA fix quality"""
 	if fixQuality == 0:
 		return "Invalid"
 	if fixQuality == 1:

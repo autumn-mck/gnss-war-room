@@ -34,7 +34,7 @@
 			"scaleMethod": "fit"
 		},
 		{
-			"type": "satellitePolarGrid"
+			"type": "polarGrid"
 		},
 		{
 			"type": "miscStats"

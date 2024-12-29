@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QResizeEvent, QKeyEvent
-from map.update import addSatellites, focusOnPoint
+from map.update import genSatelliteGroup, focusOnPoint
 from map.generate import readBaseSvg, prepareInitialSvg
 from misc import saveToTempFile
 from config import MapConfig
@@ -15,7 +15,7 @@ class MapWindow(QMainWindow):
 	defaultWidth = 700
 	defaultHeight = 500
 
-	def __init__(self, palette: Palette, windowConfig: MapConfig, multiScreen: bool, windowIndex: int):
+	def __init__(self, palette: Palette, windowConfig: MapConfig, windowIndex: int):
 		super().__init__()
 
 		self.windowConfig = windowConfig
@@ -32,11 +32,11 @@ class MapWindow(QMainWindow):
 		self.map.setGeometry(0, 0, self.defaultWidth, self.defaultHeight)
 
 		self.satelliteReceivedEvent.connect(self.newSatelliteDataEvent)
-		self.handleMultiScreen(multiScreen)
 
 		self.setWindowTitle("GNSS War Room")
 		self.setGeometry(self.defaultWidth * windowIndex, 100, self.defaultWidth, self.defaultHeight)
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
+		self.show()
 
 	def generateNewMap(self):
 		mapSvg = prepareInitialSvg(self.baseSvg, self.customPalette, self.windowConfig)
@@ -45,22 +45,16 @@ class MapWindow(QMainWindow):
 
 	def updateMap(self):
 		"""Update the map with newest data"""
-		mapSvg = addSatellites(
-			self.initialSvg,
-			self.latestSatellites,
+		satelliteGroup = genSatelliteGroup(
 			self.windowConfig,
 			self.customPalette,
+			self.latestSatellites,
 			self.latitude,
 			self.longitude
 		)
+		mapSvg = self.initialSvg.replace('</svg>', satelliteGroup + '\n</svg>')
 		mapSvg = focusOnPoint(mapSvg, self.windowConfig, self.map.width(), self.map.height())
-		return saveToTempFile(mapSvg)
-
-	def handleMultiScreen(self, multiScreen: bool):
-		if multiScreen:
-			self.showFullScreen()
-		else:
-			self.show()
+		return mapSvg
 
 	def resizeEvent(self, event: QResizeEvent):
 		"""Resize map when window is resized"""
@@ -108,11 +102,12 @@ class MapWindow(QMainWindow):
 
 	def onNewData(self, satellites: list[SatelliteInView], latitude: float, longitude: float):
 		"""Handle new satellite data"""
-		self.latestSatellites = satellites.copy()
+		self.latestSatellites = satellites
 		self.latitude = latitude
 		self.longitude = longitude
 		self.satelliteReceivedEvent.emit()
 
 	def newSatelliteDataEvent(self):
-		self.svgFile = self.updateMap()
+		newMap = self.updateMap()
+		self.svgFile = saveToTempFile(newMap)
 		self.map.load(self.svgFile)

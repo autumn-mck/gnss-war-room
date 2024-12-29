@@ -18,9 +18,10 @@ generated-members = ["pyjson5.*", "pynmeagps.*"]
 
 [tool.pylint.design]
 min-public-methods = 0 # PyQt windows generate false positives otherwise
-max-args = 6           # default of 5 seems slightly too low
+max-args = 10          # default of 5 seems too low
 max-attributes = 12    # default of 7 seems slightly too low
 max-locals = 20        # default of 15 seems slightly too low
+max-statements = 60    # default of 50 seems slightly too low
 
 [tool.pylint.format]
 indent-string = "\t"

@@ -20,10 +20,10 @@
 		"continentsBorder": {
 			"type": "string"
 		},
-		"metadata": {
+		"cities": {
 			"$ref": "#/definitions/colour"
 		},
-		"cities": {
+		"polarGrid": {
 			"$ref": "#/definitions/colour"
 		},
 		"satelliteNetworks": {
@@ -43,9 +43,9 @@
 		"admin0Border",
 		"admin1Border",
 		"continentsBorder",
-		"metadata",
 		"cities",
-		"satelliteNetworks"
+		"satelliteNetworks",
+		"polarGrid"
 	],
 	"definitions": {
 		"colour": {

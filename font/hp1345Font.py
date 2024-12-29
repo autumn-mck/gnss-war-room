@@ -13,7 +13,7 @@
 # pylint: skip-file
 
 class Font:
-	def __init__(self, romfile = "01347-80012.bin"):
+	def __init__(self, romfile = "./font/01347-80012.bin"):
 		self.v: list[list[list[tuple[int, int]]]] = [[]] * 256
 
 		stroke = bytearray(open(romfile, "rb").read())

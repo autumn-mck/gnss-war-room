@@ -21,15 +21,16 @@ class RawMessageWindow(QMainWindow):
 
 		self.messages = [b''] * self.numMessagesToKeep
 
-		self.svgFont = Font("./font/01347-80012.bin")
+		self.svgFont = Font()
 		svgStr, width, height = makeSvgString(self.svgFont,
 			"Waiting for data...".encode('ascii'),
-			scale=2, border=4, offset=0, addGrid=False, drawShadow=False, fontThickness=1.4, fontColour="#ffffff")
+			fontThickness=2,
+			fontColour=palette.foreground)
 		svgFile = saveToTempFile(svgStr)
 		self.svg = QSvgWidget(svgFile, parent=self)
 		self.svg.setGeometry(0, 0, width, height)
 
-		self.satelliteReceivedEvent.connect(self.newSatelliteDataEvent)
+		self.satelliteReceivedEvent.connect(self.updateMessageLog)
 
 		self.setGeometry(0, 0, 500, 500)
 		self.show()
@@ -40,14 +41,16 @@ class RawMessageWindow(QMainWindow):
 		self.messages.pop()
 		self.satelliteReceivedEvent.emit()
 
-	def newSatelliteDataEvent(self):
+	def updateMessageLog(self):
+		"""Update the displayed message log"""
 		strToDisplay = ""
 		for message in self.messages:
 			strToDisplay += message.decode('utf-8')
 			strToDisplay += "\n\r"
 		svgStr, width, height = makeSvgString(self.svgFont,
 			strToDisplay.encode('ascii'),
-			scale=2, border=4, offset=0, addGrid=False, drawShadow=False, fontThickness=2, fontColour="#ffffff")
+			fontThickness=2,
+			fontColour=self.customPalette.foreground)
 		width /= 2.5
 		height /= 2.5
 		svgFile = saveToTempFile(svgStr)

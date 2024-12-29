@@ -10,8 +10,8 @@ class Palette(JSONWizard):
 	admin0Border: str
 	admin1Border: str
 	continentsBorder: str
-	metadata: str
 	cities: str
+	polarGrid: str
 	satelliteNetworks: dict[str, str]
 
 def loadPalette(paletteName = "warGames") -> Palette:

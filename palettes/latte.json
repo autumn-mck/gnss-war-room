@@ -1,14 +1,13 @@
 {
 	"$schema": "./schema.json",
 	"background": "#eff1f5",
-	"continentsBorder": "#40a02b",
-	"water": "#1e66f5",
 	"foreground": "#4c4f69",
-	"highlight": "#d20f39",
+	"continentsBorder": "#40a02b",
 	"admin0Border": "#4c4f69",
 	"admin1Border": "#ff0000",
-	"metadata": "#4c4f69",
+	"water": "#1e66f5",
 	"cities": "#4c4f69",
+	"polarGrid": "#6c6f85",
 	"satelliteNetworks": {
 		"Galileo": "#1e66f5",
 		"GPS": "#179299",

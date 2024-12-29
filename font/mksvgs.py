@@ -76,9 +76,9 @@ def writePolylines(svg: TextIOWrapper, ind: int, l: list[tuple[int, str, int, in
 
 def makeSvgString(font: Font,
 		  s,
-			scale = 10,
-			offset = 1,
-			border = 5,
+			scale = 2,
+			offset = 0,
+			border = 10,
 			addGrid = False,
 			drawShadow = False,
 			fontThickness = 0.8,

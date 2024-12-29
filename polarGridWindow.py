@@ -57,8 +57,8 @@ class PolarGridWindow(QMainWindow):
 def prepareSvg(svgData: str, palette: Palette, satellites: list[SatelliteInView]) -> str:
 	"""Apply color palette to the SVG and add satellite positions"""
 	svgData = svgData.replace('fill="#fff"', f'fill="{palette.background}"')
-	svgData = svgData.replace('stroke="#aaa"', f'stroke="{palette.foreground}"')
-	svgData = svgData.replace('stroke="#000"', f'stroke="{palette.foreground}" style="display:none"')
+	svgData = svgData.replace('stroke="#aaa"', f'stroke="{palette.polarGrid}"')
+	svgData = svgData.replace('stroke="#000"', f'stroke="{palette.polarGrid}" style="display:none"')
 
 	scale = 94
 	satelliteStr: str = '<g id="Satellites">'

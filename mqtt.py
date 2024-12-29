@@ -27,6 +27,7 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 	"""Create a callback for the MQTT client to handle incoming messages"""
 	latestSatellitePositions: list[SatelliteInView] = []
 	lastUpdateTime = datetime.now()
+	lastMessageUpdateTime = datetime.now()
 
 	latitude = 0
 	longitude = 0
@@ -41,6 +42,7 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 	def onMessage(_client: MqttClient, _userdata: Any, message: MQTTMessage):
 		nonlocal latestSatellitePositions
 		nonlocal lastUpdateTime
+		nonlocal lastMessageUpdateTime
 
 		nonlocal latitude
 		nonlocal longitude
@@ -84,13 +86,18 @@ def createOnMessageCallback(windows: list[QMainWindow]) -> Callable[[MqttClient,
 			case _:
 				print(f"Unknown message type: {parsedMessage.msgID}")
 
+		# limit how often we update the windows, otherwise pyqt mostly freezes
+		timeSinceLastRawMessageUpdate = datetime.now() - lastMessageUpdateTime
+		if timeSinceLastRawMessageUpdate < timedelta(seconds=0.01):
+			return
+
 		for window in windows:
 			if isinstance(window, RawMessageWindow):
 				window.onNewData(message.payload)
+		lastMessageUpdateTime = datetime.now()
 
-		# limit how often we update the windows, otherwise pyqt mostly freezes
 		timeSinceLastUpdate = datetime.now() - lastUpdateTime
-		if timeSinceLastUpdate < timedelta(seconds=0.1):
+		if timeSinceLastUpdate < timedelta(seconds=0.5):
 			return
 		lastUpdateTime = datetime.now()
 

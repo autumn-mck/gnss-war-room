@@ -4,18 +4,16 @@ from config import MapConfig
 from map.gallStereographic import latLongToGallStereographic
 from map.generate import getMapSize
 
-def addSatellites(
-			     mapSvg: str,
-					 satellites: list[SatelliteInView],
-					 options: MapConfig,
-					 palette: Palette,
-					 measuredLatitude: float,
-					 measuredLongitude: float
-					 ) -> str:
-	"""Insert satellite positions into the SVG"""
+def genSatelliteGroup(options: MapConfig,
+					palette: Palette,
+					satellites: list[SatelliteInView],
+					measuredLatitude: float,
+					measuredLongitude: float) -> str:
+	"""Generate an SVG group of satellite positions"""
 	mapWidth, mapHeight = getMapSize()
 
-	satelliteStr = '<g id="Satellites">\n'
+	radius = 30 / options.scaleFactor
+	satelliteStr = '\t<g id="Satellites">\n'
 
 	for satellite in satellites:
 		colour = colourForNetwork(satellite.network, palette)
@@ -26,10 +24,10 @@ def addSatellites(
 		[x, y] = latLongToGallStereographic(lat, long, mapWidth)
 		x += mapWidth / 2
 		y += mapHeight / 2
-		radius = 30 / options.scaleFactor
-		satelliteStr += f'<circle cx="{x}" cy="{y}" r="{radius}" fill="{colour}" />'
-	satelliteStr += '</g></svg>'
-	return mapSvg.replace('</svg>', satelliteStr)
+
+		satelliteStr += f'\t\t<circle cx="{x:.4f}" cy="{y:.4f}" fill="{colour}" r="{radius}" />\n'
+	satelliteStr += '\t</g>'
+	return satelliteStr
 
 def focusOnPoint(mapSvg: str, options: MapConfig, desiredWidth: float, desiredHeight: float) -> str:
 	"""Focus map on a given Lat/Long."""
