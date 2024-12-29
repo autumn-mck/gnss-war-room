@@ -4,7 +4,7 @@ from PyQt6.QtCore import pyqtSignal
 
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
-from mapdata.maps import RawMessageConfig, saveToTempFile
+from misc import saveToTempFile
 from palettes.palette import Palette
 
 class RawMessageWindow(QMainWindow):
@@ -13,12 +13,11 @@ class RawMessageWindow(QMainWindow):
 	satelliteReceivedEvent = pyqtSignal()
 	numMessagesToKeep = 20
 
-	def __init__(self, palette: Palette, config: RawMessageConfig):
+	def __init__(self, palette: Palette):
 		super().__init__()
 		self.setWindowTitle("Raw Messages")
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
 		self.customPalette = palette
-		self.config = config
 
 		self.messages = [b''] * self.numMessagesToKeep
 
@@ -37,8 +36,6 @@ class RawMessageWindow(QMainWindow):
 
 	def onNewData(self, message: bytes):
 		"""Update the raw message window with new data"""
-		if self.config.logToConsole:
-			print(message.decode('utf-8'))
 		self.messages.insert(0, message)
 		self.messages.pop()
 		self.satelliteReceivedEvent.emit()

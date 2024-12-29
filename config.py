@@ -1,7 +1,39 @@
 from dataclasses import dataclass
 import pyjson5
 from dataclass_wizard import JSONWizard
-from mapdata.maps import MapConfig, PolalGridConfig, MiscStatsConfig, RawMessageConfig
+
+@dataclass
+class MapConfig(JSONWizard):
+	"""Configuration for the map."""
+	scaleFactor: float
+	scaleMethod: str
+
+	focusLat: float
+	focusLong: float
+
+	hideCities: bool
+	hideAdmin0Borders: bool
+	hideAdmin1Borders: bool
+	hideRivers: bool
+	hideLakes: bool
+
+	class _(JSONWizard.Meta):
+		tag = "worldMap"
+
+@dataclass
+class PolalGridConfig(JSONWizard):
+	class _(JSONWizard.Meta):
+		tag = "polarGrid"
+
+@dataclass
+class MiscStatsConfig(JSONWizard):
+	class _(JSONWizard.Meta):
+		tag = "miscStats"
+
+@dataclass
+class RawMessageConfig(JSONWizard):
+	class _(JSONWizard.Meta):
+		tag = "rawMessages"
 
 @dataclass
 class Config(JSONWizard):

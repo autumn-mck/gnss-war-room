@@ -4,6 +4,7 @@
 	"mqttHost": "localhost",
 	// "mqttHost": "gnss.mck.is",
 	"mqttPort": 1883,
+	"logRawMessages": false,
 	"windows": [
 		// map focused mostly on NI/europe
 		{
@@ -39,8 +40,7 @@
 			"type": "miscStats"
 		},
 		{
-			"type": "rawMessages",
-			"logToConsole": false
+			"type": "rawMessages"
 		}
 	]
 }

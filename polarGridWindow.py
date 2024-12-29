@@ -4,7 +4,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtGui import QResizeEvent
 from PyQt6.QtCore import pyqtSignal
 from palettes.palette import Palette
-from mapdata.maps import saveToTempFile
+from misc import saveToTempFile
 from gnss.satellite import SatelliteInView, colourForNetwork
 
 class PolarGridWindow(QMainWindow):
@@ -28,13 +28,13 @@ class PolarGridWindow(QMainWindow):
 		self.show()
 
 	def generateNewGrid(self):
-		with open("mapdata/polar.svg", "r", encoding="utf8") as f:
+		with open("map/polar.svg", "r", encoding="utf8") as f:
 			svgData = f.read()
 		svgData = prepareSvg(svgData, self.customPalette, [])
 		return saveToTempFile(svgData)
 
 	def updateGrid(self):
-		with open("mapdata/polar.svg", "r", encoding="utf8") as f:
+		with open("map/polar.svg", "r", encoding="utf8") as f:
 			svgData = f.read()
 		svgData = prepareSvg(svgData, self.customPalette, self.latestSatellites)
 		return saveToTempFile(svgData)

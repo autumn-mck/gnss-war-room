@@ -68,7 +68,7 @@ def calcMaxNumCitiesToInclude(countryInfo: list[str]) -> int:
 
 def readCityInfo() -> dict[str, list[list[str]]]:
 	"""Read the city info from the file and group it by country"""
-	rawCityInfo = readTSV("./mapdata/cities15000.txt")
+	rawCityInfo = readTSV("./map/cities15000.txt")
 	cityInfo = {
 		country: list(cities)
 		for country, cities in itertools.groupby(rawCityInfo, key=lambda x: x[8])
@@ -76,7 +76,7 @@ def readCityInfo() -> dict[str, list[list[str]]]:
 	return cityInfo
 
 def readCountryInfo() -> dict[str, list[str]]:
-	rawCountryInfo = readTSV("./mapdata/countryInfo.txt")
+	rawCountryInfo = readTSV("./map/countryInfo.txt")
 	countryInfo = {
 		row[0]: row for row in rawCountryInfo # key is the country code
 	}

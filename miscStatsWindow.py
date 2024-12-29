@@ -4,7 +4,7 @@ from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
-from mapdata.maps import saveToTempFile
+from misc import saveToTempFile
 
 from gnss.satellite import SatelliteInView
 

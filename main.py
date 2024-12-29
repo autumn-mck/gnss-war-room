@@ -6,10 +6,9 @@ import urllib.request
 
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtWidgets import QMainWindow
-from config import loadConfig
+from config import loadConfig, MapConfig, PolalGridConfig, MiscStatsConfig, RawMessageConfig
 from mqtt import createMqttClient
 from palettes.palette import loadPalette
-from mapdata.maps import MapConfig, PolalGridConfig, MiscStatsConfig, RawMessageConfig
 from mapWindow import MapWindow
 from polarGridWindow import PolarGridWindow
 from miscStatsWindow import MiscStatsWindow
@@ -35,7 +34,7 @@ def main():
 		elif isinstance(windowConfig, MiscStatsConfig):
 			window = MiscStatsWindow(palette)
 		elif isinstance(windowConfig, RawMessageConfig):
-			window = RawMessageWindow(palette, windowConfig)
+			window = RawMessageWindow(palette)
 		else:
 			raise ValueError(f"Unknown window type: {windowConfig.type}")
 		windows.append(window)

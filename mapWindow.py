@@ -2,7 +2,10 @@ from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QResizeEvent, QKeyEvent
-from mapdata.maps import readBaseSvg, addSatellites, prepareInitialSvg, focusOnPoint, saveToTempFile, MapConfig
+from map.update import addSatellites, focusOnPoint
+from map.generate import readBaseSvg, prepareInitialSvg
+from misc import saveToTempFile
+from config import MapConfig
 from gnss.satellite import SatelliteInView
 from palettes.palette import Palette
 
