@@ -1,5 +1,6 @@
 import csv
 import itertools
+import math
 
 # see https://download.geonames.org/export/dump/ (readme at bottom)
 
@@ -74,6 +75,29 @@ def readCityInfo() -> dict[str, list[list[str]]]:
 		for country, cities in itertools.groupby(rawCityInfo, key=lambda x: x[8])
 	}
 	return cityInfo
+
+def findNearestCity(lat: float, long: float) -> list[str]:
+	"""Find the nearest city to a given lat/long"""
+	cities = readTSV("./map/cities15000.txt")
+
+	nearestCity = None
+	nearestDist = math.inf
+	for city in cities:
+		cityLat = float(city[4])
+		cityLong = float(city[5])
+		dist = distBetweenPoints(lat, long, cityLat, cityLong)
+		if dist < nearestDist:
+			nearestDist = dist
+			nearestCity = city
+
+	if nearestCity is None:
+		# should never happen, something is badly wrong
+		raise ValueError("No nearest city found")
+
+	return nearestCity
+
+def distBetweenPoints(lat1: float, long1: float, lat2: float, long2: float) -> float:
+	return (lat2 - lat1)**2 + (long2 - long1)**2
 
 def readCountryInfo() -> dict[str, list[str]]:
 	rawCountryInfo = readTSV("./map/countryInfo.txt")

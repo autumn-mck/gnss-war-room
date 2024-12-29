@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
+from map.cities import findNearestCity
 from misc import saveToTempFile
 
 from gnss.satellite import SatelliteInView
@@ -63,9 +64,13 @@ class MiscStatsWindow(QMainWindow):
 
 	def updateWithNewData(self):
 		"""Update the misc stats window with new data"""
+		nearestCity = findNearestCity(self.latitude, self.longitude)
+		cityName = nearestCity[1]
+
 		strToDisplay = f"Lat: {self.latitude:.6f}\n\rLong: {self.longitude:.6f}\n\r"
 		strToDisplay += f"Date: {self.date.strftime('%Y-%m-%d')}\n\r"
 		strToDisplay += f"Time: {self.date.strftime('%H:%M:%S')}\n\r"
+		strToDisplay += f"City: {cityName}\n\r"
 		strToDisplay += f"Altitude: {self.altitude:.1f}\n\r"
 		strToDisplay += f"Geoid Separation: {self.geoidSeparation:.1f}\n\r"
 		strToDisplay += f"HDOP: {self.hdop:.2f} ({classifyDOP(self.hdop)})\n\r"
@@ -76,8 +81,11 @@ class MiscStatsWindow(QMainWindow):
 			fontThickness=2,
 			fontColour=self.customPalette.foreground)
 		svgFile = saveToTempFile(svgStr)
+
+		width /= 2
+		height /= 2
 		self.svg.load(svgFile)
-		self.svg.setGeometry(0, 0, width, height)
+		self.svg.setGeometry(0, 0, int(width), int(height))
 
 def classifyDOP(dop: float) -> str:
 	"""Classify the dilution of precision"""
