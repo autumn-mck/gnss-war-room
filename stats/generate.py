@@ -1,7 +1,7 @@
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
 from map.cities import findNearestCity
-from mqtt import GnssData
+from gnss.nmea import GnssData
 from palettes.palette import Palette
 
 def classifyDOP(dop: float) -> str:

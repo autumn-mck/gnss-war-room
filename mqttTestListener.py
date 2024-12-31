@@ -13,6 +13,6 @@ mqttClient.enable_logger()
 mqttClient.on_message = onMessage
 mqttClient.on_disconnect = onDisconnect
 
-mqttClient.connect("localhost")
+mqttClient.connect("gnss.mck.is")
 mqttClient.subscribe("gnss/rawMessages")
 mqttClient.loop_forever()

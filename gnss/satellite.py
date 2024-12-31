@@ -129,3 +129,6 @@ def getSatelliteLatLong(satellite: SatelliteInView) -> tuple[float, float]:
 	x, y, z = azimuthToWorldXyz(satellite)
 	lat, long = xyzToLatLong(x, y, z)
 	return (lat, long)
+
+def isSameSatellite(satellite1: SatelliteInView, satellite2: SatelliteInView) -> bool:
+	return satellite1.prnNumber == satellite2.prnNumber and satellite1.network == satellite2.network

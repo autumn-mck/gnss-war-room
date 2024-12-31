@@ -4,7 +4,7 @@ from PyQt6.QtSvgWidgets import QSvgWidget
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
 from misc import saveToTempFile
-from mqtt import GnssData
+from gnss.nmea import GnssData
 from stats.generate import generateStats
 
 class MiscStatsWindow(QMainWindow):

@@ -7,12 +7,13 @@ from datetime import datetime, timedelta
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtWidgets import QMainWindow
 from config import loadConfig, MapConfig, PolalGridConfig, MiscStatsConfig, RawMessageConfig
-from mqtt import GnssData, createMqttClient
+from gnss.nmea import GnssData
+from mqtt import createMqttClient
 from palettes.palette import loadPalette
 from map.window import MapWindow
 from polarGrid.window import PolarGridWindow
 from stats.window import MiscStatsWindow
-from rawMessageWindow import RawMessageWindow
+from rawMessages.window import RawMessageWindow
 from misc import fetchHp1345FilesIfNeeded
 
 def main():
