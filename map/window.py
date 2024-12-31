@@ -2,8 +2,8 @@ from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QResizeEvent, QKeyEvent
-from map.update import genSatelliteGroup, focusOnPoint
-from map.generate import readBaseSvg, prepareInitialSvg
+from map.update import genSatelliteMapGroup, focusOnPoint
+from map.generate import readBaseMap, prepareInitialMap
 from misc import saveToTempFile
 from config import MapConfig
 from gnss.satellite import SatelliteInView
@@ -25,7 +25,7 @@ class MapWindow(QMainWindow):
 		self.latitude = 0
 		self.longitude = 0
 
-		self.baseSvg = readBaseSvg()
+		self.baseSvg = readBaseMap()
 		self.initialSvg = self.generateNewMap()
 		self.svgFile = saveToTempFile(self.initialSvg)
 		self.map = QSvgWidget(self.svgFile, parent=self)
@@ -39,13 +39,13 @@ class MapWindow(QMainWindow):
 		self.show()
 
 	def generateNewMap(self):
-		mapSvg = prepareInitialSvg(self.baseSvg, self.customPalette, self.windowConfig)
+		mapSvg = prepareInitialMap(self.baseSvg, self.customPalette, self.windowConfig)
 		mapSvg = focusOnPoint(mapSvg, self.windowConfig, self.defaultWidth, self.defaultHeight)
 		return mapSvg
 
 	def updateMap(self):
 		"""Update the map with newest data"""
-		satelliteGroup = genSatelliteGroup(
+		satelliteGroup = genSatelliteMapGroup(
 			self.windowConfig,
 			self.customPalette,
 			self.latestSatellites,

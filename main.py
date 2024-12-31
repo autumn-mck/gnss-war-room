@@ -11,9 +11,9 @@ from PyQt6.QtWidgets import QMainWindow
 from config import loadConfig, MapConfig, PolalGridConfig, MiscStatsConfig, RawMessageConfig
 from mqtt import GnssData, createMqttClient
 from palettes.palette import loadPalette
-from mapWindow import MapWindow
-from polarGridWindow import PolarGridWindow
-from miscStatsWindow import MiscStatsWindow
+from map.window import MapWindow
+from polarGrid.window import PolarGridWindow
+from stats.window import MiscStatsWindow
 from rawMessageWindow import RawMessageWindow
 
 def main():
@@ -55,7 +55,7 @@ def handleMultiScreen(screens: list, window: QMainWindow, index: int):
 	window.move(qr.left(), qr.top())
 
 def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData], None]:
-	windows = windows
+	"""Generate a callback for the windows to handle new data"""
 	lastUpdateTime = datetime.now()
 	lastMessageUpdateTime = datetime.now()
 
@@ -86,14 +86,7 @@ def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData],
 				case PolarGridWindow():
 					window.onNewData(gnssData.satellites)
 				case MiscStatsWindow():
-					window.onNewData(gnssData.satellites,
-						gnssData.latitude,
-						gnssData.longitude,
-						gnssData.date,
-						gnssData.altitude,
-						gnssData.geoidSeparation,
-						gnssData.hdop,
-						gnssData.fixQuality)
+					window.onNewData(gnssData)
 				case RawMessageWindow():
 					# is updated above
 					pass

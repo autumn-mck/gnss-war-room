@@ -5,6 +5,7 @@
 
 * {
 	box-sizing: border-box;
+	font-family: monospace;
 }
 
 body {
@@ -25,4 +26,14 @@ body {
 		display: block;
 		margin: auto;
 	}
+}
+
+#toDisplay {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	font-size: 2rem;
+	color: var(--foreground);
+	background-color: var(--background);
+	border: 1px solid var(--foreground);
 }

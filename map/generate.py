@@ -3,7 +3,7 @@ from map.cities import getCities
 from map.gallStereographic import latLongToGallStereographic
 from config import MapConfig
 
-def readBaseSvg() -> str:
+def readBaseMap() -> str:
 	"""Read the base SVG map file."""
 	with open("map/1981.svg", "r", encoding="utf8") as f:
 		return f.read()
@@ -11,7 +11,7 @@ def readBaseSvg() -> str:
 def getMapSize() -> tuple[float, float]:
 	return (3213.05005, 2468.23999)
 
-def prepareInitialSvg(mapSvg: str, palette: Palette, options: MapConfig) -> str:
+def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> str:
 	"""Apply color palette and other options to the SVG map."""
 	mapWidth, mapHeight = getMapSize()
 

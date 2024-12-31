@@ -63,7 +63,10 @@ def createOnMessageCallback(onNewDataCallback: Callable[[bytes, GnssData], None]
 			case "RMC":
 				gnssData.latitude = parsedMessage.lat
 				gnssData.longitude = parsedMessage.lon
-				gnssData.date = parsedMessage.date # type: ignore
+
+				# take the date from here and combine it with the time from GLL
+				time = gnssData.date.time()
+				gnssData.date = datetime.combine(gnssData.date, time) # type: ignore
 			case "GGA":
 				gnssData.latitude = parsedMessage.lat
 				gnssData.longitude = parsedMessage.lon

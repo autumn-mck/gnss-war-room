@@ -4,7 +4,7 @@ from config import MapConfig
 from map.gallStereographic import latLongToGallStereographic
 from map.generate import getMapSize
 
-def genSatelliteGroup(options: MapConfig,
+def genSatelliteMapGroup(options: MapConfig,
 					palette: Palette,
 					satellites: list[SatelliteInView],
 					measuredLatitude: float,
