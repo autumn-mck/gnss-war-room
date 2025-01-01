@@ -19,8 +19,8 @@ class PolarGridWindow(QMainWindow):
 		self.latestSatellites = []
 
 		self.svgFile = self.generateNewGrid()
-		self.map = QSvgWidget(self.svgFile, parent=self)
-		self.map.setGeometry(0, 0, 400, 400)
+		self.polarGrid = QSvgWidget(self.svgFile, parent=self)
+		self.polarGrid.setGeometry(0, 0, 400, 400)
 
 		self.satelliteReceivedEvent.connect(self.newSatelliteDataEvent)
 
@@ -39,11 +39,10 @@ class PolarGridWindow(QMainWindow):
 		return saveToTempFile(svgData)
 
 	def resizeEvent(self, event: QResizeEvent):
-		"""Resize map when window is resized"""
 		newX = event.size().width()
 		newY = event.size().height()
 		minSize = min(newX, newY)
-		self.map.setGeometry(0, 0, minSize, minSize)
+		self.polarGrid.setGeometry(int((newX - minSize) / 2), int((newY - minSize) / 2), minSize, minSize)
 
 	def onNewData(self, satellites: list[SatelliteInView]):
 		self.latestSatellites = satellites
@@ -51,4 +50,4 @@ class PolarGridWindow(QMainWindow):
 
 	def newSatelliteDataEvent(self):
 		self.svgFile = self.updateGrid()
-		self.map.load(self.svgFile)
+		self.polarGrid.load(self.svgFile)
