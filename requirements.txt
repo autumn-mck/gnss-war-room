@@ -1,10 +1,21 @@
-dataclass-wizard==0.28.0
-pylint==3.3.1
+# GUI
 PyQt6==6.7.1
+
+# GNSS
 pynmeagps==1.0.43
 pyserial==3.5
+
+# Loading config
 pyjson5==1.6.7
-paho-mqtt==2.1.0
+dataclass-wizard==0.28.0
 python-dotenv==1.0.1
+
+# MQTT
+paho-mqtt==2.1.0
+
+# Web UI
 Flask==3.1.0
 gunicorn==23.0.0
+
+# Linting
+pylint==3.3.1
