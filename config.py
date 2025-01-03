@@ -33,6 +33,8 @@ class MiscStatsConfig(JSONWizard):
 
 @dataclass
 class RawMessageConfig(JSONWizard):
+	fontThickness: float
+	numMessagesToKeep: int
 	class _(JSONWizard.Meta):
 		tag = "rawMessages"
 

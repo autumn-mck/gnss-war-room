@@ -43,6 +43,8 @@
 		},
 		{
 			"type": "rawMessages",
+			"fontThickness": 1.5,
+			"numMessagesToKeep": 80,
 		}
 	]
 }

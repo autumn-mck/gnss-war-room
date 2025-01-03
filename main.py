@@ -36,7 +36,7 @@ def main():
 		elif isinstance(windowConfig, MiscStatsConfig):
 			window = MiscStatsWindow(palette)
 		elif isinstance(windowConfig, RawMessageConfig):
-			window = RawMessageWindow(palette)
+			window = RawMessageWindow(palette, windowConfig)
 		else:
 			raise ValueError(f"Unknown window type: {windowConfig.type}")
 		windows.append(window)
