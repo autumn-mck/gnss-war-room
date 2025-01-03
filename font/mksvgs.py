@@ -78,7 +78,7 @@ def writePolylines(svg: TextIOWrapper, ind: int, l: list[tuple[int, str, int, in
 
 def makeTextGroup(
 	font: Font,
-	s,
+	textBytes: bytes,
 	scale=2.0,
 	xOffset=0,
 	yOffset=0,
@@ -86,7 +86,7 @@ def makeTextGroup(
 	fontThickness=0.8,
 	fontColour="#000000",
 ) -> tuple[str, float, float]:
-	ss = bytearray(s)
+	ss = bytearray(textBytes)
 
 	boundingBox = [0, 0, 0, 0]
 	x1, y1 = 0, 0
@@ -122,7 +122,7 @@ def makeTextGroup(
 
 def makeSvgString(
 	font: Font,
-	s,
+	textBytes: bytes,
 	scale=2,
 	offset=0,
 	border=10,
@@ -131,7 +131,7 @@ def makeSvgString(
 	fontThickness=0.8,
 	fontColour="#000000",
 ) -> tuple[str, int, int]:
-	ss = bytearray(s)
+	ss = bytearray(textBytes)
 
 	boundingBox = [0, 0, 0, 0]
 	x1, y1 = 0, 0
@@ -199,7 +199,7 @@ def makeSvgString(
 def makeSvg(
 	fileName: str,
 	font: Font,
-	s,
+	textBytes: bytes,
 	scale=10,
 	offset=1,
 	border=5,
@@ -210,7 +210,7 @@ def makeSvg(
 ):
 	(svg, width, height) = makeSvgString(
 		font,
-		s,
+		textBytes,
 		scale=scale,
 		offset=offset,
 		border=border,
@@ -256,7 +256,7 @@ def saveEachChar(font: Font):
 		v = font.vectors(char)
 		if len(v) == 1:
 			continue
-		makeSvg(f"_wargames_{char:02x}.svg", font, [char], scale=10, border=5, offset=5)
+		makeSvg(f"_wargames_{char:02x}.svg", font, bytes([char]), scale=10, border=5, offset=5)
 
 
 def saveCharsToTable(font: Font):
