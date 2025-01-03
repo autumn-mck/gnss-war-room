@@ -13,7 +13,7 @@ def readBaseMap() -> str:
 def getMapSize() -> tuple[float, float]:
 	return (3213.05005, 2468.23999)
 
-def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> str:
+def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> tuple[str, float, float]:
 	"""Apply color palette and other options to the SVG map."""
 	mapWidth, mapHeight = getMapSize()
 
@@ -25,7 +25,7 @@ def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> str:
 	mapSvg = mapSvg.replace('</svg>', '\n<!-- satellites go here -->\n</svg>')
 
 	# key (will be hidden later if needed)
-	keyStr, _, _ = genKey(palette)
+	keyStr, keyWidth, keyHeight = genKey(palette)
 	mapSvg = mapSvg.replace('</svg>', keyStr + '\n</svg>')
 
 	# continent border width
@@ -63,7 +63,7 @@ def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> str:
 
 	# hide metadata
 	mapSvg = mapSvg.replace('g id="MetaData"', 'g id="MetaData" style="display:none"')
-	return mapSvg
+	return mapSvg, keyWidth, keyHeight
 
 def genCitiesGroup(svgOrigWidth: float, svgOrigHeight: float, options: MapConfig, palette: Palette) -> str:
 	"""Insert cities into the SVG"""

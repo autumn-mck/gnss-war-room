@@ -29,7 +29,11 @@ def genSatelliteMapGroup(options: MapConfig,
 	satelliteStr += '\t</g>'
 	return satelliteStr
 
-def focusOnPoint(mapSvg: str, options: MapConfig, desiredWidth: float, desiredHeight: float) -> str:
+def focusOnPoint(mapSvg: str,
+		 options: MapConfig,
+		 desiredWidth: float, desiredHeight: float,
+		 keyWidth: float, keyHeight: float,
+		 keyXMult: float = 1, keyYMult: float = 1) -> str:
 	"""Focus map on a given Lat/Long."""
 	mapWidth, mapHeight = getMapSize()
 
@@ -50,8 +54,8 @@ def focusOnPoint(mapSvg: str, options: MapConfig, desiredWidth: float, desiredHe
 	# move the key
 	if not options.hideKey:
 		inverseScaleFactor = 1 / options.scaleFactor
-		keyNewX = newX
-		keyNewY = newHeight + newY - 581 * inverseScaleFactor
+		keyNewX = newX + (newWidth - keyWidth * inverseScaleFactor) * keyXMult
+		keyNewY = newY + (newHeight - keyHeight * inverseScaleFactor) * keyYMult
 		newGroupStr = f'<g id="Key" transform="translate({keyNewX} {keyNewY}) scale({inverseScaleFactor})">'
 		mapSvg = mapSvg.replace('<g id="Key">', newGroupStr)
 

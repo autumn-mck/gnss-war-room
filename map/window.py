@@ -25,9 +25,12 @@ class MapWindow(QMainWindow):
 		self.latitude = 0
 		self.longitude = 0
 
+		self.keyXMult = 0
+		self.keyYMult = 1
+
 		baseSvg = readBaseMap()
 
-		self.initialMap = prepareInitialMap(baseSvg, palette, windowConfig)
+		self.initialMap, self.keyWidth, self.keyHeight = prepareInitialMap(baseSvg, palette, windowConfig)
 		self.preFocusMap = self.initialMap
 		self.svgFile = saveToTempFile(self.initialMap)
 		self.map = QSvgWidget(self.svgFile, parent=self)
@@ -51,7 +54,10 @@ class MapWindow(QMainWindow):
 		)
 		mapSvg = self.initialMap.replace('<!-- satellites go here -->', satelliteGroup)
 		self.preFocusMap = mapSvg
-		mapSvg = focusOnPoint(mapSvg, self.windowConfig, self.map.width(), self.map.height())
+		mapSvg = focusOnPoint(mapSvg, self.windowConfig,
+			self.map.width(), self.map.height(),
+			self.keyWidth, self.keyHeight,
+			self.keyXMult, self.keyYMult)
 		return mapSvg
 
 	def resizeEvent(self, event: QResizeEvent):
@@ -59,7 +65,7 @@ class MapWindow(QMainWindow):
 		newX = event.size().width()
 		newY = event.size().height()
 
-		mapSvg = focusOnPoint(self.preFocusMap, self.windowConfig, newX, newY)
+		mapSvg = focusOnPoint(self.preFocusMap, self.windowConfig, newX, newY, self.keyWidth, self.keyHeight, self.keyXMult, self.keyYMult)
 		self.svgFile = saveToTempFile(mapSvg)
 
 		self.map.load(self.svgFile)
@@ -86,6 +92,19 @@ class MapWindow(QMainWindow):
 		if event.key() == Qt.Key.Key_D:
 			self.moveMapBy(0, toMove)
 
+		keyMovement = 0.5
+		if event.key() == Qt.Key.Key_Left:
+			self.keyXMult -= keyMovement
+		if event.key() == Qt.Key.Key_Right:
+			self.keyXMult += keyMovement
+		if event.key() == Qt.Key.Key_Up:
+			self.keyYMult -= keyMovement
+		if event.key() == Qt.Key.Key_Down:
+			self.keyYMult += keyMovement
+
+		self.keyXMult = max(0, min(1, self.keyXMult))
+		self.keyYMult = max(0, min(1, self.keyYMult))
+
 		if event.key() == Qt.Key.Key_Q:
 			self.windowConfig.scaleFactor *= 1.1
 		if event.key() == Qt.Key.Key_E:
@@ -98,7 +117,7 @@ class MapWindow(QMainWindow):
 		if event.key() == Qt.Key.Key_Z:
 			self.windowConfig.scaleMethod = scaleMethods[(scaleMethods.index(self.windowConfig.scaleMethod) + 1) % len(scaleMethods)]
 
-		mapSvg = focusOnPoint(self.preFocusMap, self.windowConfig, self.map.width(), self.map.height())
+		mapSvg = focusOnPoint(self.preFocusMap, self.windowConfig, self.map.width(), self.map.height(), self.keyWidth, self.keyHeight, self.keyXMult, self.keyYMult)
 		self.svgFile = saveToTempFile(mapSvg)
 
 		self.map.load(self.svgFile)
