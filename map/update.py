@@ -44,6 +44,9 @@ def focusOnPoint(mapSvg: str, options: MapConfig, desiredWidth: float, desiredHe
 	newX = projectedX - newWidth / 2
 	newY = projectedY - newHeight / 2
 
+	if options.hideKey:
+		mapSvg = mapSvg.replace('<g id="Key">', '<g id="Key" style="display:none">')
+
 	# move the key
 	if not options.hideKey:
 		inverseScaleFactor = 1 / options.scaleFactor

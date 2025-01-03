@@ -24,10 +24,9 @@ def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> str:
 	# add comment for where sattelites will go
 	mapSvg = mapSvg.replace('</svg>', '\n<!-- satellites go here -->\n</svg>')
 
-	# key
-	if not options.hideKey:
-		keyStr, _, _ = genKey(palette)
-		mapSvg = mapSvg.replace('</svg>', keyStr + '\n</svg>')
+	# key (will be hidden later if needed)
+	keyStr, _, _ = genKey(palette)
+	mapSvg = mapSvg.replace('</svg>', keyStr + '\n</svg>')
 
 	# continent border width
 	continentBorderWidth = 6 / options.scaleFactor

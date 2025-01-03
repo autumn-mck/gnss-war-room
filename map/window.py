@@ -91,6 +91,9 @@ class MapWindow(QMainWindow):
 		if event.key() == Qt.Key.Key_E:
 			self.windowConfig.scaleFactor /= 1.1
 
+		if event.key() == Qt.Key.Key_K:
+			self.windowConfig.hideKey = not self.windowConfig.hideKey
+
 		scaleMethods = ['constantScale', 'withWidth', 'withHeight', 'fit']
 		if event.key() == Qt.Key.Key_Z:
 			self.windowConfig.scaleMethod = scaleMethods[(scaleMethods.index(self.windowConfig.scaleMethod) + 1) % len(scaleMethods)]
