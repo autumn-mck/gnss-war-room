@@ -1,3 +1,4 @@
+from misc import Size
 from palettes.palette import Palette
 from map.cities import getCities
 from map.gallStereographic import latLongToGallStereographic
@@ -10,22 +11,22 @@ def readBaseMap() -> str:
 	with open("map/1981.svg", "r", encoding="utf8") as f:
 		return f.read()
 
-def getMapSize() -> tuple[float, float]:
-	return (3213.05005, 2468.23999)
+def getMapSize() -> Size:
+	return Size(3213.05005, 2468.23999)
 
-def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> tuple[str, float, float]:
+def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> tuple[str, Size]:
 	"""Apply color palette and other options to the SVG map."""
-	mapWidth, mapHeight = getMapSize()
+	mapSize = getMapSize()
 
 	# cities
 	if not options.hideCities:
-		mapSvg = mapSvg.replace('</svg>', genCitiesGroup(mapWidth, mapHeight, options, palette) + '\n</svg>')
+		mapSvg = mapSvg.replace('</svg>', genCitiesGroup(mapSize, options, palette) + '\n</svg>')
 
 	# add comment for where sattelites will go
 	mapSvg = mapSvg.replace('</svg>', '\n<!-- satellites go here -->\n</svg>')
 
 	# key (will be hidden later if needed)
-	keyStr, keyWidth, keyHeight = genKey(palette)
+	keyStr, keySize = genKey(palette)
 	mapSvg = mapSvg.replace('</svg>', keyStr + '\n</svg>')
 
 	# continent border width
@@ -63,18 +64,18 @@ def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> tupl
 
 	# hide metadata
 	mapSvg = mapSvg.replace('g id="MetaData"', 'g id="MetaData" style="display:none"')
-	return mapSvg, keyWidth, keyHeight
+	return mapSvg, keySize
 
-def genCitiesGroup(svgOrigWidth: float, svgOrigHeight: float, options: MapConfig, palette: Palette) -> str:
+def genCitiesGroup(mapSize: Size, options: MapConfig, palette: Palette) -> str:
 	"""Insert cities into the SVG"""
 	cities = getCities()
 	cityDataStr = f'\t<g id="Cities" fill="{palette.cities}">\n'
 	for city in cities:
 		cityLat = float(city[4])
 		cityLong = float(city[5])
-		[cityX, cityY] = latLongToGallStereographic(cityLat, cityLong, svgOrigWidth)
-		cityX += svgOrigWidth / 2
-		cityY += svgOrigHeight / 2
+		[cityX, cityY] = latLongToGallStereographic(cityLat, cityLong, mapSize.width)
+		cityX += mapSize.width / 2
+		cityY += mapSize.height / 2
 
 		radius = 5 / options.scaleFactor
 		cityDataStr += f'\t\t<circle cx="{int(cityX)}" cy="{int(cityY)}" r="{radius}" />\n'
@@ -83,7 +84,7 @@ def genCitiesGroup(svgOrigWidth: float, svgOrigHeight: float, options: MapConfig
 
 	return cityDataStr
 
-def genKey(palette: Palette) -> tuple[str, int, int]:
+def genKey(palette: Palette) -> tuple[str, Size]:
 	"""Generate the key for the map"""
 	svgFont = Font()
 
@@ -115,4 +116,4 @@ def genKey(palette: Palette) -> tuple[str, int, int]:
 
 	group = '  <g id="Key">\n' + group + '  </g>\n'
 
-	return group, int(maxWidth), int(heightSoFar)
+	return group, Size(maxWidth, heightSoFar)

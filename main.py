@@ -30,7 +30,7 @@ def main():
 	count = 0
 	for windowConfig in appConfig.windows:
 		if isinstance(windowConfig, MapConfig):
-			window = MapWindow(palette, windowConfig, count)
+			window = MapWindow(palette, windowConfig)
 		elif isinstance(windowConfig, PolalGridConfig):
 			window = PolarGridWindow(palette)
 		elif isinstance(windowConfig, MiscStatsConfig):

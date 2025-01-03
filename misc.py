@@ -23,3 +23,9 @@ def fetchHp1345FilesIfNeeded():
 	urllib.request.urlretrieve(charIndexRomUrl, "./font/1816-1500.bin")
 	urllib.request.urlretrieve(firmwareRomUrl, "./font/01347-80010.bin")
 	print("Done downloading HP1345 font files")
+
+class Size:
+	"""A class for storing a size"""
+	def __init__(self, width: float, height: float):
+		self.width = width
+		self.height = height

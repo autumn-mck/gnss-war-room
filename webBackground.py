@@ -31,7 +31,7 @@ PALETTE = loadPalette("warGames")
 FONT = Font()
 
 baseMap = readBaseMap()
-baseMap, keyWidth, keyHeight = prepareInitialMap(baseMap, PALETTE, mapConfig)
+baseMap, keySize = prepareInitialMap(baseMap, PALETTE, mapConfig)
 
 basePolarGrid = readBasePolarGrid()
 basePolarGrid = prepareIntialPolarGrid(basePolarGrid, PALETTE)
@@ -48,8 +48,8 @@ def updateMap():
 		LATEST_DATA.longitude
 	)
 	latestMap = baseMap.replace('<!-- satellites go here -->', satelliteGroup)
-	baseMapWidth, baseMapHeight = getMapSize()
-	latestMap = focusOnPoint(latestMap, mapConfig, baseMapWidth, baseMapHeight, keyWidth, keyHeight)
+	mapSize = getMapSize()
+	latestMap = focusOnPoint(latestMap, mapConfig, mapSize, keySize)
 	with open('./web/map.svg', 'w', encoding='utf-8') as f:
 		f.write(latestMap)
 

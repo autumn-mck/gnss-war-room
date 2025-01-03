@@ -1,4 +1,5 @@
 from gnss.satellite import SatelliteInView, colourForNetwork, getSatelliteLatLong
+from misc import Size
 from palettes.palette import Palette
 from config import MapConfig
 from map.gallStereographic import latLongToGallStereographic
@@ -10,7 +11,7 @@ def genSatelliteMapGroup(options: MapConfig,
 					measuredLatitude: float,
 					measuredLongitude: float) -> str:
 	"""Generate an SVG group of satellite positions"""
-	mapWidth, mapHeight = getMapSize()
+	mapSize = getMapSize()
 
 	radius = 30 / options.scaleFactor
 	satelliteStr = '\t<g id="Satellites">\n'
@@ -21,9 +22,9 @@ def genSatelliteMapGroup(options: MapConfig,
 		lat += measuredLatitude
 		long += measuredLongitude
 
-		[x, y] = latLongToGallStereographic(lat, long, mapWidth)
-		x += mapWidth / 2
-		y += mapHeight / 2
+		[x, y] = latLongToGallStereographic(lat, long, mapSize.width)
+		x += mapSize.width / 2
+		y += mapSize.height / 2
 
 		satelliteStr += f'\t\t<circle cx="{x:.4f}" cy="{y:.4f}" fill="{colour}" r="{radius}" />\n'
 	satelliteStr += '\t</g>'
@@ -31,22 +32,22 @@ def genSatelliteMapGroup(options: MapConfig,
 
 def focusOnPoint(mapSvg: str,
 		 options: MapConfig,
-		 desiredWidth: float, desiredHeight: float,
-		 keyWidth: float, keyHeight: float,
+		 desiredSize: Size,
+		 keySize: Size,
 		 keyXMult: float = 1, keyYMult: float = 1) -> str:
 	"""Focus map on a given Lat/Long."""
-	mapWidth, mapHeight = getMapSize()
+	mapSize = getMapSize()
 
-	[projectedX, projectedY] = latLongToGallStereographic(options.focusLat, options.focusLong, mapWidth)
-	projectedX += mapWidth / 2
-	projectedY += mapHeight / 2
+	[projectedX, projectedY] = latLongToGallStereographic(options.focusLat, options.focusLong, mapSize.width)
+	projectedX += mapSize.width / 2
+	projectedY += mapSize.height / 2
 
-	[newWidth, newHeight] = calcNewDimensions(mapWidth, mapHeight,
+	newSize = calcNewDimensions(mapSize,
 																					 options.scaleMethod, options.scaleFactor,
-																					 desiredWidth, desiredHeight)
+																					 desiredSize)
 
-	newX = projectedX - newWidth / 2
-	newY = projectedY - newHeight / 2
+	newX = projectedX - newSize.width / 2
+	newY = projectedY - newSize.height / 2
 
 	if options.hideKey:
 		mapSvg = mapSvg.replace('<g id="Key">', '<g id="Key" style="display:none">')
@@ -54,8 +55,8 @@ def focusOnPoint(mapSvg: str,
 	# move the key
 	if not options.hideKey:
 		inverseScaleFactor = 1 / options.scaleFactor
-		keyNewX = newX + (newWidth - keyWidth * inverseScaleFactor) * keyXMult
-		keyNewY = newY + (newHeight - keyHeight * inverseScaleFactor) * keyYMult
+		keyNewX = newX + (newSize.width - keySize.width * inverseScaleFactor) * keyXMult
+		keyNewY = newY + (newSize.height - keySize.height * inverseScaleFactor) * keyYMult
 		newGroupStr = f'<g id="Key" transform="translate({keyNewX} {keyNewY}) scale({inverseScaleFactor})">'
 		mapSvg = mapSvg.replace('<g id="Key">', newGroupStr)
 
@@ -64,35 +65,33 @@ def focusOnPoint(mapSvg: str,
 	viewBoxStart = mapSvg.find('viewBox="')
 	viewBoxEnd = mapSvg.find('"', viewBoxStart + viewboxLen)
 
-	return mapSvg[:viewBoxStart + viewboxLen] + f"{newX} {newY} {newWidth} {newHeight}" + mapSvg[viewBoxEnd:]
+	return mapSvg[:viewBoxStart + viewboxLen] + f"{newX} {newY} {newSize.width} {newSize.height}" + mapSvg[viewBoxEnd:]
 
-def calcNewDimensions(svgOrigWidth: float,
-											svgOrigHeight: float,
+def calcNewDimensions(mapSize: Size,
 											scaleMethod: str,
 											scaleFactor: float,
-											desiredWidth: float,
-											desiredHeight: float
-											) -> tuple[float, float]:
+											desiredSize: Size
+											) -> Size:
 	"""Calculate new dimensions for the map based on the given options."""
 
 	match scaleMethod:
 		case "constantScale":
-			newWidth = desiredWidth / scaleFactor * 3
-			newHeight = desiredHeight / scaleFactor * 3
+			newWidth = desiredSize.width / scaleFactor * 3
+			newHeight = desiredSize.height / scaleFactor * 3
 		case "withWidth":
-			newWidth = svgOrigWidth / scaleFactor
-			newHeight = newWidth * desiredHeight / desiredWidth
+			newWidth = mapSize.width / scaleFactor
+			newHeight = newWidth * desiredSize.height / desiredSize.width
 		case "withHeight":
-			newHeight = svgOrigHeight / scaleFactor
-			newWidth = newHeight * desiredWidth / desiredHeight
+			newHeight = mapSize.height / scaleFactor
+			newWidth = newHeight * desiredSize.width / desiredSize.height
 		case "fit":
-			if desiredWidth / svgOrigWidth < desiredHeight / svgOrigHeight:
-				newWidth = svgOrigWidth / scaleFactor
-				newHeight = newWidth * desiredHeight / desiredWidth
+			if desiredSize.width / mapSize.width < desiredSize.height / mapSize.height:
+				newWidth = mapSize.width / scaleFactor
+				newHeight = newWidth * desiredSize.height / desiredSize.width
 			else:
-				newHeight = svgOrigHeight / scaleFactor
-				newWidth = newHeight * desiredWidth / desiredHeight
+				newHeight = mapSize.height / scaleFactor
+				newWidth = newHeight * desiredSize.width / desiredSize.height
 		case _:
 			raise ValueError(f"Invalid scale method: {scaleMethod}")
 
-	return (newWidth, newHeight)
+	return Size(newWidth, newHeight)

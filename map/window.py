@@ -4,7 +4,7 @@ from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QResizeEvent, QKeyEvent
 from map.update import genSatelliteMapGroup, focusOnPoint
 from map.generate import readBaseMap, prepareInitialMap
-from misc import saveToTempFile
+from misc import Size, saveToTempFile
 from config import MapConfig
 from gnss.satellite import SatelliteInView
 from palettes.palette import Palette
@@ -12,10 +12,9 @@ from palettes.palette import Palette
 class MapWindow(QMainWindow):
 	"""Configurable map window"""
 	satelliteReceivedEvent = pyqtSignal()
-	defaultWidth = 700
-	defaultHeight = 500
+	defaultSize = Size(700, 500)
 
-	def __init__(self, palette: Palette, windowConfig: MapConfig, windowIndex: int):
+	def __init__(self, palette: Palette, windowConfig: MapConfig):
 		super().__init__()
 
 		self.windowConfig = windowConfig
@@ -30,16 +29,16 @@ class MapWindow(QMainWindow):
 
 		baseSvg = readBaseMap()
 
-		self.initialMap, self.keyWidth, self.keyHeight = prepareInitialMap(baseSvg, palette, windowConfig)
+		self.initialMap, self.keySize = prepareInitialMap(baseSvg, palette, windowConfig)
 		self.preFocusMap = self.initialMap
 		self.svgFile = saveToTempFile(self.initialMap)
 		self.map = QSvgWidget(self.svgFile, parent=self)
-		self.map.setGeometry(0, 0, self.defaultWidth, self.defaultHeight)
+		self.map.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
 
 		self.satelliteReceivedEvent.connect(self.newSatelliteDataEvent)
 
 		self.setWindowTitle("GNSS War Room")
-		self.setGeometry(self.defaultWidth * windowIndex, 100, self.defaultWidth, self.defaultHeight)
+		self.setGeometry(0, 100, int(self.defaultSize.width), int(self.defaultSize.height))
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
 		self.show()
 
@@ -55,9 +54,10 @@ class MapWindow(QMainWindow):
 		mapSvg = self.initialMap.replace('<!-- satellites go here -->', satelliteGroup)
 		self.preFocusMap = mapSvg
 		mapSvg = focusOnPoint(mapSvg, self.windowConfig,
-			self.map.width(), self.map.height(),
-			self.keyWidth, self.keyHeight,
-			self.keyXMult, self.keyYMult)
+			Size(self.map.width(), self.map.height()),
+			self.keySize,
+			self.keyXMult,
+			self.keyYMult)
 		return mapSvg
 
 	def resizeEvent(self, event: QResizeEvent):
@@ -65,7 +65,12 @@ class MapWindow(QMainWindow):
 		newX = event.size().width()
 		newY = event.size().height()
 
-		mapSvg = focusOnPoint(self.preFocusMap, self.windowConfig, newX, newY, self.keyWidth, self.keyHeight, self.keyXMult, self.keyYMult)
+		mapSvg = focusOnPoint(self.preFocusMap,
+			self.windowConfig,
+			Size(newX, newY),
+			self.keySize,
+			self.keyXMult,
+			self.keyYMult)
 		self.svgFile = saveToTempFile(mapSvg)
 
 		self.map.load(self.svgFile)
@@ -79,6 +84,27 @@ class MapWindow(QMainWindow):
 	# key bindings
 	def keyPressEvent(self, event: QKeyEvent):
 		"""Handle keybinds"""
+		self.handleMoveMapKeys(event)
+		self.handleMoveKeyKeys(event)
+		self.handleScaleKeys(event)
+
+		if event.key() == Qt.Key.Key_K:
+			self.windowConfig.hideKey = not self.windowConfig.hideKey
+
+		mapSvg = focusOnPoint(self.preFocusMap,
+			self.windowConfig,
+			Size(self.map.width(), self.map.height()),
+			self.keySize,
+			self.keyXMult,
+			self.keyYMult)
+
+		self.svgFile = saveToTempFile(mapSvg)
+
+		self.map.load(self.svgFile)
+		self.map.setGeometry(0, 0, self.map.width(), self.map.height())
+
+	def handleMoveMapKeys(self, event: QKeyEvent):
+		"""Handle keybinds for moving the map"""
 		toMove = 2 / self.windowConfig.scaleFactor
 		if event.modifiers() == Qt.KeyboardModifier.ShiftModifier:
 			toMove *= 5
@@ -92,6 +118,8 @@ class MapWindow(QMainWindow):
 		if event.key() == Qt.Key.Key_D:
 			self.moveMapBy(0, toMove)
 
+	def handleMoveKeyKeys(self, event: QKeyEvent):
+		"""Handle keybinds for moving the key"""
 		keyMovement = 0.5
 		if event.key() == Qt.Key.Key_Left:
 			self.keyXMult -= keyMovement
@@ -105,23 +133,18 @@ class MapWindow(QMainWindow):
 		self.keyXMult = max(0, min(1, self.keyXMult))
 		self.keyYMult = max(0, min(1, self.keyYMult))
 
+	def handleScaleKeys(self, event: QKeyEvent):
+		"""Handle keybinds for scaling the map"""
 		if event.key() == Qt.Key.Key_Q:
 			self.windowConfig.scaleFactor *= 1.1
 		if event.key() == Qt.Key.Key_E:
 			self.windowConfig.scaleFactor /= 1.1
 
-		if event.key() == Qt.Key.Key_K:
-			self.windowConfig.hideKey = not self.windowConfig.hideKey
-
 		scaleMethods = ['constantScale', 'withWidth', 'withHeight', 'fit']
 		if event.key() == Qt.Key.Key_Z:
-			self.windowConfig.scaleMethod = scaleMethods[(scaleMethods.index(self.windowConfig.scaleMethod) + 1) % len(scaleMethods)]
-
-		mapSvg = focusOnPoint(self.preFocusMap, self.windowConfig, self.map.width(), self.map.height(), self.keyWidth, self.keyHeight, self.keyXMult, self.keyYMult)
-		self.svgFile = saveToTempFile(mapSvg)
-
-		self.map.load(self.svgFile)
-		self.map.setGeometry(0, 0, self.map.width(), self.map.height())
+			currentScaleIndex = scaleMethods.index(self.windowConfig.scaleMethod)
+			newScaleMethod = scaleMethods[(currentScaleIndex + 1) % len(scaleMethods)]
+			self.windowConfig.scaleMethod = newScaleMethod
 
 	def onNewData(self, satellites: list[SatelliteInView], latitude: float, longitude: float):
 		"""Handle new satellite data"""
