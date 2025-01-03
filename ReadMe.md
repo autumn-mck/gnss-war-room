@@ -20,4 +20,4 @@ Edit `config.json5` and set `mqttHost` to the hostname of the remote server. You
 
 To display the main PyQt GUI: `python main.py`
 
-To run the web frontend: `bash webStart.sh` (will default to port 2024)
+To run the web frontend: `sh webStart.sh` (will default to port 2024)
