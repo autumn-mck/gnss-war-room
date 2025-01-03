@@ -96,7 +96,6 @@ class RawMessageWindow(QMainWindow):
 
 		charsWide = 75
 		totalWidth = charsWide * self.charSize.width
-		print(self.charSize)
 
 		newWidth = self.svg.width()
 		desiredHeight = int(heightOfMessage * len(self.messageSvgGroups))
