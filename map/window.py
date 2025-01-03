@@ -91,6 +91,10 @@ class MapWindow(QMainWindow):
 		if event.key() == Qt.Key.Key_E:
 			self.windowConfig.scaleFactor /= 1.1
 
+		scaleMethods = ['constantScale', 'withWidth', 'withHeight', 'fit']
+		if event.key() == Qt.Key.Key_Z:
+			self.windowConfig.scaleMethod = scaleMethods[(scaleMethods.index(self.windowConfig.scaleMethod) + 1) % len(scaleMethods)]
+
 		mapSvg = focusOnPoint(self.preFocusMap, self.windowConfig, self.map.width(), self.map.height())
 		self.svgFile = saveToTempFile(mapSvg)
 
