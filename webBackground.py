@@ -7,14 +7,14 @@ from font.hp1345Font import Font
 from misc import fetchHp1345FilesIfNeeded
 from mqtt import GnssData, createMqttClient
 from palettes.palette import loadPalette
-from map.generate import readBaseMap, prepareInitialMap
-from map.update import genSatelliteMapGroup
+from map.generate import readBaseMap, prepareInitialMap, getMapSize
+from map.update import genSatelliteMapGroup, focusOnPoint
 from polarGrid.generate import readBasePolarGrid, prepareIntialPolarGrid
 from polarGrid.update import addSatellitesToPolarGrid
 from stats.generate import generateStats
 
 mapConfig = MapConfig(
-    scaleFactor=2,
+    scaleFactor=1,
     scaleMethod="fit",
     focusLat=0,
     focusLong=10,
@@ -23,7 +23,7 @@ mapConfig = MapConfig(
     hideAdmin1Borders=True,
     hideRivers=True,
     hideLakes=True,
-    hideKey=True,
+    hideKey=False,
 )
 
 CONFIG = loadConfig()
@@ -48,6 +48,8 @@ def updateMap():
 		LATEST_DATA.longitude
 	)
 	latestMap = baseMap.replace('<!-- satellites go here -->', satelliteGroup)
+	baseMapWidth, baseMapHeight = getMapSize()
+	latestMap = focusOnPoint(latestMap, mapConfig, baseMapWidth, baseMapHeight)
 	with open('./web/map.svg', 'w', encoding='utf-8') as f:
 		f.write(latestMap)
 
