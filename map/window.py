@@ -9,8 +9,10 @@ from config import MapConfig
 from gnss.satellite import SatelliteInView
 from palettes.palette import Palette
 
+
 class MapWindow(QMainWindow):
 	"""Configurable map window"""
+
 	satelliteReceivedEvent = pyqtSignal()
 	defaultSize = Size(700, 500)
 
@@ -29,7 +31,7 @@ class MapWindow(QMainWindow):
 
 		baseSvg = readBaseMap()
 
-		self.initialMap, self.keySize = prepareInitialMap(baseSvg, palette, windowConfig)
+		(self.initialMap, self.keySize) = prepareInitialMap(baseSvg, palette, windowConfig)
 		self.preFocusMap = self.initialMap
 		self.svgFile = saveToTempFile(self.initialMap)
 		self.map = QSvgWidget(self.svgFile, parent=self)
@@ -49,15 +51,18 @@ class MapWindow(QMainWindow):
 			self.customPalette,
 			self.latestSatellites,
 			self.latitude,
-			self.longitude
+			self.longitude,
 		)
-		mapSvg = self.initialMap.replace('<!-- satellites go here -->', satelliteGroup)
+		mapSvg = self.initialMap.replace("<!-- satellites go here -->", satelliteGroup)
 		self.preFocusMap = mapSvg
-		mapSvg = focusOnPoint(mapSvg, self.windowConfig,
+		mapSvg = focusOnPoint(
+			mapSvg,
+			self.windowConfig,
 			Size(self.map.width(), self.map.height()),
 			self.keySize,
 			self.keyXMult,
-			self.keyYMult)
+			self.keyYMult,
+		)
 		return mapSvg
 
 	def resizeEvent(self, event: QResizeEvent):
@@ -65,12 +70,14 @@ class MapWindow(QMainWindow):
 		newX = event.size().width()
 		newY = event.size().height()
 
-		mapSvg = focusOnPoint(self.preFocusMap,
+		mapSvg = focusOnPoint(
+			self.preFocusMap,
 			self.windowConfig,
 			Size(newX, newY),
 			self.keySize,
 			self.keyXMult,
-			self.keyYMult)
+			self.keyYMult,
+		)
 		self.svgFile = saveToTempFile(mapSvg)
 
 		self.map.load(self.svgFile)
@@ -91,17 +98,18 @@ class MapWindow(QMainWindow):
 		if event.key() == Qt.Key.Key_K:
 			self.windowConfig.hideKey = not self.windowConfig.hideKey
 
-		mapSvg = focusOnPoint(self.preFocusMap,
+		mapSvg = focusOnPoint(
+			self.preFocusMap,
 			self.windowConfig,
 			Size(self.map.width(), self.map.height()),
 			self.keySize,
 			self.keyXMult,
-			self.keyYMult)
+			self.keyYMult,
+		)
 
 		self.svgFile = saveToTempFile(mapSvg)
 
 		self.map.load(self.svgFile)
-		self.map.setGeometry(0, 0, self.map.width(), self.map.height())
 
 	def handleMoveMapKeys(self, event: QKeyEvent):
 		"""Handle keybinds for moving the map"""
@@ -140,7 +148,7 @@ class MapWindow(QMainWindow):
 		if event.key() == Qt.Key.Key_E:
 			self.windowConfig.scaleFactor /= 1.1
 
-		scaleMethods = ['constantScale', 'withWidth', 'withHeight', 'fit']
+		scaleMethods = ["constantScale", "withWidth", "withHeight", "fit"]
 		if event.key() == Qt.Key.Key_Z:
 			currentScaleIndex = scaleMethods.index(self.windowConfig.scaleMethod)
 			newScaleMethod = scaleMethods[(currentScaleIndex + 1) % len(scaleMethods)]

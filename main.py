@@ -16,6 +16,7 @@ from stats.window import MiscStatsWindow
 from rawMessages.window import RawMessageWindow
 from misc import fetchHp1345FilesIfNeeded
 
+
 def main():
 	"""Main function"""
 	fetchHp1345FilesIfNeeded()
@@ -46,13 +47,15 @@ def main():
 
 	onNewDataCallback = genWindowCallback(windows)
 	createMqttClient(appConfig, onNewDataCallback)
-	app.exec() # blocks until the app is closed
+	app.exec()  # blocks until the app is closed
+
 
 def handleMultiScreen(screens: list, window: QMainWindow, index: int):
 	"""Handle multi-screen setup"""
 	screen = screens[index]
 	qr = screen.geometry()
 	window.move(qr.left(), qr.top())
+
 
 def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData], None]:
 	"""Generate a callback for the windows to handle new data"""
@@ -94,6 +97,7 @@ def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData],
 					print("Unknown window type")
 
 	return updateWindowsOnNewData
+
 
 if __name__ == "__main__":
 	main()

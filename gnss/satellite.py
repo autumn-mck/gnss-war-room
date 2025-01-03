@@ -4,15 +4,18 @@ from dataclasses import dataclass
 
 from palettes.palette import Palette
 
+
 @dataclass
 class SatelliteInView:
 	"""Data about a GNSS satellite"""
+
 	prnNumber: int
 	network: str
 	elevation: float
 	azimuth: float
 	snr: float
 	lastSeen: datetime
+
 
 def groupSatellitesByPrn(satellites: list[SatelliteInView]) -> dict[int, list[SatelliteInView]]:
 	"""Group satellites by PRN number"""
@@ -23,11 +26,13 @@ def groupSatellitesByPrn(satellites: list[SatelliteInView]) -> dict[int, list[Sa
 		satellitesByPrn[satellite.prnNumber].append(satellite)
 	return satellitesByPrn
 
+
 def colourForNetwork(network: str, palette: Palette) -> str:
 	networkName = networkCodeToName(network)
 	if networkName in palette.satelliteNetworks:
 		return palette.satelliteNetworks[networkName]
 	return palette.satelliteNetworks["Unknown"]
+
 
 def networkCodeToName(networkCode: str) -> str:
 	match networkCode:
@@ -42,19 +47,24 @@ def networkCodeToName(networkCode: str) -> str:
 		case _:
 			return "Unknown"
 
+
 def orbitHeightForNetwork(network: str) -> float:
 	match network:
-		case "GA": # Galileo
+		case "GA":  # Galileo
 			return 23.222
-		case "GP": # GPS
+		case "GP":  # GPS
 			return 20.18
-		case "GL": # GLONASS
+		case "GL":  # GLONASS
 			return 19.13
-		case "BD" | "GB": # BeiDou (todo: there appears to be satellites at a few different orbit heights)
+		case (
+			"BD"
+			| "GB"
+		):  # BeiDou (todo: there appears to be satellites at a few different orbit heights)
 			return 21.528
-		case _: # something else I need to add
+		case _:  # something else I need to add
 			print(network)
-			return 21.0 # in the middle-ish
+			return 21.0  # in the middle-ish
+
 
 def azimuthToWorldXyz(satellite: SatelliteInView) -> tuple[float, float, float]:
 	"""Projecting from the azimuth and elevation to the world xyz coordinates
@@ -88,38 +98,42 @@ def azimuthToWorldXyz(satellite: SatelliteInView) -> tuple[float, float, float]:
 	y2 /= orbit
 	z2 /= orbit
 
-	return x1, y2, z1
+	return (x1, y2, z1)
+
 
 def calcY(elevation: float, orbit: float, ground: float) -> tuple[float, float]:
 	"""Calculate possible global Y coordinates of a satellite"""
 	if elevation == 0:
-		return ground, ground
+		return (ground, ground)
 
-	yConst = 1 / (math.tan(math.radians(elevation)))**2
+	yConst = 1 / (math.tan(math.radians(elevation))) ** 2
 	ay = -1 - yConst
 	by = 2 * ground * yConst
 	cy = orbit**2 - ground**2 * yConst
 
 	y1, y2 = quadraticFormula(ay, by, cy)
-	return y1,y2
+	return y1, y2
+
 
 def calcX(elevation: float, orbit: float, ground: float) -> tuple[float, float]:
 	"""Calculate possible global X coordinates of a satellite"""
 	if elevation == 90:
 		return 0, 0
 
-	ax = 1 + math.tan(math.radians(elevation))**2
+	ax = 1 + math.tan(math.radians(elevation)) ** 2
 	bx = 2 * ground * math.tan(math.radians(elevation))
 	cx = ground**2 - orbit**2
 
 	x1, x2 = quadraticFormula(ax, bx, cx)
-	return x1,x2
+	return x1, x2
+
 
 def quadraticFormula(a: float, b: float, c: float) -> tuple[float, float]:
 	discriminant = b**2 - 4 * a * c
 	root1 = (-b + math.sqrt(discriminant)) / (2 * a)
 	root2 = (-b - math.sqrt(discriminant)) / (2 * a)
-	return root1, root2
+	return (root1, root2)
+
 
 def xyzToLatLong(x: float, y: float, z: float) -> tuple[float, float]:
 	"""Projecting from the xyz coordinates to the lat long coordinates. XYZ should be in the range [-1, 1]"""
@@ -127,11 +141,13 @@ def xyzToLatLong(x: float, y: float, z: float) -> tuple[float, float]:
 	long = math.degrees(math.atan2(z, y))
 	return (lat, long)
 
+
 def getSatelliteLatLong(satellite: SatelliteInView) -> tuple[float, float]:
 	"""Get the lat long coordinates of a satellite"""
 	x, y, z = azimuthToWorldXyz(satellite)
 	lat, long = xyzToLatLong(x, y, z)
 	return (lat, long)
+
 
 def isSameSatellite(satellite1: SatelliteInView, satellite2: SatelliteInView) -> bool:
 	return satellite1.prnNumber == satellite2.prnNumber and satellite1.network == satellite2.network

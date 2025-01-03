@@ -8,8 +8,10 @@ from gnss.satellite import SatelliteInView
 from polarGrid.generate import readBasePolarGrid, prepareIntialPolarGrid
 from polarGrid.update import addSatellitesToPolarGrid
 
+
 class PolarGridWindow(QMainWindow):
 	"""Window for displaying the positions of satellites"""
+
 	satelliteReceivedEvent = pyqtSignal()
 
 	def __init__(self, palette: Palette):
@@ -35,14 +37,18 @@ class PolarGridWindow(QMainWindow):
 		return saveToTempFile(svgData)
 
 	def updateGrid(self):
-		svgData = addSatellitesToPolarGrid(self.basePolarGrid, self.customPalette, self.latestSatellites)
+		svgData = addSatellitesToPolarGrid(
+			self.basePolarGrid, self.customPalette, self.latestSatellites
+		)
 		return saveToTempFile(svgData)
 
 	def resizeEvent(self, event: QResizeEvent):
 		newX = event.size().width()
 		newY = event.size().height()
 		minSize = min(newX, newY)
-		self.polarGrid.setGeometry(int((newX - minSize) / 2), int((newY - minSize) / 2), minSize, minSize)
+		self.polarGrid.setGeometry(
+			int((newX - minSize) / 2), int((newY - minSize) / 2), minSize, minSize
+		)
 
 	def onNewData(self, satellites: list[SatelliteInView]):
 		self.latestSatellites = satellites

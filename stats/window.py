@@ -7,10 +7,12 @@ from misc import saveToTempFile
 from gnss.nmea import GnssData
 from stats.generate import generateStats
 
+
 class MiscStatsWindow(QMainWindow):
 	"""Window for displaying miscellaneous statistics"""
 
 	satelliteReceivedEvent = pyqtSignal()
+
 	def __init__(self, palette):
 		super().__init__()
 		self.setWindowTitle("Misc Stats")
@@ -21,9 +23,12 @@ class MiscStatsWindow(QMainWindow):
 		self.latestData = None
 
 		self.svgFont = Font()
-		svgStr, width, height = makeSvgString(self.svgFont,
-			"Waiting for data...".encode('ascii'),
-			fontThickness=2, fontColour=palette.foreground)
+		(svgStr, width, height) = makeSvgString(
+			self.svgFont,
+			"Waiting for data...".encode("ascii"),
+			fontThickness=2,
+			fontColour=palette.foreground,
+		)
 		svgFile = saveToTempFile(svgStr)
 		self.svg = QSvgWidget(svgFile, parent=self)
 		self.svg.setGeometry(0, 0, width, height)
@@ -40,7 +45,7 @@ class MiscStatsWindow(QMainWindow):
 		"""Update the misc stats window with new data"""
 		if self.latestData is None:
 			return
-		svgStr, width, height = generateStats(self.latestData, self.customPalette, self.svgFont)
+		(svgStr, width, height) = generateStats(self.latestData, self.customPalette, self.svgFont)
 		svgFile = saveToTempFile(svgStr)
 
 		width /= 2

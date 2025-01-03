@@ -1,8 +1,10 @@
 from palettes.palette import Palette
 
+
 def readBasePolarGrid() -> str:
 	with open("polarGrid/polar.svg", "r", encoding="utf8") as f:
 		return f.read()
+
 
 def prepareIntialPolarGrid(svgData: str, palette: Palette) -> str:
 	"""Apply color palette to the SVG and add satellite positions"""

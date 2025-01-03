@@ -1,5 +1,6 @@
 import math
 
+
 def latLongToGallStereographic(lat: float, long: float, mapWidth: float) -> tuple[float, float]:
 	"""Convert latitude and longitude to Gall Stereographic coordinates."""
 	longOffset = -10
@@ -23,7 +24,9 @@ def latLongToGallStereographic(lat: float, long: float, mapWidth: float) -> tupl
 	latRad = math.radians(lat)
 	longRad = math.radians(long)
 
-	x = radius * longRad # the formula should divide by sqrt(2) here but for some reason that gives the wrong result
+	x = (
+		radius * longRad
+	)  # the formula should divide by sqrt(2) here but for some reason that gives the wrong result
 	y = -radius * (math.sqrt(2) + 1) * math.tan(latRad / 2)
 
 	return (x, y)

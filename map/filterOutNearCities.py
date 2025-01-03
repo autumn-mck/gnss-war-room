@@ -6,6 +6,7 @@ def filterOutCitiesNearOtherCities(citiesInCountry: list[list[str]]) -> list[lis
 			cities.append(city)
 	return cities
 
+
 def areCitiesNearby(city1: list[str], city2: list[str]) -> bool:
 	"""Check if two cities are geographically close"""
 	cityLat = float(city1[4])
@@ -13,4 +14,4 @@ def areCitiesNearby(city1: list[str], city2: list[str]) -> bool:
 
 	cityLat2 = float(city2[4])
 	cityLong2 = float(city2[5])
-	return (cityLat - cityLat2)**2 + (cityLong - cityLong2)**2 < 20
+	return (cityLat - cityLat2) ** 2 + (cityLong - cityLong2) ** 2 < 20

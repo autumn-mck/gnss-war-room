@@ -14,16 +14,16 @@ from polarGrid.update import addSatellitesToPolarGrid
 from stats.generate import generateStats
 
 mapConfig = MapConfig(
-    scaleFactor=1,
-    scaleMethod="fit",
-    focusLat=0,
-    focusLong=10,
-    hideCities=True,
-    hideAdmin0Borders=False,
-    hideAdmin1Borders=True,
-    hideRivers=True,
-    hideLakes=True,
-    hideKey=False,
+	scaleFactor=1,
+	scaleMethod="fit",
+	focusLat=0,
+	focusLong=10,
+	hideCities=True,
+	hideAdmin0Borders=False,
+	hideAdmin1Borders=True,
+	hideRivers=True,
+	hideLakes=True,
+	hideKey=False,
 )
 
 CONFIG = loadConfig()
@@ -38,36 +38,38 @@ basePolarGrid = prepareIntialPolarGrid(basePolarGrid, PALETTE)
 
 LATEST_DATA = None
 
+
 def updateMap():
 	"""Generate and write the latest map"""
 	if LATEST_DATA is None:
 		return
-	satelliteGroup = genSatelliteMapGroup(mapConfig, PALETTE,
-		LATEST_DATA.satellites,
-		LATEST_DATA.latitude,
-		LATEST_DATA.longitude
+	satelliteGroup = genSatelliteMapGroup(
+		mapConfig, PALETTE, LATEST_DATA.satellites, LATEST_DATA.latitude, LATEST_DATA.longitude
 	)
-	latestMap = baseMap.replace('<!-- satellites go here -->', satelliteGroup)
+	latestMap = baseMap.replace("<!-- satellites go here -->", satelliteGroup)
 	mapSize = getMapSize()
 	latestMap = focusOnPoint(latestMap, mapConfig, mapSize, keySize)
-	with open('./web/map.svg', 'w', encoding='utf-8') as f:
+	with open("./web/map.svg", "w", encoding="utf-8") as f:
 		f.write(latestMap)
+
 
 def updatePolarGrid():
 	"""Generate and write the latest polar grid"""
 	if LATEST_DATA is None:
 		return
 	polarGrid = addSatellitesToPolarGrid(basePolarGrid, PALETTE, LATEST_DATA.satellites)
-	with open('./web/polarGrid.svg', 'w', encoding='utf-8') as f:
+	with open("./web/polarGrid.svg", "w", encoding="utf-8") as f:
 		f.write(polarGrid)
+
 
 def updateStats():
 	"""Generate and write the latest stats"""
 	if LATEST_DATA is None:
 		return
-	statsSvg, _, _ = generateStats(LATEST_DATA, PALETTE, FONT)
-	with open('./web/stats.svg', 'w', encoding='utf-8') as f:
+	(statsSvg, _, _) = generateStats(LATEST_DATA, PALETTE, FONT)
+	with open("./web/stats.svg", "w", encoding="utf-8") as f:
 		f.write(statsSvg)
+
 
 def updateSVGsThread():
 	"""Update the SVGs in the background once per second"""
@@ -82,11 +84,14 @@ def updateSVGsThread():
 		timeToSleep = 1 - (endTime - startTime).total_seconds()
 		time.sleep(timeToSleep)
 
+
 def genOnNewDataCallback():
 	def onNewData(_: bytes, gnssData: GnssData):
-		global LATEST_DATA # pylint: disable=global-statement
+		global LATEST_DATA  # pylint: disable=global-statement
 		LATEST_DATA = gnssData
+
 	return onNewData
+
 
 def main():
 	fetchHp1345FilesIfNeeded()
@@ -95,5 +100,6 @@ def main():
 	thread = threading.Thread(target=updateSVGsThread)
 	thread.start()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 	main()

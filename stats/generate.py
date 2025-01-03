@@ -4,6 +4,7 @@ from map.cities import findNearestCity
 from gnss.nmea import GnssData
 from palettes.palette import Palette
 
+
 def classifyDOP(dop: float) -> str:
 	"""Classify the dilution of precision"""
 	if dop < 1:
@@ -18,6 +19,7 @@ def classifyDOP(dop: float) -> str:
 		return "Fair"
 	return "Poor"
 
+
 def classifyFixQuality(fixQuality: int) -> str:
 	"""Classify the GGA fix quality"""
 	if fixQuality == 0:
@@ -28,6 +30,7 @@ def classifyFixQuality(fixQuality: int) -> str:
 		return "DGPS"
 	print(f"Unknown fix quality: {fixQuality}")
 	return "Unknown"
+
 
 def generateStats(data: GnssData, palette: Palette, font: Font) -> tuple[str, int, int]:
 	"""Generate an SVG of stats for the given data"""
@@ -43,8 +46,7 @@ def generateStats(data: GnssData, palette: Palette, font: Font) -> tuple[str, in
 	strToDisplay += f"HDOP: {data.hdop:.2f} ({classifyDOP(data.hdop)})\n\r"
 	strToDisplay += f"Fix Quality: {data.fixQuality} ({classifyFixQuality(data.fixQuality)})\n\r"
 
-	svgStr, width, height = makeSvgString(font,
-		strToDisplay.encode('ascii'),
-		fontThickness=2,
-		fontColour=palette.foreground)
-	return svgStr, width, height
+	(svgStr, width, height) = makeSvgString(
+		font, strToDisplay.encode("ascii"), fontThickness=2, fontColour=palette.foreground
+	)
+	return (svgStr, width, height)

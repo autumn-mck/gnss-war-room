@@ -6,13 +6,16 @@ from config import MapConfig
 from font.hp1345Font import Font
 from font.mksvgs import makeTextGroup
 
+
 def readBaseMap() -> str:
 	"""Read the base SVG map file."""
 	with open("map/1981.svg", "r", encoding="utf8") as f:
 		return f.read()
 
+
 def getMapSize() -> Size:
 	return Size(3213.05005, 2468.23999)
+
 
 def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> tuple[str, Size]:
 	"""Apply color palette and other options to the SVG map."""
@@ -20,41 +23,57 @@ def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> tupl
 
 	# cities
 	if not options.hideCities:
-		mapSvg = mapSvg.replace('</svg>', genCitiesGroup(mapSize, options, palette) + '\n</svg>')
+		mapSvg = mapSvg.replace("</svg>", genCitiesGroup(mapSize, options, palette) + "\n</svg>")
 
 	# add comment for where sattelites will go
-	mapSvg = mapSvg.replace('</svg>', '\n<!-- satellites go here -->\n</svg>')
+	mapSvg = mapSvg.replace("</svg>", "\n<!-- satellites go here -->\n</svg>")
 
 	# key (will be hidden later if needed)
-	keyStr, keySize = genKey(palette)
-	mapSvg = mapSvg.replace('</svg>', keyStr + '\n</svg>')
+	(keyStr, keySize) = genKey(palette)
+	mapSvg = mapSvg.replace("</svg>", keyStr + "\n</svg>")
 
 	# continent border width
 	continentBorderWidth = 6 / options.scaleFactor
 	admin0BorderWidth = 2 / options.scaleFactor
 
 	# waterbodies
-	mapSvg = mapSvg.replace('.st0{fill:#50C8F4;', f'.st0{{fill:{palette.water};')
-	mapSvg = mapSvg.replace('.st3{fill:none;stroke:#50C8F4;', f'.st3{{fill:none;stroke:{palette.water};')
+	mapSvg = mapSvg.replace(".st0{fill:#50C8F4;", f".st0{{fill:{palette.water};")
+	mapSvg = mapSvg.replace(
+		".st3{fill:none;stroke:#50C8F4;", f".st3{{fill:none;stroke:{palette.water};"
+	)
 
 	# admin1 borders
-	mapSvg = mapSvg.replace('.st1{fill:none;stroke:#808080;', f'.st1{{fill:none;stroke:{palette.admin1Border};')
+	mapSvg = mapSvg.replace(
+		".st1{fill:none;stroke:#808080;", f".st1{{fill:none;stroke:{palette.admin1Border};"
+	)
 
 	# admin0 borders
-	mapSvg = mapSvg.replace('.st2{fill:none;stroke:#000000;', f'.st2{{fill:none;stroke:{palette.admin0Border};')
-	mapSvg = mapSvg.replace('.st2{', f'.st2{{stroke-width:{admin0BorderWidth};')
+	mapSvg = mapSvg.replace(
+		".st2{fill:none;stroke:#000000;", f".st2{{fill:none;stroke:{palette.admin0Border};"
+	)
+	mapSvg = mapSvg.replace(".st2{", f".st2{{stroke-width:{admin0BorderWidth};")
 
 	# continent borders
-	mapSvg = mapSvg.replace('stroke-width:2;', f'stroke-width:{continentBorderWidth};')
-	mapSvg = mapSvg.replace('.st4{fill:none;stroke:#000000;', f'.st4{{fill:none;stroke:{palette.continentsBorder};')
+	mapSvg = mapSvg.replace("stroke-width:2;", f"stroke-width:{continentBorderWidth};")
+	mapSvg = mapSvg.replace(
+		".st4{fill:none;stroke:#000000;", f".st4{{fill:none;stroke:{palette.continentsBorder};"
+	)
 
 	if options.hideAdmin0Borders:
-		mapSvg = mapSvg.replace('g id="Admin_0_Polygon"', 'g id="Admin_0_Polygon" style="display:none"')
-		mapSvg = mapSvg.replace('g id="Admin_x5F_0_x5F_lines"', 'g id="Admin_x5F_0_x5F_lines" style="display:none"')
+		mapSvg = mapSvg.replace(
+			'g id="Admin_0_Polygon"', 'g id="Admin_0_Polygon" style="display:none"'
+		)
+		mapSvg = mapSvg.replace(
+			'g id="Admin_x5F_0_x5F_lines"', 'g id="Admin_x5F_0_x5F_lines" style="display:none"'
+		)
 
 	if options.hideAdmin1Borders:
-		mapSvg = mapSvg.replace('g id="Admin_1_Polygon"', 'g id="Admin_1_Polygon" style="display:none"')
-		mapSvg = mapSvg.replace('g id="Admin_x5F_1_x5F_lines"', 'g id="Admin_x5F_1_x5F_lines" style="display:none"')
+		mapSvg = mapSvg.replace(
+			'g id="Admin_1_Polygon"', 'g id="Admin_1_Polygon" style="display:none"'
+		)
+		mapSvg = mapSvg.replace(
+			'g id="Admin_x5F_1_x5F_lines"', 'g id="Admin_x5F_1_x5F_lines" style="display:none"'
+		)
 
 	if options.hideRivers:
 		mapSvg = mapSvg.replace('g id="Rivers"', 'g id="Rivers" style="display:none"')
@@ -64,7 +83,8 @@ def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> tupl
 
 	# hide metadata
 	mapSvg = mapSvg.replace('g id="MetaData"', 'g id="MetaData" style="display:none"')
-	return mapSvg, keySize
+	return (mapSvg, keySize)
+
 
 def genCitiesGroup(mapSize: Size, options: MapConfig, palette: Palette) -> str:
 	"""Insert cities into the SVG"""
@@ -80,15 +100,16 @@ def genCitiesGroup(mapSize: Size, options: MapConfig, palette: Palette) -> str:
 		radius = 5 / options.scaleFactor
 		cityDataStr += f'\t\t<circle cx="{int(cityX)}" cy="{int(cityY)}" r="{radius}" />\n'
 
-	cityDataStr += '\t</g>\n'
+	cityDataStr += "\t</g>\n"
 
 	return cityDataStr
+
 
 def genKey(palette: Palette) -> tuple[str, Size]:
 	"""Generate the key for the map"""
 	svgFont = Font()
 
-	group = ''
+	group = ""
 
 	maxWidth = 0
 	heightSoFar = 0
@@ -96,12 +117,14 @@ def genKey(palette: Palette) -> tuple[str, Size]:
 	for networkName, colour in palette.satelliteNetworks.items():
 		networkScale = 3.5
 
-		network, width, height = makeTextGroup(svgFont,
-			networkName.encode('ascii'),
+		(network, width, height) = makeTextGroup(
+			svgFont,
+			networkName.encode("ascii"),
 			fontThickness=2,
 			scale=networkScale,
 			yOffset=int(heightSoFar / networkScale),
-			fontColour=colour)
+			fontColour=colour,
+		)
 		heightSoFar = height - 20
 		maxWidth = max(maxWidth, width)
 		group += "\n" + network
@@ -114,6 +137,6 @@ def genKey(palette: Palette) -> tuple[str, Size]:
 	stroke="{palette.foreground}" stroke-width="3" />"""
 	group = background + "\n" + group
 
-	group = '  <g id="Key">\n' + group + '  </g>\n'
+	group = '  <g id="Key">\n' + group + "  </g>\n"
 
-	return group, Size(maxWidth, heightSoFar)
+	return (group, Size(maxWidth, heightSoFar))

@@ -15,30 +15,31 @@
 import math
 from hp1345Font import Font
 
+
 def vectorlist(wl):
 	font = Font()
 	lastX = 0
 	x, y = 0, 0
 	dx = 1
-	rot = [ 1, 0, 0, 1 ]
+	rot = [1, 0, 0, 1]
 	siz = 1.0
-	attr = (0,0,0)
+	attr = (0, 0, 0)
 	ii = 1.0
 	vl = []
 
-	def move(x,y):
+	def move(x, y):
 		vl.append([ii, (x, y)])
 
-	def line(x,y):
-		ox,oy = vl[-1][-1]
-		if attr[1] in (2,3):
+	def line(x, y):
+		ox, oy = vl[-1][-1]
+		if attr[1] in (2, 3):
 			l = math.hypot(x - ox, y - oy)
 			dx = (x - ox) / l
 			dy = (y - oy) / l
 			if attr[1] == 2:
-				dl = 400. / 13.
+				dl = 400.0 / 13.0
 			else:
-				dl = 400. / 31.
+				dl = 400.0 / 31.0
 			ddx = dx * dl
 			ddy = dy * dl
 			while l > dl:
@@ -52,7 +53,7 @@ def vectorlist(wl):
 
 		if attr[1] != 5:
 			vl[-1].append((x, y))
-		if attr[1] in (1,5):
+		if attr[1] in (1, 5):
 			vl.append([2, (x, y)])
 			vl.append([ii, (x, y)])
 
@@ -66,18 +67,13 @@ def vectorlist(wl):
 		elif c == 0x4000:
 			# Text
 			if a & 0x0100:
-				rot = [
-					[  1,  0,  0,  1 ],
-					[  0, -1,  1,  0 ],
-					[ -1,  0,  0, -1 ],
-					[  0,  1, -1,  0 ],
-				][(a >> 9) & 3]
-				siz = 1.0 + .5 * ((a >> 11) & 3)
+				rot = [[1, 0, 0, 1], [0, -1, 1, 0], [-1, 0, 0, -1], [0, 1, -1, 0]][(a >> 9) & 3]
+				siz = 1.0 + 0.5 * ((a >> 11) & 3)
 				siz = int(siz * 2)
-			tl = font.vectors(a & 0x0ff)
+			tl = font.vectors(a & 0x0FF)
 			for i in tl:
 				l = [ii]
-				for dx,dy in i:
+				for dx, dy in i:
 					ddx = dx * rot[0] + dy * rot[1]
 					ddy = dx * rot[2] + dy * rot[3]
 					x += ddx * siz
@@ -86,7 +82,7 @@ def vectorlist(wl):
 				vl.append(l)
 		elif c == 0x2000:
 			# Graph
-			b = a & 0x7ff
+			b = a & 0x7FF
 			if a & 0x1000:
 				if a & 0x800:
 					vl.append((ii, (lastX, y), (x, b)))
@@ -97,7 +93,7 @@ def vectorlist(wl):
 				dx = b
 
 		elif c == 0x0000:
-			b = a & 0x7ff
+			b = a & 0x7FF
 			if a & 0x1000:
 				if a & 0x0800:
 					line(lastX, b)
@@ -110,7 +106,8 @@ def vectorlist(wl):
 
 	return vl
 
-def writeSvg(fileName: str, wl, scale=.25):
+
+def writeSvg(fileName: str, wl, scale=0.25):
 	svg = open(fileName, "w", encoding="utf8")
 	svg.write('<?xml version="1.0" standalone="no"?>\n')
 	svg.write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"\n')
@@ -124,39 +121,45 @@ def writeSvg(fileName: str, wl, scale=.25):
 	svg.write(' xmlns="http://www.w3.org/2000/svg">\n')
 	svg.write('<g stroke-linecap="round" fill="none" stroke="black"')
 	svg.write(f' stroke-width="{(scale * 5):.1f}"')
-	svg.write('>\n')
+	svg.write(">\n")
 	for i in vectorlist(wl):
 		if i[0] <= 1.0:
 			c = 255 - int(255 * i[0])
 			svg.write('  <polyline points="')
-			for x,y in i[1:]:
-				svg.write(f" {(offset + scale * x):.1f},{(scale * (height - y * aspectRatio) + offset):.1f}")
+			for x, y in i[1:]:
+				svg.write(
+					f" {(offset + scale * x):.1f},{(scale * (height - y * aspectRatio) + offset):.1f}"
+				)
 			svg.write(f'" stroke="#{c:02x}{c:02x}{c:02x}"')
-			svg.write('/>\n')
+			svg.write("/>\n")
 		elif i[0] == 2.0:
-			x,y = i[1]
-			svg.write(f'  <circle cx="{offset + scale * x}" cy="{scale * (height - y * aspectRatio) + offset}"')
+			x, y = i[1]
+			svg.write(
+				f'  <circle cx="{offset + scale * x}" cy="{scale * (height - y * aspectRatio) + offset}"'
+			)
 			svg.write(f' r="{(5 * scale):.1f}" fill="black" />\n')
 
-	svg.write('</g>\n')
-	svg.write('</svg>\n')
+	svg.write("</g>\n")
+	svg.write("</svg>\n")
 	svg.close()
+
 
 def main():
 	b = bytearray(open("01347-80010.bin", "rb").read())
 	l = []
-	for a in range(0x31e, 0x400, 2):
+	for a in range(0x31E, 0x400, 2):
 		l.append((b[a] << 8) | b[a + 1])
-	writeSvg("_focus.svg", l, .3)
+	writeSvg("_focus.svg", l, 0.3)
 
 	l = []
 	for a in range(0x122, 0x150, 2):
 		l.append((b[a] << 8) | b[a + 1])
 	for a in range(0x150, 0x200, 2):
 		l.append((b[a] << 8) | b[a + 1])
-	for a in range(0x222, 0x2c8, 2):
+	for a in range(0x222, 0x2C8, 2):
 		l.append((b[a] << 8) | b[a + 1])
-	writeSvg("_align.svg", l, .3)
+	writeSvg("_align.svg", l, 0.3)
+
 
 if __name__ == "__main__":
 	main()

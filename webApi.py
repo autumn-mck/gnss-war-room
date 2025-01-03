@@ -2,29 +2,36 @@ from flask import Flask, send_file
 
 app = Flask(__name__)
 
-@app.route('/')
+
+@app.route("/")
 def indexRoute():
-	return send_file('web/index.html')
+	return send_file("web/index.html")
 
-@app.route('/style.css')
+
+@app.route("/style.css")
 def styleRoute():
-	return send_file('web/style.css')
+	return send_file("web/style.css")
 
-@app.route('/script.js')
+
+@app.route("/script.js")
 def scriptRoute():
-	return send_file('web/script.js')
+	return send_file("web/script.js")
 
-@app.route('/map')
+
+@app.route("/map")
 def mapRoute():
-	return send_file('web/map.svg')
+	return send_file("web/map.svg")
 
-@app.route('/polarGrid')
+
+@app.route("/polarGrid")
 def polarGridRoute():
-	return send_file('web/polarGrid.svg')
+	return send_file("web/polarGrid.svg")
 
-@app.route('/stats')
+
+@app.route("/stats")
 def miscStatsRoute():
-	return send_file('web/stats.svg')
+	return send_file("web/stats.svg")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 	app.run()

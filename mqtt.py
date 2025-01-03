@@ -6,7 +6,10 @@ from pynmeagps import NMEAReader, NMEAMessage
 from config import Config
 from gnss.nmea import GnssData, updateGnssDataWithMessage
 
-def createMqttClient(config: Config, onNewDataCallback: Callable[[bytes, GnssData], None]) -> MqttClient:
+
+def createMqttClient(
+	config: Config, onNewDataCallback: Callable[[bytes, GnssData], None]
+) -> MqttClient:
 	"""Create a new MQTT client"""
 	mqttClient = MqttClient(mqttEnums.CallbackAPIVersion.VERSION2)
 	mqttClient.on_message = createOnMessageCallback(onNewDataCallback)
@@ -15,8 +18,10 @@ def createMqttClient(config: Config, onNewDataCallback: Callable[[bytes, GnssDat
 	mqttClient.loop_start()
 	return mqttClient
 
-def createOnMessageCallback(onNewDataCallback: Callable[[bytes, GnssData], None]
-					) -> Callable[[MqttClient, Any, MQTTMessage], None]:
+
+def createOnMessageCallback(
+	onNewDataCallback: Callable[[bytes, GnssData], None],
+) -> Callable[[MqttClient, Any, MQTTMessage], None]:
 	"""Create a callback for the MQTT client to handle incoming messages"""
 	gnssData = GnssData()
 
@@ -28,4 +33,5 @@ def createOnMessageCallback(onNewDataCallback: Callable[[bytes, GnssData], None]
 			return
 		gnssData = updateGnssDataWithMessage(gnssData, parsedMessage)
 		onNewDataCallback(message.payload, gnssData)
+
 	return onMessage

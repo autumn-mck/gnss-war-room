@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 from dataclass_wizard import JSONWizard
 
+
 @dataclass
 class Palette(JSONWizard):
 	"""Color palette for the map."""
+
 	background: str
 	foreground: str
 	water: str
@@ -14,7 +16,8 @@ class Palette(JSONWizard):
 	polarGrid: str
 	satelliteNetworks: dict[str, str]
 
-def loadPalette(paletteName = "warGames") -> Palette:
+
+def loadPalette(paletteName="warGames") -> Palette:
 	"""Load the palette with the given name."""
 	with open(f"palettes/{paletteName}.json", "r", encoding="utf8") as f:
 		palette = Palette.from_json(f.read())
