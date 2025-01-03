@@ -70,12 +70,6 @@ class MapWindow(QMainWindow):
 		self.windowConfig.focusLat += lat
 		self.windowConfig.focusLong += long
 
-		mapSvg = focusOnPoint(self.preFocusMap, self.windowConfig, self.map.width(), self.map.height())
-		self.svgFile = saveToTempFile(mapSvg)
-
-		self.map.load(self.svgFile)
-		self.map.setGeometry(0, 0, self.map.width(), self.map.height())
-
 	# key bindings
 	def keyPressEvent(self, event: QKeyEvent):
 		"""Handle keybinds"""
@@ -91,6 +85,17 @@ class MapWindow(QMainWindow):
 			self.moveMapBy(0, -toMove)
 		if event.key() == Qt.Key.Key_D:
 			self.moveMapBy(0, toMove)
+
+		if event.key() == Qt.Key.Key_Q:
+			self.windowConfig.scaleFactor *= 1.1
+		if event.key() == Qt.Key.Key_E:
+			self.windowConfig.scaleFactor /= 1.1
+
+		mapSvg = focusOnPoint(self.preFocusMap, self.windowConfig, self.map.width(), self.map.height())
+		self.svgFile = saveToTempFile(mapSvg)
+
+		self.map.load(self.svgFile)
+		self.map.setGeometry(0, 0, self.map.width(), self.map.height())
 
 	def onNewData(self, satellites: list[SatelliteInView], latitude: float, longitude: float):
 		"""Handle new satellite data"""
