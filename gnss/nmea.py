@@ -1,28 +1,20 @@
 from datetime import datetime
+from dataclasses import dataclass, field
 from pynmeagps import NMEAMessage
 from gnss.satellite import SatelliteInView, isSameSatellite
 
+@dataclass
 class GnssData:
 	"""Data from GNSS receiver"""
-	satellites: list[SatelliteInView]
-	latitude: float
-	longitude: float
-	date: datetime
-	altitude: float
-	geoidSeparation: float
-	hdop: float
-	fixQuality: int
+	satellites: list[SatelliteInView] = field(default_factory=list)
+	latitude: float = 0
+	longitude: float = 0
+	date: datetime = datetime.now()
+	altitude: float = 0
+	geoidSeparation: float = 0
+	hdop: float = 0
+	fixQuality: int = 0
 	"""https://receiverhelp.trimble.com/alloy-gnss/en-us/NMEA-0183messages_GGA.html for meanings"""
-
-	def __init__(self):
-		self.satellites = []
-		self.latitude = 0
-		self.longitude = 0
-		self.date = datetime.now()
-		self.altitude = 0
-		self.geoidSeparation = 0
-		self.hdop = 0
-		self.fixQuality = 0
 
 def filterMessagesToType(nmeaMessages: list[NMEAMessage], messageType: str) -> list[NMEAMessage]:
 	return [

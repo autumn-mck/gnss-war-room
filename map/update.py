@@ -38,13 +38,14 @@ def focusOnPoint(mapSvg: str,
 	"""Focus map on a given Lat/Long."""
 	mapSize = getMapSize()
 
-	[projectedX, projectedY] = latLongToGallStereographic(options.focusLat, options.focusLong, mapSize.width)
+	projectedX, projectedY = latLongToGallStereographic(options.focusLat, options.focusLong, mapSize.width)
 	projectedX += mapSize.width / 2
 	projectedY += mapSize.height / 2
 
 	newSize = calcNewDimensions(mapSize,
-																					 options.scaleMethod, options.scaleFactor,
-																					 desiredSize)
+			     options.scaleMethod,
+					 options.scaleFactor,
+					 desiredSize)
 
 	newX = projectedX - newSize.width / 2
 	newY = projectedY - newSize.height / 2
@@ -52,20 +53,30 @@ def focusOnPoint(mapSvg: str,
 	if options.hideKey:
 		mapSvg = mapSvg.replace('<g id="Key">', '<g id="Key" style="display:none">')
 
-	# move the key
 	if not options.hideKey:
-		inverseScaleFactor = 1 / options.scaleFactor
-		keyNewX = newX + (newSize.width - keySize.width * inverseScaleFactor) * keyXMult
-		keyNewY = newY + (newSize.height - keySize.height * inverseScaleFactor) * keyYMult
-		newGroupStr = f'<g id="Key" transform="translate({keyNewX} {keyNewY}) scale({inverseScaleFactor})">'
+		newGroupStr = genNewKeyGoup(options, newSize, keySize, keyXMult, keyYMult, newX, newY)
 		mapSvg = mapSvg.replace('<g id="Key">', newGroupStr)
 
+	return replaceViewBox(mapSvg, f"{newX} {newY} {newSize.width} {newSize.height}")
+
+def genNewKeyGoup(options: MapConfig,
+		  newSize: Size,
+			keySize: Size,
+			keyXMult: float,
+			keyYMult: float,
+			newX: float,
+			newY: float) -> str:
+	"""Generate the new key group with the correct position and scale"""
+	inverseScaleFactor = 1 / options.scaleFactor
+	keyNewX = newX + (newSize.width - keySize.width * inverseScaleFactor) * keyXMult
+	keyNewY = newY + (newSize.height - keySize.height * inverseScaleFactor) * keyYMult
+	return f'<g id="Key" transform="translate({keyNewX} {keyNewY}) scale({inverseScaleFactor})">'
+
+def replaceViewBox(mapSvg: str, newViewBox: str) -> str:
 	viewboxLen = len('viewBox="')
-	# find location of original viewbox
 	viewBoxStart = mapSvg.find('viewBox="')
 	viewBoxEnd = mapSvg.find('"', viewBoxStart + viewboxLen)
-
-	return mapSvg[:viewBoxStart + viewboxLen] + f"{newX} {newY} {newSize.width} {newSize.height}" + mapSvg[viewBoxEnd:]
+	return mapSvg[:viewBoxStart + viewboxLen] + newViewBox + mapSvg[viewBoxEnd:]
 
 def calcNewDimensions(mapSize: Size,
 											scaleMethod: str,

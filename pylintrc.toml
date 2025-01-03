@@ -1,5 +1,6 @@
 [tool.pylint.main]
 py-version = "3.12"
+extension-pkg-whitelist = ["PyQt6"]
 
 [tool.pylint.basic]
 # camelCase is more readable to me
@@ -17,23 +18,20 @@ docstring-min-length = 6 # on shorter functions, case by case basis
 generated-members = ["pyjson5.*", "pynmeagps.*"]
 
 [tool.pylint.design]
-min-public-methods = 0 # PyQt windows generate false positives otherwise
-max-args = 10          # default of 5 seems too low
-max-attributes = 12    # default of 7 seems slightly too low
-max-locals = 20        # default of 15 seems slightly too low
-max-statements = 60    # default of 50 seems slightly too low
+max-args = 7        # default of 5 seems too low
+max-attributes = 12 # default of 7 seems too low
+max-statements = 30 # default of 50 seems too high
 
 [tool.pylint.format]
 indent-string = "\t"
-max-line-length = 120
+max-line-length = 120 # default of 100 is too low
 
 [tool.pylint.refactoring]
-max-nested-blocks = 2
+max-nested-blocks = 2 # default of 5 is too high
 
 # warnings to disable
 [tool.pylint.messages_control]
 disable = [
 	"missing-module-docstring",      # i don't see a need for this
-	"no-name-in-module",             # false positive on laptop with external packages
 	"too-many-positional-arguments", # i don't see a need for this
 ]

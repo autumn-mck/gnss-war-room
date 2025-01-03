@@ -1,6 +1,7 @@
 import os
 import tempfile
 import urllib.request
+from dataclasses import dataclass
 
 def saveToTempFile(string: str) -> str:
 	"""Save a string to a temporary file and return its file path."""
@@ -24,8 +25,7 @@ def fetchHp1345FilesIfNeeded():
 	urllib.request.urlretrieve(firmwareRomUrl, "./font/01347-80010.bin")
 	print("Done downloading HP1345 font files")
 
+@dataclass
 class Size:
-	"""A class for storing a size"""
-	def __init__(self, width: float, height: float):
-		self.width = width
-		self.height = height
+	width: float
+	height: float
