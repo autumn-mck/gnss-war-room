@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 from pynmeagps import NMEAMessage
 from gnss.satellite import SatelliteInView, isSameSatellite
@@ -22,7 +22,7 @@ def filterMessagesToType(nmeaMessages: list[NMEAMessage], messageType: str) -> l
 		if parsedData.msgID == messageType
 	]
 
-def parseSatelliteInMessage(parsedData: NMEAMessage) -> list[SatelliteInView]:
+def parseSatelliteInMessage(parsedData: NMEAMessage, updateTime: datetime) -> list[SatelliteInView]:
 	"""Parse a GSV message into a list of SatelliteInView objects"""
 	if parsedData.msgID != 'GSV':
 		raise ValueError(f"Expected GSV message, got {parsedData.msgID}")
@@ -33,7 +33,8 @@ def parseSatelliteInMessage(parsedData: NMEAMessage) -> list[SatelliteInView]:
 			network=parsedData.talker,
 			elevation=getattr(parsedData, f'elv_0{satNum+1}'),
 			azimuth=getattr(parsedData, f'az_0{satNum+1}'),
-			snr=getattr(parsedData, f'cno_0{satNum+1}')
+			snr=getattr(parsedData, f'cno_0{satNum+1}'),
+			lastSeen=updateTime
 		)
 		for satNum in range(3)
 		if hasattr(parsedData, f'svid_0{satNum+1}')
@@ -44,7 +45,7 @@ def updateGnssDataWithMessage(gnssData: GnssData, message: NMEAMessage):
 	# no clue what's up with the typing here, it's fine though so ignore
 	match message.msgID:
 		case "GSV":
-			gnssData.satellites = updateSatellitePositions(gnssData.satellites, message)
+			gnssData.satellites = updateSatellitePositions(gnssData.satellites, message, gnssData.date)
 		case "GLL":
 			gnssData.latitude = message.lat
 			gnssData.longitude = message.lon
@@ -73,14 +74,25 @@ def updateGnssDataWithMessage(gnssData: GnssData, message: NMEAMessage):
 			print(f"Unknown message type: {message.msgID}")
 	return gnssData
 
-def updateSatellitePositions(satellites: list[SatelliteInView], nmeaSentence: NMEAMessage) -> list[SatelliteInView]:
+def updateSatellitePositions(satellites: list[SatelliteInView],
+			     nmeaSentence: NMEAMessage,
+					 updateTime: datetime,
+					 satelliteTTL: timedelta = timedelta(seconds=30)
+					 ) -> list[SatelliteInView]:
 	"""Update the satellite positions in the windows"""
-	newSatelliteData = parseSatelliteInMessage(nmeaSentence)
+	newSatelliteData = parseSatelliteInMessage(nmeaSentence, updateTime)
 	# update existing satellites
 	for i, oldData in enumerate(satellites):
 		matchingNewData = next((newData for newData in newSatelliteData if isSameSatellite(newData, oldData)), None)
 		if matchingNewData is not None:
 			satellites[i] = matchingNewData
+
+	# remove satellites that haven't been seen in a while
+	satellites = [
+		satellite
+		for satellite in satellites
+		if satellite.lastSeen + satelliteTTL > updateTime
+	]
 
 	# add new satellites
 	newSatellites = [

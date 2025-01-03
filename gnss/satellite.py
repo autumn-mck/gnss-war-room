@@ -1,3 +1,4 @@
+from datetime import datetime
 import math
 from dataclasses import dataclass
 
@@ -5,11 +6,13 @@ from palettes.palette import Palette
 
 @dataclass
 class SatelliteInView:
+	"""Data about a GNSS satellite"""
 	prnNumber: int
 	network: str
 	elevation: float
 	azimuth: float
 	snr: float
+	lastSeen: datetime
 
 def groupSatellitesByPrn(satellites: list[SatelliteInView]) -> dict[int, list[SatelliteInView]]:
 	"""Group satellites by PRN number"""
