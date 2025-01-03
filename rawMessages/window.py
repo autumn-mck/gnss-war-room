@@ -40,9 +40,10 @@ class RawMessageWindow(QMainWindow):
 		(svgStr, width, height) = makeSvgString(
 			self.svgFont,
 			"Waiting for data...".encode("ascii"),
-			fontThickness=2,
 			fontColour=palette.foreground,
+			fontThickness=2,
 		)
+
 		svgFile = saveToTempFile(svgStr)
 		self.svg = QSvgWidget(svgFile, parent=self)
 		self.svg.setGeometry(0, 0, width, height)
