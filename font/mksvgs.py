@@ -74,6 +74,42 @@ def writePolylines(svg: TextIOWrapper, ind: int, l: list[tuple[int, str, int, in
 	for _, b, x0, y0, x1, y1 in l:
 		svg.write(f'{" " * ind}<polyline points="{x0},{y0} {x1},{y1}" {b} />\n')
 
+def makeTextGroup(font: Font,
+		  s,
+		  scale = 2.0,
+		  xOffset = 0,
+		  yOffset = 0,
+		  border = 10,
+		  fontThickness = 0.8,
+		  fontColour = "#000000") -> tuple[str, float, float]:
+	ss = bytearray(s)
+
+	boundingBox = [0,0,0,0]
+	x1,y1 = 0,0
+	for char in ss:
+		boundingBox, x1, y1 = font.boundingBox(char, bbox=boundingBox, x=x1, y=y1)
+
+	width = scale * (xOffset + 2 * border + boundingBox[2] - boundingBox[0])
+	height = scale * (yOffset + 2 * border + boundingBox[3] - boundingBox[1])
+
+	svg = io.StringIO()
+	svg.write('	<g')
+	svg.write(' transform="matrix(%d,0,0,%d,%d,%d)" ' % (
+		scale, -scale,
+		scale * (border + xOffset - boundingBox[0]),
+		scale * (border + yOffset + boundingBox[3])))
+	svg.write(f' stroke-width="{fontThickness}" stroke="{fontColour}"')
+	svg.write('>\n')
+
+	x,y = 0,0
+
+	for char in ss:
+		x,y = polylines(svg, 6, font, char, x=x, y=y)
+		if chr(char) == '\r':
+			x = 0
+	svg.write('	</g>\n')
+	return svg.getvalue(), width, height
+
 def makeSvgString(font: Font,
 		  s,
 			scale = 2,

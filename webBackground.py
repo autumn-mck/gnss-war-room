@@ -22,7 +22,8 @@ mapConfig = MapConfig(
     hideAdmin0Borders=False,
     hideAdmin1Borders=True,
     hideRivers=True,
-    hideLakes=True
+    hideLakes=True,
+    hideKey=True,
 )
 
 CONFIG = loadConfig()
@@ -46,7 +47,7 @@ def updateMap():
 		LATEST_DATA.latitude,
 		LATEST_DATA.longitude
 	)
-	latestMap = baseMap.replace('</svg>', satelliteGroup + '\n</svg>')
+	latestMap = baseMap.replace('<!-- satellites go here -->', satelliteGroup)
 	with open('./web/map.svg', 'w', encoding='utf-8') as f:
 		f.write(latestMap)
 

@@ -17,7 +17,8 @@
 			"focusLat": 54.6,
 			"focusLong": -6.0,
 			"scaleFactor": 2,
-			"scaleMethod": "constantScale"
+			"scaleMethod": "constantScale",
+			"hideKey": false,
 		},
 
 		// map of the whole world at once
@@ -31,16 +32,17 @@
 			"focusLat": 0,
 			"focusLong": 10,
 			"scaleFactor": 1,
-			"scaleMethod": "fit"
+			"scaleMethod": "fit",
+			"hideKey": false,
 		},
 		{
-			"type": "polarGrid"
+			"type": "polarGrid",
 		},
 		{
-			"type": "miscStats"
+			"type": "miscStats",
 		},
 		{
-			"type": "rawMessages"
+			"type": "rawMessages",
 		}
 	]
 }

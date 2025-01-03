@@ -44,6 +44,14 @@ def focusOnPoint(mapSvg: str, options: MapConfig, desiredWidth: float, desiredHe
 	newX = projectedX - newWidth / 2
 	newY = projectedY - newHeight / 2
 
+	# move the key
+	if not options.hideKey:
+		inverseScaleFactor = 1 / options.scaleFactor
+		keyNewX = newX
+		keyNewY = newHeight + newY - 581 * inverseScaleFactor
+		newGroupStr = f'<g id="Key" transform="translate({keyNewX} {keyNewY}) scale({inverseScaleFactor})">'
+		mapSvg = mapSvg.replace('<g id="Key">', newGroupStr)
+
 	viewboxLen = len('viewBox="')
 	# find location of original viewbox
 	viewBoxStart = mapSvg.find('viewBox="')

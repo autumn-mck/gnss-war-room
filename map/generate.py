@@ -2,6 +2,8 @@ from palettes.palette import Palette
 from map.cities import getCities
 from map.gallStereographic import latLongToGallStereographic
 from config import MapConfig
+from font.hp1345Font import Font
+from font.mksvgs import makeTextGroup
 
 def readBaseMap() -> str:
 	"""Read the base SVG map file."""
@@ -18,6 +20,14 @@ def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> str:
 	# cities
 	if not options.hideCities:
 		mapSvg = mapSvg.replace('</svg>', genCitiesGroup(mapWidth, mapHeight, options, palette) + '\n</svg>')
+
+	# add comment for where sattelites will go
+	mapSvg = mapSvg.replace('</svg>', '\n<!-- satellites go here -->\n</svg>')
+
+	# key
+	if not options.hideKey:
+		keyStr, _, _ = genKey(palette)
+		mapSvg = mapSvg.replace('</svg>', keyStr + '\n</svg>')
 
 	# continent border width
 	continentBorderWidth = 6 / options.scaleFactor
@@ -73,3 +83,37 @@ def genCitiesGroup(svgOrigWidth: float, svgOrigHeight: float, options: MapConfig
 	cityDataStr += '\t</g>\n'
 
 	return cityDataStr
+
+def genKey(palette: Palette) -> tuple[str, int, int]:
+	"""Generate the key for the map"""
+	svgFont = Font()
+
+	group = ''
+
+	maxWidth = 0
+	heightSoFar = 0
+
+	for networkName, colour in palette.satelliteNetworks.items():
+		networkScale = 3.5
+
+		network, width, height = makeTextGroup(svgFont,
+			networkName.encode('ascii'),
+			fontThickness=2,
+			scale=networkScale,
+			yOffset=int(heightSoFar / networkScale),
+			fontColour=colour)
+		heightSoFar = height - 20
+		maxWidth = max(maxWidth, width)
+		group += "\n" + network
+
+	heightSoFar += 20
+
+	background = f"""<rect x="0" y="0"
+	width="{maxWidth}" height="{heightSoFar}"
+	fill="{palette.background}"
+	stroke="{palette.foreground}" stroke-width="3" />"""
+	group = background + "\n" + group
+
+	group = '  <g id="Key">\n' + group + '  </g>\n'
+
+	return group, int(maxWidth), int(heightSoFar)

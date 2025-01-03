@@ -7,6 +7,7 @@ class MapConfig(JSONWizard):
 	"""Configuration for the map."""
 	scaleFactor: float
 	scaleMethod: str
+	hideKey: bool
 
 	focusLat: float
 	focusLong: float

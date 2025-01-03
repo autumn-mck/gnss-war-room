@@ -25,9 +25,11 @@ class MapWindow(QMainWindow):
 		self.latitude = 0
 		self.longitude = 0
 
-		self.baseSvg = readBaseMap()
-		self.initialSvg = self.generateNewMap()
-		self.svgFile = saveToTempFile(self.initialSvg)
+		baseSvg = readBaseMap()
+
+		self.initialMap = prepareInitialMap(baseSvg, palette, windowConfig)
+		self.preFocusMap = self.initialMap
+		self.svgFile = saveToTempFile(self.initialMap)
 		self.map = QSvgWidget(self.svgFile, parent=self)
 		self.map.setGeometry(0, 0, self.defaultWidth, self.defaultHeight)
 
@@ -38,11 +40,6 @@ class MapWindow(QMainWindow):
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
 		self.show()
 
-	def generateNewMap(self):
-		mapSvg = prepareInitialMap(self.baseSvg, self.customPalette, self.windowConfig)
-		mapSvg = focusOnPoint(mapSvg, self.windowConfig, self.defaultWidth, self.defaultHeight)
-		return mapSvg
-
 	def updateMap(self):
 		"""Update the map with newest data"""
 		satelliteGroup = genSatelliteMapGroup(
@@ -52,7 +49,8 @@ class MapWindow(QMainWindow):
 			self.latitude,
 			self.longitude
 		)
-		mapSvg = self.initialSvg.replace('</svg>', satelliteGroup + '\n</svg>')
+		mapSvg = self.initialMap.replace('<!-- satellites go here -->', satelliteGroup)
+		self.preFocusMap = mapSvg
 		mapSvg = focusOnPoint(mapSvg, self.windowConfig, self.map.width(), self.map.height())
 		return mapSvg
 
@@ -61,10 +59,7 @@ class MapWindow(QMainWindow):
 		newX = event.size().width()
 		newY = event.size().height()
 
-		with open(self.svgFile, "r", encoding="utf8") as f:
-			mapSvg = f.read()
-
-		mapSvg = focusOnPoint(mapSvg, self.windowConfig, newX, newY)
+		mapSvg = focusOnPoint(self.preFocusMap, self.windowConfig, newX, newY)
 		self.svgFile = saveToTempFile(mapSvg)
 
 		self.map.load(self.svgFile)
@@ -75,10 +70,7 @@ class MapWindow(QMainWindow):
 		self.windowConfig.focusLat += lat
 		self.windowConfig.focusLong += long
 
-		with open(self.svgFile, "r", encoding="utf8") as f:
-			mapSvg = f.read()
-
-		mapSvg = focusOnPoint(mapSvg, self.windowConfig, self.map.width(), self.map.height())
+		mapSvg = focusOnPoint(self.preFocusMap, self.windowConfig, self.map.width(), self.map.height())
 		self.svgFile = saveToTempFile(mapSvg)
 
 		self.map.load(self.svgFile)
