@@ -11,7 +11,7 @@ class GnssData:
 	satellites: list[SatelliteInView] = field(default_factory=list)
 	latitude: float = 0
 	longitude: float = 0
-	date: datetime = datetime.now()
+	date: datetime = datetime.fromtimestamp(0)
 	altitude: float = 0
 	geoidSeparation: float = 0
 	pdop: float = 0
@@ -62,7 +62,7 @@ def updateGnssDataWithMessage(gnssData: GnssData, message: NMEAMessage):
 
 			# take the date from here and combine it with the time from GLL
 			time = gnssData.date.time()
-			gnssData.date = datetime.combine(gnssData.date, time)  # type: ignore
+			gnssData.date = datetime.combine(message.date, time)  # type: ignore
 		case "GGA":
 			gnssData.latitude = message.lat
 			gnssData.longitude = message.lon
