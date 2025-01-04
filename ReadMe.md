@@ -20,4 +20,12 @@ Edit `config.json5` and set `mqttHost` to the hostname of the remote server. You
 
 To display the main PyQt GUI: `python main.py`
 
+Map controls:
+- WASD: move map
+- Q: zoom in
+- E: zoom out
+- Z: rotate between scale methods (constant scale, scale to fit width, scale to fit height, fit to window)
+- Arrow keys: move key
+- K: toggle key
+
 To run the web frontend: `sh webStart.sh` (will default to port 2024)
