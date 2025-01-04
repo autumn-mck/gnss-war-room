@@ -85,11 +85,7 @@ class RawMessageWindow(QMainWindow):
 		heightOfMessage = self.charSize.height + 15
 
 		for i, messageSvgGroup in enumerate(self.messageSvgGroups):
-			strToAdd = f"""<g
-			transform="translate(0, {i * heightOfMessage})"
-			stroke-linecap="round"
-			stroke-linejoin="round"
-			fill="none">
+			strToAdd = f"""<g transform="translate(0, {i * heightOfMessage})">
 				{messageSvgGroup}
 			</g>"""
 			svgToDisplay += strToAdd

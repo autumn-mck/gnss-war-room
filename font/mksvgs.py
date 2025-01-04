@@ -107,7 +107,13 @@ def makeTextGroup(
 			scale * (border + yOffset + boundingBox[3]),
 		)
 	)
-	svg.write(f' stroke-width="{fontThickness}" stroke="{fontColour}"')
+	svg.write(
+		f''' stroke-width="{fontThickness}"
+		stroke="{fontColour}"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		fill="none"'''
+	)
 	svg.write(">\n")
 
 	x, y = 0, 0
