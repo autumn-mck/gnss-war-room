@@ -46,7 +46,9 @@ def generateStats(
 	strToDisplay += f"City: {cityName}\n\r"
 	strToDisplay += f"Altitude: {data.altitude:.1f}\n\r"
 	strToDisplay += f"Geoid Separation: {data.geoidSeparation:.1f}\n\r"
+	strToDisplay += f"PDOP: {data.pdop:.2f} ({classifyDOP(data.pdop)})\n\r"
 	strToDisplay += f"HDOP: {data.hdop:.2f} ({classifyDOP(data.hdop)})\n\r"
+	strToDisplay += f"VDOP: {data.vdop:.2f} ({classifyDOP(data.vdop)})\n\r"
 	strToDisplay += f"Fix Quality: {data.fixQuality} ({classifyFixQuality(data.fixQuality)})"
 
 	(svgStr, width, height) = makeSvgString(

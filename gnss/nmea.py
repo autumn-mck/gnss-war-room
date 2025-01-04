@@ -14,7 +14,9 @@ class GnssData:
 	date: datetime = datetime.now()
 	altitude: float = 0
 	geoidSeparation: float = 0
+	pdop: float = 0
 	hdop: float = 0
+	vdop: float = 0
 	fixQuality: int = 0
 	"""https://receiverhelp.trimble.com/alloy-gnss/en-us/NMEA-0183messages_GGA.html for meanings"""
 
@@ -72,8 +74,9 @@ def updateGnssDataWithMessage(gnssData: GnssData, message: NMEAMessage):
 			# seems useless
 			pass
 		case "GSA":
-			# will get back to this later
-			pass
+			gnssData.pdop = message.PDOP  # type: ignore
+			gnssData.hdop = message.HDOP  # type: ignore
+			gnssData.vdop = message.VDOP  # type: ignore
 		case _:
 			print(f"Unknown message type: {message.msgID}")
 	return gnssData
