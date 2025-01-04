@@ -6,7 +6,14 @@ from datetime import datetime, timedelta
 
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtWidgets import QMainWindow
-from config import loadConfig, MapConfig, PolalGridConfig, MiscStatsConfig, RawMessageConfig
+from config import (
+	SignalChartConfig,
+	loadConfig,
+	MapConfig,
+	PolalGridConfig,
+	MiscStatsConfig,
+	RawMessageConfig,
+)
 from gnss.nmea import GnssData
 from mqtt import createMqttClient
 from palettes.palette import loadPalette
@@ -15,6 +22,7 @@ from polarGrid.window import PolarGridWindow
 from stats.window import MiscStatsWindow
 from rawMessages.window import RawMessageWindow
 from misc import fetchHp1345FilesIfNeeded
+from signalGraph.window import SignalGraphWindow
 
 
 def main():
@@ -38,6 +46,8 @@ def main():
 			window = MiscStatsWindow(palette, windowConfig)
 		elif isinstance(windowConfig, RawMessageConfig):
 			window = RawMessageWindow(palette, windowConfig)
+		elif isinstance(windowConfig, SignalChartConfig):
+			window = SignalGraphWindow(palette, windowConfig)
 		else:
 			raise ValueError(f"Unknown window type: {windowConfig.type}")
 		windows.append(window)
@@ -93,6 +103,8 @@ def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData],
 				case RawMessageWindow():
 					# is updated above
 					pass
+				case SignalGraphWindow():
+					window.onNewData(gnssData)
 				case _:
 					print("Unknown window type")
 

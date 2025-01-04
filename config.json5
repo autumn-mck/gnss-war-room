@@ -46,6 +46,21 @@
 			"type": "rawMessages",
 			"fontThickness": 1.5,
 			"numMessagesToKeep": 80,
-		}
+		},
+		{
+			"type": "signalGraph",
+			"marginLeft": 45,
+			"marginRight": 10,
+			"marginTop": 20,
+			"marginBottom": 20,
+
+			"markerWidth": 5,
+			"markerStrokeWidth": 1.5,
+
+			"minValue": 0,
+			"maxValue": 60,
+			"markerStep": 10,
+			"countUntrackedSatellites": false,
+		},
 	]
 }

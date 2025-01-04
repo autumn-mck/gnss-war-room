@@ -13,7 +13,7 @@ class SatelliteInView:
 	network: str
 	elevation: float
 	azimuth: float
-	snr: float
+	snr: str
 	lastSeen: datetime
 
 

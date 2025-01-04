@@ -48,6 +48,28 @@ class RawMessageConfig(JSONWizard):
 
 
 @dataclass
+class SignalChartConfig(JSONWizard):
+	"""Configuration for the SNR bar chart"""
+
+	marginLeft: float = 45
+	marginRight: float = 10
+	marginTop: float = 20
+	marginBottom: float = 20
+
+	markerWidth: float = 5
+	markerStrokeWidth: float = 1.5
+
+	minValue: float = 0
+	maxValue: float = 60
+	markerStep: float = 10
+
+	countUntrackedSatellites: bool = False
+
+	class _(JSONWizard.Meta):
+		tag = "signalGraph"
+
+
+@dataclass
 class Config(JSONWizard):
 	"""Configuration for the app"""
 
@@ -58,7 +80,9 @@ class Config(JSONWizard):
 	multiScreen: bool
 	mqttHost: str
 	mqttPort: int
-	windows: list[MapConfig | PolalGridConfig | MiscStatsConfig | RawMessageConfig]
+	windows: list[
+		MapConfig | PolalGridConfig | MiscStatsConfig | RawMessageConfig | SignalChartConfig
+	]
 
 
 def loadConfig() -> Config:
