@@ -35,7 +35,7 @@ def main():
 		elif isinstance(windowConfig, PolalGridConfig):
 			window = PolarGridWindow(palette)
 		elif isinstance(windowConfig, MiscStatsConfig):
-			window = MiscStatsWindow(palette)
+			window = MiscStatsWindow(palette, windowConfig)
 		elif isinstance(windowConfig, RawMessageConfig):
 			window = RawMessageWindow(palette, windowConfig)
 		else:

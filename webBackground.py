@@ -2,7 +2,7 @@ from datetime import datetime
 import time
 import threading
 
-from config import loadConfig, MapConfig
+from config import MiscStatsConfig, loadConfig, MapConfig
 from font.hp1345Font import Font
 from misc import fetchHp1345FilesIfNeeded
 from mqtt import GnssData, createMqttClient
@@ -25,6 +25,8 @@ mapConfig = MapConfig(
 	hideLakes=True,
 	hideKey=False,
 )
+
+MISC_STATS_CONFIG = MiscStatsConfig(fontThickness=1.5)
 
 CONFIG = loadConfig()
 PALETTE = loadPalette("warGames")
@@ -66,7 +68,7 @@ def updateStats():
 	"""Generate and write the latest stats"""
 	if LATEST_DATA is None:
 		return
-	(statsSvg, _, _) = generateStats(LATEST_DATA, PALETTE, FONT)
+	(statsSvg, _, _) = generateStats(LATEST_DATA, PALETTE, FONT, MISC_STATS_CONFIG)
 	with open("./web/stats.svg", "w", encoding="utf-8") as f:
 		f.write(statsSvg)
 

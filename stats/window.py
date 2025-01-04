@@ -1,10 +1,13 @@
 from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtGui import QResizeEvent
+from config import MiscStatsConfig
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
 from misc import saveToTempFile
 from gnss.nmea import GnssData
+from palettes.palette import Palette
 from stats.generate import generateStats
 
 
@@ -13,11 +16,12 @@ class MiscStatsWindow(QMainWindow):
 
 	satelliteReceivedEvent = pyqtSignal()
 
-	def __init__(self, palette):
+	def __init__(self, palette: Palette, config: MiscStatsConfig):
 		super().__init__()
 		self.setWindowTitle("Misc Stats")
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
 		self.customPalette = palette
+		self.config = config
 
 		self.satelliteReceivedEvent.connect(self.updateWithNewData)
 		self.latestData = None
@@ -26,7 +30,7 @@ class MiscStatsWindow(QMainWindow):
 		(svgStr, width, height) = makeSvgString(
 			self.svgFont,
 			"Waiting for data...".encode("ascii"),
-			fontThickness=2,
+			fontThickness=self.config.fontThickness,
 			fontColour=palette.foreground,
 		)
 		svgFile = saveToTempFile(svgStr)
@@ -35,6 +39,20 @@ class MiscStatsWindow(QMainWindow):
 
 		self.setGeometry(0, 0, 500, 500)
 		self.show()
+
+	def resizeEvent(self, event: QResizeEvent):
+		"""Resize the text to always fit the window"""
+		newWidth = event.size().width()
+		newHeight = event.size().height()
+		oldWidth = self.svg.width()
+		oldHeight = self.svg.height()
+
+		if newWidth / oldWidth < newHeight / oldHeight:
+			newHeight = oldHeight * newWidth / oldWidth
+		else:
+			newWidth = oldWidth * newHeight / oldHeight
+
+		self.svg.setGeometry(0, 0, int(newWidth), int(newHeight))
 
 	def onNewData(self, gnssData: GnssData):
 		"""Update window with new data"""
@@ -45,10 +63,17 @@ class MiscStatsWindow(QMainWindow):
 		"""Update the misc stats window with new data"""
 		if self.latestData is None:
 			return
-		(svgStr, width, height) = generateStats(self.latestData, self.customPalette, self.svgFont)
-		svgFile = saveToTempFile(svgStr)
+		(svgStr, desiredWidth, desiredHeight) = generateStats(
+			self.latestData, self.customPalette, self.svgFont, self.config
+		)
 
-		width /= 2
-		height /= 2
+		if desiredWidth / self.svg.width() < desiredHeight / self.svg.height():
+			height = desiredHeight * self.svg.width() / desiredWidth
+			width = self.svg.width()
+		else:
+			width = desiredWidth * self.svg.height() / desiredHeight
+			height = self.svg.height()
+
+		svgFile = saveToTempFile(svgStr)
 		self.svg.load(svgFile)
 		self.svg.setGeometry(0, 0, int(width), int(height))

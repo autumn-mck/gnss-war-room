@@ -32,6 +32,8 @@ class PolalGridConfig(JSONWizard):
 
 @dataclass
 class MiscStatsConfig(JSONWizard):
+	fontThickness: float
+
 	class _(JSONWizard.Meta):
 		tag = "miscStats"
 

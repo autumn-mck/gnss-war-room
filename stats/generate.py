@@ -1,3 +1,4 @@
+from config import MiscStatsConfig
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
 from map.cities import findNearestCity
@@ -32,7 +33,9 @@ def classifyFixQuality(fixQuality: int) -> str:
 	return "Unknown"
 
 
-def generateStats(data: GnssData, palette: Palette, font: Font) -> tuple[str, int, int]:
+def generateStats(
+	data: GnssData, palette: Palette, font: Font, config: MiscStatsConfig
+) -> tuple[str, int, int]:
 	"""Generate an SVG of stats for the given data"""
 	nearestCity = findNearestCity(data.latitude, data.longitude)
 	cityName = nearestCity[1]
@@ -44,9 +47,12 @@ def generateStats(data: GnssData, palette: Palette, font: Font) -> tuple[str, in
 	strToDisplay += f"Altitude: {data.altitude:.1f}\n\r"
 	strToDisplay += f"Geoid Separation: {data.geoidSeparation:.1f}\n\r"
 	strToDisplay += f"HDOP: {data.hdop:.2f} ({classifyDOP(data.hdop)})\n\r"
-	strToDisplay += f"Fix Quality: {data.fixQuality} ({classifyFixQuality(data.fixQuality)})\n\r"
+	strToDisplay += f"Fix Quality: {data.fixQuality} ({classifyFixQuality(data.fixQuality)})"
 
 	(svgStr, width, height) = makeSvgString(
-		font, strToDisplay.encode("ascii"), fontThickness=2, fontColour=palette.foreground
+		font,
+		strToDisplay.encode("ascii"),
+		fontThickness=config.fontThickness,
+		fontColour=palette.foreground,
 	)
 	return (svgStr, width, height)
