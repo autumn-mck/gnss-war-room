@@ -7,18 +7,18 @@ from dataclass_wizard import JSONWizard
 class MapConfig(JSONWizard):
 	"""Configuration for the map."""
 
-	scaleFactor: float
-	scaleMethod: str
-	hideKey: bool
+	scaleFactor: float = 1
+	scaleMethod: str = "fit"
+	hideKey: bool = False
 
-	focusLat: float
-	focusLong: float
+	focusLat: float = 0
+	focusLong: float = 10
 
-	hideCities: bool
-	hideAdmin0Borders: bool
-	hideAdmin1Borders: bool
-	hideRivers: bool
-	hideLakes: bool
+	hideCities: bool = True
+	hideAdmin0Borders: bool = False
+	hideAdmin1Borders: bool = True
+	hideRivers: bool = True
+	hideLakes: bool = True
 
 	class _(JSONWizard.Meta):
 		tag = "worldMap"
@@ -32,7 +32,7 @@ class PolalGridConfig(JSONWizard):
 
 @dataclass
 class MiscStatsConfig(JSONWizard):
-	fontThickness: float
+	fontThickness: float = 1.5
 
 	class _(JSONWizard.Meta):
 		tag = "miscStats"

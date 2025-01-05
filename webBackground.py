@@ -14,21 +14,9 @@ from polarGrid.update import addSatellitesToPolarGrid
 from stats.generate import generateStats
 from signalGraph.generate import generateBarChart
 
-mapConfig = MapConfig(
-	scaleFactor=1,
-	scaleMethod="fit",
-	focusLat=0,
-	focusLong=10,
-	hideCities=True,
-	hideAdmin0Borders=False,
-	hideAdmin1Borders=True,
-	hideRivers=True,
-	hideLakes=True,
-	hideKey=False,
-)
-
+mapConfig = MapConfig()
 chartConfig = SignalChartConfig()
-mistStatsConfig = MiscStatsConfig(fontThickness=1.5)
+mistStatsConfig = MiscStatsConfig()
 
 CONFIG = loadConfig()
 PALETTE = loadPalette("warGames")
