@@ -1,26 +1,10 @@
-import os
 from datetime import datetime
 from time import sleep
 import paho.mqtt.client as mqtt
-import paho.mqtt.enums as mqttEnums
 from dotenv import load_dotenv
 
+from mqtt import createMqttPublisherClient
 from config import loadConfig
-
-
-def createMqttClient():
-	"""Create a new MQTT client"""
-	appConfig = loadConfig()
-	mqttClient = mqtt.Client(mqttEnums.CallbackAPIVersion.VERSION2, client_id="publisher")
-	mqttClient.on_disconnect = reconnectOnDisconnect
-	mqttClient.username_pw_set("gnssreceiver", os.environ.get("RECEIVER_MQTT_PASSWORD"))
-	mqttClient.connect(appConfig.mqttHost, appConfig.mqttPort)
-	mqttClient.loop_start()
-	return mqttClient
-
-
-def reconnectOnDisconnect(client, _userdata, _rc, _reasonCode, _properties):
-	client.reconnect()
 
 
 def parseAndPublishLines(lines: list[str], mqttClient: mqtt.Client):
@@ -44,7 +28,8 @@ def parseAndPublishLines(lines: list[str], mqttClient: mqtt.Client):
 def main():
 	"""Main function"""
 	load_dotenv()
-	mqttClient = createMqttClient()
+	config = loadConfig()
+	mqttClient = createMqttPublisherClient(config)
 	with open("test.nmea", "r", encoding="utf-8") as f:
 		lines = f.readlines()
 	parseAndPublishLines(lines, mqttClient)

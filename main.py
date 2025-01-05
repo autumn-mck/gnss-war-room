@@ -15,7 +15,7 @@ from config import (
 	RawMessageConfig,
 )
 from gnss.nmea import GnssData
-from mqtt import createMqttClient
+from mqtt import createMqttSubscriberClient
 from palettes.palette import loadPalette
 from map.window import MapWindow
 from polarGrid.window import PolarGridWindow
@@ -56,7 +56,7 @@ def main():
 		count += 1
 
 	onNewDataCallback = genWindowCallback(windows)
-	createMqttClient(appConfig, onNewDataCallback)
+	createMqttSubscriberClient(appConfig, onNewDataCallback)
 	app.exec()  # blocks until the app is closed
 
 

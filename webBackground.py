@@ -5,7 +5,7 @@ import threading
 from config import MiscStatsConfig, loadConfig, MapConfig, SignalChartConfig
 from font.hp1345Font import Font
 from misc import fetchHp1345FilesIfNeeded
-from mqtt import GnssData, createMqttClient
+from mqtt import GnssData, createMqttSubscriberClient
 from palettes.palette import loadPalette
 from map.generate import readBaseMap, prepareInitialMap, getMapSize
 from map.update import genSatelliteMapGroup, focusOnPoint
@@ -96,7 +96,7 @@ def genOnNewDataCallback():
 
 def main():
 	fetchHp1345FilesIfNeeded()
-	createMqttClient(CONFIG, genOnNewDataCallback())
+	createMqttSubscriberClient(CONFIG, genOnNewDataCallback())
 
 	thread = threading.Thread(target=updateSVGsThread)
 	thread.start()
