@@ -152,7 +152,7 @@ def makeSvgString(
 	svg.write('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"\n')
 	svg.write(' "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">\n')
 	svg.write('<svg version="1.1"\n')
-	svg.write(f' width="{width + 1}" height="{height + 1}"\n')
+	svg.write(f' viewBox="0 0 {width} {height}"\n')
 	svg.write(' xmlns="http://www.w3.org/2000/svg">\n')
 	svg.write('  <g stroke-linecap="round" stroke-linejoin="round" ')
 	svg.write('fill="none"')
