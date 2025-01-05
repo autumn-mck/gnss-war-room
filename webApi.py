@@ -33,5 +33,10 @@ def miscStatsRoute():
 	return send_file("web/stats.svg")
 
 
+@app.route("/snr-chart")
+def snrChartRoute():
+	return send_file("web/snrChart.svg")
+
+
 if __name__ == "__main__":
 	app.run()

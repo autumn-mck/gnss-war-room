@@ -2,7 +2,7 @@ from datetime import datetime
 import time
 import threading
 
-from config import MiscStatsConfig, loadConfig, MapConfig
+from config import MiscStatsConfig, loadConfig, MapConfig, SignalChartConfig
 from font.hp1345Font import Font
 from misc import fetchHp1345FilesIfNeeded
 from mqtt import GnssData, createMqttClient
@@ -12,6 +12,7 @@ from map.update import genSatelliteMapGroup, focusOnPoint
 from polarGrid.generate import readBasePolarGrid, prepareIntialPolarGrid
 from polarGrid.update import addSatellitesToPolarGrid
 from stats.generate import generateStats
+from signalGraph.generate import generateBarChart
 
 mapConfig = MapConfig(
 	scaleFactor=1,
@@ -26,7 +27,8 @@ mapConfig = MapConfig(
 	hideKey=False,
 )
 
-MISC_STATS_CONFIG = MiscStatsConfig(fontThickness=1.5)
+chartConfig = SignalChartConfig()
+mistStatsConfig = MiscStatsConfig(fontThickness=1.5)
 
 CONFIG = loadConfig()
 PALETTE = loadPalette("warGames")
@@ -68,9 +70,17 @@ def updateStats():
 	"""Generate and write the latest stats"""
 	if LATEST_DATA is None:
 		return
-	(statsSvg, _, _) = generateStats(LATEST_DATA, PALETTE, FONT, MISC_STATS_CONFIG)
+	(statsSvg, _, _) = generateStats(LATEST_DATA, PALETTE, FONT, mistStatsConfig)
 	with open("./web/stats.svg", "w", encoding="utf-8") as f:
 		f.write(statsSvg)
+
+
+def updateChart():
+	if LATEST_DATA is None:
+		return
+	snrChart = generateBarChart(chartConfig, PALETTE, FONT, LATEST_DATA.satellites, 1280, 720)
+	with open("./web/snrChart.svg", "w", encoding="utf-8") as f:
+		f.write(snrChart)
 
 
 def updateSVGsThread():
@@ -80,6 +90,7 @@ def updateSVGsThread():
 		updateMap()
 		updatePolarGrid()
 		updateStats()
+		updateChart()
 		endTime = datetime.now()
 
 		# sleep for the rest of the second
