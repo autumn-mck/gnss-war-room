@@ -100,7 +100,7 @@ def findNearestCity(lat: float, long: float) -> str:
 		# should never happen, something is badly wrong
 		raise ValueError("No nearest city found")
 
-	cityName = nearestCity[1]
+	cityName = nearestCity[2]
 	return cityName
 
 
