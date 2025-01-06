@@ -38,12 +38,11 @@ def generateStats(
 ) -> tuple[str, int, int]:
 	"""Generate an SVG of stats for the given data"""
 	nearestCity = findNearestCity(data.latitude, data.longitude)
-	cityName = nearestCity[1]
 
 	strToDisplay = f"Lat: {data.latitude:.6f}\n\rLong: {data.longitude:.6f}\n\r"
 	strToDisplay += f"Date: {data.date.strftime('%Y-%m-%d')}\n\r"
 	strToDisplay += f"Time: {data.date.strftime('%H:%M:%S')}\n\r"
-	strToDisplay += f"City: {cityName}\n\r"
+	strToDisplay += f"City: {nearestCity}\n\r"
 	strToDisplay += f"Altitude: {data.altitude:.1f}\n\r"
 	strToDisplay += f"Geoid Separation: {data.geoidSeparation:.1f}\n\r"
 	strToDisplay += f"PDOP: {data.pdop:.2f} ({classifyDOP(data.pdop)})\n\r"

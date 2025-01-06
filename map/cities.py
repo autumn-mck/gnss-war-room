@@ -82,7 +82,7 @@ def readCityInfo() -> dict[str, list[list[str]]]:
 	return cityInfo
 
 
-def findNearestCity(lat: float, long: float) -> list[str]:
+def findNearestCity(lat: float, long: float) -> str:
 	"""Find the nearest city to a given lat/long"""
 	cities = readTSV("./map/cities15000.txt")
 
@@ -100,7 +100,8 @@ def findNearestCity(lat: float, long: float) -> list[str]:
 		# should never happen, something is badly wrong
 		raise ValueError("No nearest city found")
 
-	return nearestCity
+	cityName = nearestCity[1]
+	return cityName
 
 
 def distBetweenPoints(lat1: float, long1: float, lat2: float, long2: float) -> float:
