@@ -97,12 +97,10 @@ def generateBar(
 	barGap: float,
 ) -> str:
 	"""Generate the bar for the given satellite's SNR"""
-	if satellite.snr == "":
-		snr = 0
-	else:
-		snr = float(satellite.snr)
 
-	height = chartHeight * (snr - settings.minValue) / (settings.maxValue - settings.minValue)
+	height = (
+		chartHeight * (satellite.snr - settings.minValue) / (settings.maxValue - settings.minValue)
+	)
 
 	return f"""<rect
 	x='{barIndex * barWidth + barGap * barIndex + settings.marginLeft}'
@@ -160,7 +158,7 @@ def generateBarChart(
 ) -> str:
 	"""Generate a full SVG SNR bar chart of the given satellites"""
 	if not settings.countUntrackedSatellites:
-		satellites = [satellite for satellite in satellites if satellite.snr != ""]
+		satellites = [satellite for satellite in satellites if satellite.snr != 0]
 
 	if len(satellites) == 0:
 		return f"<svg version='1.1' viewBox='0 0 {availableWidth} {availableHeight}'></svg>"
