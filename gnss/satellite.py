@@ -9,12 +9,12 @@ from palettes.palette import Palette
 class SatelliteInView:
 	"""Data about a GNSS satellite"""
 
-	prnNumber: int
-	network: str
-	elevation: float
-	azimuth: float
-	snr: str
-	lastSeen: datetime
+	prnNumber: int = 0
+	network: str = "??"
+	elevation: float = 0
+	azimuth: float = 0
+	snr: float = 0
+	lastSeen: datetime = datetime.fromtimestamp(0)
 
 
 def groupSatellitesByPrn(satellites: list[SatelliteInView]) -> dict[int, list[SatelliteInView]]:
