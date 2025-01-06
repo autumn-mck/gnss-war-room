@@ -44,11 +44,11 @@ def parseSatelliteInMessage(parsedData: NMEAMessage, updateTime: datetime) -> li
 	]
 
 
-def tryParseFloat(str: str):
+def tryParseFloat(string: str):
 	if str is None:
 		return 0
 	try:
-		return float(str)
+		return float(string)
 	except ValueError:
 		return 0
 
