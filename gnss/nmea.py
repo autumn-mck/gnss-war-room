@@ -34,14 +34,23 @@ def parseSatelliteInMessage(parsedData: NMEAMessage, updateTime: datetime) -> li
 		SatelliteInView(
 			prnNumber=getattr(parsedData, f"svid_0{satNum+1}"),
 			network=parsedData.talker,
-			elevation=getattr(parsedData, f"elv_0{satNum+1}"),
-			azimuth=getattr(parsedData, f"az_0{satNum+1}"),
+			elevation=tryParseFloat(getattr(parsedData, f"elv_0{satNum+1}")),
+			azimuth=tryParseFloat(getattr(parsedData, f"az_0{satNum+1}")),
 			snr=getattr(parsedData, f"cno_0{satNum+1}"),
 			lastSeen=updateTime,
 		)
 		for satNum in range(3)
 		if hasattr(parsedData, f"svid_0{satNum+1}")
 	]
+
+
+def tryParseFloat(str: str):
+	if str is None:
+		return 0
+	try:
+		return float(str)
+	except ValueError:
+		return 0
 
 
 def updateGnssDataWithMessage(gnssData: GnssData, message: NMEAMessage):
