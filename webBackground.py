@@ -66,7 +66,7 @@ def updateStats():
 def updateChart():
 	if LATEST_DATA is None:
 		return
-	snrChart = generateBarChart(chartConfig, PALETTE, FONT, LATEST_DATA.satellites, 1280, 720)
+	snrChart = generateBarChart(chartConfig, PALETTE, FONT, LATEST_DATA.satellites, 854, 480)
 	with open("./web/snrChart.svg", "w", encoding="utf-8") as f:
 		f.write(snrChart)
 
