@@ -39,16 +39,18 @@ def generateStats(
 	"""Generate an SVG of stats for the given data"""
 	nearestCity = findNearestCityWithCache(data.latitude, data.longitude)
 
-	strToDisplay = f"Lat: {data.latitude:.6f}\n\rLong: {data.longitude:.6f}\n\r"
-	strToDisplay += f"Date: {data.date.strftime('%Y-%m-%d')}\n\r"
-	strToDisplay += f"Time: {data.date.strftime('%H:%M:%S')}\n\r"
-	strToDisplay += f"City: {nearestCity}\n\r"
-	strToDisplay += f"Altitude: {data.altitude:.1f}\n\r"
-	strToDisplay += f"Geoid Separation: {data.geoidSeparation:.1f}\n\r"
-	strToDisplay += f"PDOP: {data.pdop:.2f} ({classifyDOP(data.pdop)})\n\r"
-	strToDisplay += f"HDOP: {data.hdop:.2f} ({classifyDOP(data.hdop)})\n\r"
-	strToDisplay += f"VDOP: {data.vdop:.2f} ({classifyDOP(data.vdop)})\n\r"
-	strToDisplay += f"Fix Quality: {data.fixQuality} ({classifyFixQuality(data.fixQuality)})"
+	strToDisplay = f"""Lat: {data.latitude:.6f}
+Long: {data.longitude:.6f}
+Date: {data.date.strftime('%Y-%m-%d')}
+Time: {data.date.strftime('%H:%M:%S')}
+City: {nearestCity}
+Altitude: {data.altitude:.1f}{data.altitudeUnit.lower()}
+Geoid Separation: {data.geoidSeparation:.1f}{data.geoidSeparationUnit.lower()}
+PDOP: {data.pdop:.2f} ({classifyDOP(data.pdop)})
+HDOP: {data.hdop:.2f} ({classifyDOP(data.hdop)})
+VDOP: {data.vdop:.2f} ({classifyDOP(data.vdop)})
+Fix Quality: {data.fixQuality} ({classifyFixQuality(data.fixQuality)})"""
+	strToDisplay = "\n\r".join(strToDisplay.split("\n"))
 
 	(svgStr, width, height) = makeSvgString(
 		font,

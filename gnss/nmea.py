@@ -13,7 +13,9 @@ class GnssData:
 	longitude: float = 0
 	date: datetime = datetime.fromtimestamp(0)
 	altitude: float = 0
+	altitudeUnit: str = "M"
 	geoidSeparation: float = 0
+	geoidSeparationUnit: str = "M"
 	pdop: float = 0
 	hdop: float = 0
 	vdop: float = 0
@@ -76,7 +78,9 @@ def updateGnssDataWithMessage(gnssData: GnssData, message: NMEAMessage):
 			gnssData.latitude = message.lat
 			gnssData.longitude = message.lon
 			gnssData.geoidSeparation = message.sep  # type: ignore
+			gnssData.geoidSeparationUnit = message.sepUnit  # type: ignore
 			gnssData.altitude = message.alt  # type: ignore
+			gnssData.altitudeUnit = message.altUnit  # type: ignore
 			gnssData.hdop = message.HDOP  # type: ignore
 			gnssData.fixQuality = message.quality  # type: ignore
 		case "VTG":
