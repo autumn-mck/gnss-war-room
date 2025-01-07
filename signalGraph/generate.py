@@ -75,16 +75,91 @@ def generateAxisLines(
 
 
 def generateScale(
-	settings: SignalChartConfig, palette: Palette, font: Font, chartHeight: float, chartWidth: float
+	settings: SignalChartConfig,
+	palette: Palette,
+	font: Font,
+	chartHeight: float,
+	chartWidth: float,
+	satellites: list[SatelliteInView],
 ) -> str:
 	"""Generate the axis and scale with the given options"""
 	scale = generateAxisLines(settings, palette, chartWidth, chartHeight)
 
 	markerCount = int((settings.maxValue - settings.minValue) / settings.markerStep)
-	for markerIndex in range(0, markerCount + 1):
+
+	_, _, charHeight = makeTextGroup(font, "0".encode("ascii"), fontThickness=2, border=0)
+	step = 1
+	charsCanFit = chartHeight / (charHeight)
+	if charsCanFit < markerCount:
+		step = 2
+
+	for markerIndex in range(0, markerCount + 1, step):
 		scale += generateYTick(settings, palette, chartHeight, markerCount, markerIndex)
 		scale += generateYLabel(settings, palette, font, chartHeight, markerCount, markerIndex)
+
+	if shouldLabelXAxis(satellites, font, chartWidth):
+		scale += generateXLabels(settings, palette, font, chartWidth, chartHeight, satellites)
 	return scale
+
+
+def shouldLabelXAxis(satellites: list[SatelliteInView], font: Font, availableWidth: float) -> bool:
+	"""Check if the x-axis should be labelled"""
+	_, charWidth, _ = makeTextGroup(font, "0".encode("ascii"), fontThickness=2)
+	charsCanFit = availableWidth / (charWidth - 10)
+	return len(satellites) < charsCanFit * 2
+
+
+def generateXLabels(
+	settings: SignalChartConfig,
+	palette: Palette,
+	font: Font,
+	chartWidth: float,
+	chartHeight: float,
+	satellites: list[SatelliteInView],
+) -> str:
+	"""Generate the x-axis labels"""
+	if len(satellites) == 0:
+		return ""
+
+	labels = ""
+	for index, satellite in enumerate(satellites):
+		labels += generateXLabel(
+			settings, palette, font, chartWidth, chartHeight, index, len(satellites), satellite
+		)
+	return labels
+
+
+def generateXLabel(
+	settings: SignalChartConfig,
+	palette: Palette,
+	font: Font,
+	chartWidth: float,
+	chartHeight: float,
+	index: int,
+	numSatellites: int,
+	satellite: SatelliteInView,
+) -> str:
+	"""Generate the x-axis label for the given satellite"""
+	barGap = chartWidth / 100
+	barWidth = chartWidth / numSatellites - barGap
+
+	labelText = f"{satellite.prnNumber}"
+	labelTextSvg, labelWidth, labelHeight = makeTextGroup(
+		font, labelText.encode("ascii"), fontThickness=2, fontColour=palette.foreground
+	)
+	scaleTextBy = 0.4
+
+	labelWidth *= scaleTextBy
+	labelHeight *= scaleTextBy
+
+	translateX = (
+		settings.marginLeft + index * chartWidth / numSatellites - labelWidth / 2 + barWidth / 2
+	)
+	translateY = settings.marginTop + chartHeight
+
+	return f"""<g transform='translate({translateX}, {translateY}) scale({scaleTextBy})'>
+		{labelTextSvg}
+	</g>\n"""
 
 
 def generateBar(
@@ -168,7 +243,7 @@ def generateBarChart(
 	chartWidth = availableWidth - settings.marginLeft - settings.marginRight
 	chartHeight = availableHeight - settings.marginTop - settings.marginBottom
 
-	chartContents = generateScale(settings, palette, font, chartHeight, chartWidth)
+	chartContents = generateScale(settings, palette, font, chartHeight, chartWidth, satellites)
 	chartContents += generateBars(settings, palette, satellites, chartHeight, chartWidth)
 
 	return f"""<svg version='1.1' viewBox='0 0 {availableWidth} {availableHeight}'>

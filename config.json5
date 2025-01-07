@@ -52,14 +52,14 @@
 			"marginLeft": 45,
 			"marginRight": 10,
 			"marginTop": 20,
-			"marginBottom": 20,
+			"marginBottom": 40,
 
 			"markerWidth": 5,
 			"markerStrokeWidth": 1.5,
 
 			"minValue": 0,
 			"maxValue": 60,
-			"markerStep": 10,
+			"markerStep": 5,
 			"countUntrackedSatellites": false,
 		},
 	]
