@@ -17,9 +17,12 @@ def createMqttSubscriberClient(
 		onNewDataCallback, timedelta(seconds=int(config.satelliteTTL))
 	)
 
-	mqttClient.connect(config.mqttHost, config.mqttPort)
-	mqttClient.subscribe("gnss/rawMessages")
-	mqttClient.loop_start()
+	try:
+		mqttClient.connect(config.mqttHost, config.mqttPort)
+		mqttClient.subscribe("gnss/rawMessages")
+		mqttClient.loop_start()
+	except ConnectionRefusedError:
+		print("Error! Unable to connect to MQTT broker")
 
 	return mqttClient
 
@@ -32,8 +35,11 @@ def createMqttPublisherClient(config: Config) -> MqttClient:
 	if publisherPassword:
 		mqttClient.username_pw_set("gnssreceiver", publisherPassword)
 
-	mqttClient.connect(config.mqttHost, config.mqttPort)
-	mqttClient.loop_start()
+	try:
+		mqttClient.connect(config.mqttHost, config.mqttPort)
+		mqttClient.loop_start()
+	except ConnectionRefusedError:
+		print("Error! Unable to connect to MQTT broker")
 
 	return mqttClient
 
