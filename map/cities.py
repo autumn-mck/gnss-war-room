@@ -1,6 +1,7 @@
 import csv
 import itertools
 import math
+import os
 
 # see https://download.geonames.org/export/dump/ (readme at bottom)
 
@@ -82,9 +83,9 @@ def readCityInfo() -> dict[str, list[list[str]]]:
 	return cityInfo
 
 
-def findNearestCity(lat: float, long: float) -> str:
+def findNearestCity(lat: float, long: float, file: str = "./map/cities15000.txt"):
 	"""Find the nearest city to a given lat/long"""
-	cities = readTSV("./map/cities15000.txt")
+	cities = readTSV(file)
 
 	nearestCity = None
 	nearestDist = math.inf
@@ -97,11 +98,34 @@ def findNearestCity(lat: float, long: float) -> str:
 			nearestCity = city
 
 	if nearestCity is None:
-		# should never happen, something is badly wrong
-		raise ValueError("No nearest city found")
+		return []
 
-	cityName = nearestCity[2]
-	return cityName
+	return nearestCity
+
+
+def findNearestCityWithCache(lat: float, long: float):
+	"""Find the nearest city to the given lat/long, using the cache file if possible"""
+	nearestCity = findNearestCity(lat, long, "./map/citiesCache.txt")
+
+	if len(nearestCity) > 0:
+		margin = 0.1
+		if abs(lat - float(nearestCity[4])) < margin and abs(long - float(nearestCity[5])) < margin:
+			return nearestCity[2]
+
+	nearestCity = findNearestCity(lat, long, "./map/cities15000.txt")
+	appendToCache(nearestCity)
+	return nearestCity[2]
+
+
+def appendToCache(city: list[str]):
+	"""Append a city to the cache file"""
+	strToAppend = ""
+	for index, string in enumerate(city):
+		strToAppend += string
+		if index != len(city) - 1:
+			strToAppend += "\t"
+	with open("./map/citiesCache.txt", "a", encoding="utf-8") as file:
+		file.write(strToAppend + "\n")
 
 
 def distBetweenPoints(lat1: float, long1: float, lat2: float, long2: float) -> float:
@@ -115,6 +139,10 @@ def readCountryInfo() -> dict[str, list[str]]:
 
 
 def readTSV(filename: str) -> list[list[str]]:
+	"""Read a TSV file"""
+	if not os.path.exists(filename):
+		return []
+
 	with open(filename, "r", encoding="utf8") as f:
 		rd = csv.reader(f, delimiter="\t")
 		return list(rd)

@@ -1,7 +1,7 @@
 from config import MiscStatsConfig
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
-from map.cities import findNearestCity
+from map.cities import findNearestCityWithCache
 from gnss.nmea import GnssData
 from palettes.palette import Palette
 
@@ -37,7 +37,7 @@ def generateStats(
 	data: GnssData, palette: Palette, font: Font, config: MiscStatsConfig
 ) -> tuple[str, int, int]:
 	"""Generate an SVG of stats for the given data"""
-	nearestCity = findNearestCity(data.latitude, data.longitude)
+	nearestCity = findNearestCityWithCache(data.latitude, data.longitude)
 
 	strToDisplay = f"Lat: {data.latitude:.6f}\n\rLong: {data.longitude:.6f}\n\r"
 	strToDisplay += f"Date: {data.date.strftime('%Y-%m-%d')}\n\r"
