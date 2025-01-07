@@ -1,6 +1,6 @@
+from datetime import timedelta
 import os
 from typing import Any, Callable
-
 import paho.mqtt.enums as mqttEnums
 from paho.mqtt.client import Client as MqttClient, MQTTMessage
 from pynmeagps import NMEAReader, NMEAMessage
@@ -13,7 +13,9 @@ def createMqttSubscriberClient(
 ) -> MqttClient:
 	"""Create the subscriber MQTT client"""
 	mqttClient = MqttClient(mqttEnums.CallbackAPIVersion.VERSION2)
-	mqttClient.on_message = createSubscriberCallback(onNewDataCallback)
+	mqttClient.on_message = createSubscriberCallback(
+		onNewDataCallback, timedelta(seconds=int(config.satelliteTTL))
+	)
 
 	mqttClient.connect(config.mqttHost, config.mqttPort)
 	mqttClient.subscribe("gnss/rawMessages")
@@ -37,7 +39,7 @@ def createMqttPublisherClient(config: Config) -> MqttClient:
 
 
 def createSubscriberCallback(
-	onNewDataCallback: Callable[[bytes, GnssData], None],
+	onNewDataCallback: Callable[[bytes, GnssData], None], satelliteTTL: timedelta
 ) -> Callable[[MqttClient, Any, MQTTMessage], None]:
 	"""Create a callback for the MQTT subscriber client to handle incoming messages"""
 	gnssData = GnssData()
@@ -48,7 +50,7 @@ def createSubscriberCallback(
 		parsedMessage = NMEAReader.parse(message.payload)
 		if not isinstance(parsedMessage, NMEAMessage):
 			return
-		gnssData = updateGnssDataWithMessage(gnssData, parsedMessage)
+		gnssData = updateGnssDataWithMessage(gnssData, parsedMessage, satelliteTTL)
 		onNewDataCallback(message.payload, gnssData)
 
 	return onMessage

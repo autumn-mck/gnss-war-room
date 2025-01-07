@@ -55,13 +55,13 @@ def tryParseFloat(string: str):
 		return 0
 
 
-def updateGnssDataWithMessage(gnssData: GnssData, message: NMEAMessage):
+def updateGnssDataWithMessage(gnssData: GnssData, message: NMEAMessage, satelliteTTL: timedelta):
 	"""Update the gnss data with the new data from a message"""
 	# no clue what's up with the typing here, it's fine though so ignore
 	match message.msgID:
 		case "GSV":
 			gnssData.satellites = updateSatellitePositions(
-				gnssData.satellites, message, gnssData.date
+				gnssData.satellites, message, gnssData.date, satelliteTTL
 			)
 		case "GLL":
 			gnssData.latitude = message.lat
@@ -99,7 +99,7 @@ def updateSatellitePositions(
 	satellites: list[SatelliteInView],
 	nmeaSentence: NMEAMessage,
 	updateTime: datetime,
-	satelliteTTL: timedelta = timedelta(seconds=30),
+	satelliteTTL: timedelta,
 ) -> list[SatelliteInView]:
 	"""Update the satellite positions in the windows"""
 	newSatelliteData = parseSatelliteInMessage(nmeaSentence, updateTime)

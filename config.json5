@@ -4,6 +4,7 @@
 	// "mqttHost": "localhost",
 	"mqttHost": "gnss-mqtt.mck.is",
 	"mqttPort": 1883,
+	"satelliteTTL": 30,
 	"windows": [
 		// map focused mostly on NI/europe
 		{

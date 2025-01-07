@@ -80,6 +80,7 @@ class Config(JSONWizard):
 	multiScreen: bool
 	mqttHost: str
 	mqttPort: int
+	satelliteTTL: int
 	windows: list[
 		MapConfig | PolalGridConfig | MiscStatsConfig | RawMessageConfig | SignalChartConfig
 	]
