@@ -4,7 +4,7 @@ from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QResizeEvent, QKeyEvent
 from map.update import genSatelliteMapGroup, focusOnPoint
 from map.generate import readBaseMap, prepareInitialMap
-from misc import Size, saveToTempFile
+from misc import Size, svgToQByteArray
 from config import MapConfig
 from gnss.satellite import SatelliteInView
 from palettes.palette import Palette
@@ -33,8 +33,8 @@ class MapWindow(QMainWindow):
 
 		(self.initialMap, self.keySize) = prepareInitialMap(baseSvg, palette, windowConfig)
 		self.preFocusMap = self.initialMap
-		self.svgFile = saveToTempFile(self.initialMap)
-		self.map = QSvgWidget(self.svgFile, parent=self)
+		self.map = QSvgWidget(parent=self)
+		self.map.load(svgToQByteArray(self.initialMap))
 		self.map.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
 
 		self.satelliteReceivedEvent.connect(self.newSatelliteDataEvent)
@@ -78,9 +78,8 @@ class MapWindow(QMainWindow):
 			self.keyXMult,
 			self.keyYMult,
 		)
-		self.svgFile = saveToTempFile(mapSvg)
 
-		self.map.load(self.svgFile)
+		self.map.load(svgToQByteArray(mapSvg))
 		self.map.setGeometry(0, 0, newX, newY)
 
 	def moveMapBy(self, lat: float, long: float):
@@ -107,9 +106,7 @@ class MapWindow(QMainWindow):
 			self.keyYMult,
 		)
 
-		self.svgFile = saveToTempFile(mapSvg)
-
-		self.map.load(self.svgFile)
+		self.map.load(svgToQByteArray(mapSvg))
 
 	def handleMoveMapKeys(self, event: QKeyEvent):
 		"""Handle keybinds for moving the map"""
@@ -163,5 +160,4 @@ class MapWindow(QMainWindow):
 
 	def newSatelliteDataEvent(self):
 		newMap = self.updateMap()
-		self.svgFile = saveToTempFile(newMap)
-		self.map.load(self.svgFile)
+		self.map.load(svgToQByteArray(newMap))

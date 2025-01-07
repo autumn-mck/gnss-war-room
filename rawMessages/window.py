@@ -6,7 +6,7 @@ from config import RawMessageConfig
 
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString, makeTextGroup
-from misc import Size, saveToTempFile
+from misc import Size, svgToQByteArray
 from palettes.palette import Palette
 
 
@@ -44,8 +44,8 @@ class RawMessageWindow(QMainWindow):
 			fontThickness=2,
 		)
 
-		svgFile = saveToTempFile(svgStr)
-		self.svg = QSvgWidget(svgFile, parent=self)
+		self.svg = QSvgWidget(parent=self)
+		self.svg.load(svgToQByteArray(svgStr))
 		self.svg.setGeometry(0, 0, width, height)
 
 		self.satelliteReceivedEvent.connect(self.updateMessageLog)
@@ -100,6 +100,5 @@ class RawMessageWindow(QMainWindow):
 		svgToDisplay = (
 			f'<svg version="1.1" viewBox="0 0 {totalWidth} {desiredHeight}">{svgToDisplay}</svg>'
 		)
-		svgFile = saveToTempFile(svgToDisplay)
-		self.svg.load(svgFile)
+		self.svg.load(svgToQByteArray(svgToDisplay))
 		self.svg.setGeometry(0, 0, newWidth, int(newHeight))

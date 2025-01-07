@@ -1,15 +1,11 @@
 import os
-import tempfile
 import urllib.request
 from dataclasses import dataclass
+from PyQt6.QtCore import QByteArray
 
 
-def saveToTempFile(string: str) -> str:
-	"""Save a string to a temporary file and return its file path."""
-	with tempfile.NamedTemporaryFile(delete=False) as temp:
-		with open(temp.name, "w", encoding="utf8") as f:
-			f.write(string)
-	return temp.name
+def svgToQByteArray(svg: str) -> QByteArray:
+	return QByteArray(svg.encode("utf-8"))
 
 
 def fetchHp1345FilesIfNeeded():

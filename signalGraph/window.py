@@ -5,7 +5,7 @@ from PyQt6.QtGui import QResizeEvent
 from config import SignalChartConfig
 from font.hp1345Font import Font
 from gnss.nmea import GnssData
-from misc import saveToTempFile
+from misc import svgToQByteArray
 from palettes.palette import Palette
 from signalGraph.generate import generateBarChart
 
@@ -55,5 +55,4 @@ class SignalGraphWindow(QMainWindow):
 			self.svg.width(),
 			self.svg.height(),
 		)
-		svgFile = saveToTempFile(barChartSvg)
-		self.svg.load(svgFile)
+		self.svg.load(svgToQByteArray(barChartSvg))
