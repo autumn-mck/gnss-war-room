@@ -44,7 +44,7 @@
 		{
 			"type": "rawMessages",
 			"fontThickness": 1.5,
-			"numMessagesToKeep": 80,
+			"numMessagesToKeep": 50,
 		},
 		{
 			"type": "signalGraph",
