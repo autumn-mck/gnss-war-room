@@ -47,11 +47,11 @@ class MiscStatsWindow(QMainWindow):
 		oldHeight = self.svg.height()
 
 		if newWidth / oldWidth < newHeight / oldHeight:
-			newHeight = oldHeight * newWidth / oldWidth
+			newHeight = round(oldHeight * newWidth / oldWidth)
 		else:
-			newWidth = oldWidth * newHeight / oldHeight
+			newWidth = round(oldWidth * newHeight / oldHeight)
 
-		self.svg.setGeometry(0, 0, int(newWidth), int(newHeight))
+		self.svg.setGeometry(0, 0, newWidth, newHeight)
 
 	def onNewData(self, gnssData: GnssData):
 		"""Update window with new data"""
