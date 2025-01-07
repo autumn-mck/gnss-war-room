@@ -23,6 +23,7 @@ from stats.window import MiscStatsWindow
 from rawMessages.window import RawMessageWindow
 from misc import fetchHp1345FilesIfNeeded
 from signalGraph.window import SignalGraphWindow
+from pynmeagps import NMEAReader, NMEAMessage
 
 
 def main():
@@ -71,15 +72,28 @@ def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData],
 	"""Generate a callback for the windows to handle new data"""
 	lastUpdateTime = datetime.now()
 	lastMessageUpdateTime = datetime.now()
+	lastFinalMessageUpdateTime = datetime.now()
 
 	def updateWindowsOnNewData(rawMessage: bytes, gnssData: GnssData):
 		nonlocal windows
 		nonlocal lastUpdateTime
 		nonlocal lastMessageUpdateTime
+		nonlocal lastFinalMessageUpdateTime
+
+		finalMessageId = "GLL"
+		timeSinceLastFinalMessageUpdate = datetime.now() - lastFinalMessageUpdateTime
+		msg = NMEAReader.parse(rawMessage)
+		isFinalMessage = (
+			isinstance(msg, NMEAMessage)
+			and msg.msgID == finalMessageId
+			and timeSinceLastFinalMessageUpdate > timedelta(seconds=0.5)
+		)
+		if isFinalMessage:
+			lastFinalMessageUpdateTime = datetime.now()
 
 		# limit how often we update the windows, otherwise pyqt mostly freezes
 		timeSinceLastRawMessageUpdate = datetime.now() - lastMessageUpdateTime
-		if timeSinceLastRawMessageUpdate < timedelta(seconds=0.01):
+		if timeSinceLastRawMessageUpdate < timedelta(seconds=0.05) and not isFinalMessage:
 			return
 
 		for window in windows:
@@ -88,7 +102,7 @@ def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData],
 		lastMessageUpdateTime = datetime.now()
 
 		timeSinceLastUpdate = datetime.now() - lastUpdateTime
-		if timeSinceLastUpdate < timedelta(seconds=0.5):
+		if timeSinceLastUpdate < timedelta(seconds=0.2) and not isFinalMessage:
 			return
 		lastUpdateTime = datetime.now()
 
