@@ -17,7 +17,15 @@ from font.hp1345Font import Font
 
 
 def polylines(
-	svg: TextIOWrapper, indent: int, font: Font, ch: int, x=0, y=0, shadow: str | None = None
+	svg: TextIOWrapper,
+	indent: int,
+	font: Font,
+	ch: int,
+	x=0,
+	y=0,
+	fontColour: str = "#000000",
+	fontThickness: float = 0.8,
+	shadow: str | None = None,
 ) -> tuple[int, int]:
 	if shadow is not None:
 		x0, y0 = (x, y)
@@ -44,6 +52,19 @@ def polylines(
 				y += dy
 				svg.write(f" {x},{y}")
 			svg.write('" />\n')
+
+			# workaround for QTBUG-132468
+			# all points are same if everything after first is 0
+			allSame = True
+			for dx, dy in i[1:]:
+				if dx != 0 or dy != 0:
+					allSame = False
+					break
+			if allSame:
+				svg.write(
+					(" " * indent)
+					+ f"<circle cx='{x}' cy='{y}' r='{fontThickness / 2}' fill='{fontColour}' />\n"
+				)
 	return x, y
 
 
@@ -119,7 +140,9 @@ def makeTextGroup(
 	x, y = 0, 0
 
 	for char in ss:
-		x, y = polylines(svg, 6, font, char, x=x, y=y)
+		x, y = polylines(
+			svg, 6, font, char, fontColour=fontColour, fontThickness=fontThickness, x=x, y=y
+		)
 		if chr(char) == "\r":
 			x = 0
 	svg.write("	</g>\n")
@@ -189,7 +212,17 @@ def makeSvgString(
 		shadow = None
 
 	for char in ss:
-		x, y = polylines(svg, 6, font, char, x=x, y=y, shadow=shadow)
+		x, y = polylines(
+			svg,
+			6,
+			font,
+			char,
+			fontColour=fontColour,
+			fontThickness=fontThickness,
+			x=x,
+			y=y,
+			shadow=shadow,
+		)
 		if chr(char) == "\r":
 			x = 0
 	svg.write("	</g>\n")
