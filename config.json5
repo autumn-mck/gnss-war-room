@@ -6,23 +6,8 @@
 	"mqttPort": 1883,
 	"satelliteTTL": 30,
 	"windows": [
-		// map focused mostly on NI/europe
 		{
-			"type": "worldMap",
-			"hideRivers": true,
-			"hideLakes": true,
-			"hideAdmin1Borders": true,
-			"hideAdmin0Borders": true,
-			"hideCities": false,
-			"focusLat": 54.6,
-			"focusLong": -6.0,
-			"scaleFactor": 2,
-			"scaleMethod": "constantScale",
-			"hideKey": false,
-		},
-
-		// map of the whole world at once
-		{
+			// map of the whole world at once
 			"type": "worldMap",
 			"hideRivers": true,
 			"hideLakes": true,
@@ -36,16 +21,8 @@
 			"hideKey": false,
 		},
 		{
-			"type": "polarGrid",
-		},
-		{
 			"type": "miscStats",
 			"fontThickness": 1.5,
-		},
-		{
-			"type": "rawMessages",
-			"fontThickness": 1.5,
-			"numMessagesToKeep": 50,
 		},
 		{
 			"type": "signalGraph",
@@ -61,6 +38,28 @@
 			"maxValue": 60,
 			"markerStep": 5,
 			"countUntrackedSatellites": false,
+		},
+		{
+			"type": "polarGrid",
+		},
+		{
+			// map focused mostly on NI/europe
+			"type": "worldMap",
+			"hideRivers": true,
+			"hideLakes": true,
+			"hideAdmin1Borders": true,
+			"hideAdmin0Borders": true,
+			"hideCities": false,
+			"focusLat": 54.6,
+			"focusLong": -6.0,
+			"scaleFactor": 2,
+			"scaleMethod": "constantScale",
+			"hideKey": true,
+		},
+		{
+			"type": "rawMessages",
+			"fontThickness": 1.5,
+			"numMessagesToKeep": 50,
 		},
 	]
 }
