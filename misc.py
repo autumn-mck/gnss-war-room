@@ -1,11 +1,6 @@
 import os
 import urllib.request
 from dataclasses import dataclass
-from PyQt6.QtCore import QByteArray
-
-
-def svgToQByteArray(svg: str) -> QByteArray:
-	return QByteArray(svg.encode("utf-8"))
 
 
 def fetchHp1345FilesIfNeeded():

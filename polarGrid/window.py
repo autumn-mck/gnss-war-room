@@ -1,9 +1,8 @@
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtGui import QResizeEvent
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, QByteArray
 from palettes.palette import Palette
-from misc import svgToQByteArray
 from gnss.satellite import SatelliteInView
 from polarGrid.generate import readBasePolarGrid, prepareIntialPolarGrid
 from polarGrid.update import addSatellitesToPolarGrid
@@ -35,13 +34,13 @@ class PolarGridWindow(QMainWindow):
 		svgData = readBasePolarGrid()
 		svgData = prepareIntialPolarGrid(svgData, self.customPalette)
 		self.basePolarGrid = svgData
-		return svgToQByteArray(svgData)
+		return QByteArray(svgData.encode())
 
 	def updateGrid(self):
 		svgData = addSatellitesToPolarGrid(
 			self.basePolarGrid, self.customPalette, self.latestSatellites
 		)
-		return svgToQByteArray(svgData)
+		return QByteArray(svgData.encode())
 
 	def resizeEvent(self, event: QResizeEvent):
 		newX = event.size().width()

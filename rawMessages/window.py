@@ -1,12 +1,12 @@
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, QByteArray
 from PyQt6.QtGui import QResizeEvent
 from config import RawMessageConfig
 
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString, makeTextGroup
-from misc import Size, svgToQByteArray
+from misc import Size
 from palettes.palette import Palette
 
 
@@ -45,7 +45,7 @@ class RawMessageWindow(QMainWindow):
 		)
 
 		self.svg = QSvgWidget(parent=self)
-		self.svg.load(svgToQByteArray(svgStr))
+		self.svg.load(QByteArray(svgStr.encode()))
 		self.svg.setGeometry(0, 0, width, height)
 
 		self.satelliteReceivedEvent.connect(self.updateMessageLog)
@@ -100,5 +100,5 @@ class RawMessageWindow(QMainWindow):
 		svgToDisplay = (
 			f'<svg version="1.1" viewBox="0 0 {totalWidth} {desiredHeight}">{svgToDisplay}</svg>'
 		)
-		self.svg.load(svgToQByteArray(svgToDisplay))
+		self.svg.load(QByteArray(svgToDisplay.encode()))
 		self.svg.setGeometry(0, 0, newWidth, int(newHeight))

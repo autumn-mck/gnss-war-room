@@ -1,11 +1,10 @@
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, QByteArray
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtGui import QResizeEvent
 from config import MiscStatsConfig
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
-from misc import svgToQByteArray
 from gnss.nmea import GnssData
 from palettes.palette import Palette
 from stats.generate import generateStats
@@ -34,7 +33,7 @@ class MiscStatsWindow(QMainWindow):
 			fontColour=palette.foreground,
 		)
 		self.svg = QSvgWidget(parent=self)
-		self.svg.load(svgToQByteArray(svgStr))
+		self.svg.load(QByteArray(svgStr.encode()))
 		self.svg.setGeometry(0, 0, width, height)
 
 		self.setGeometry(0, 0, 500, 500)
@@ -74,5 +73,5 @@ class MiscStatsWindow(QMainWindow):
 			width = desiredWidth * self.svg.height() / desiredHeight
 			height = self.svg.height()
 
-		self.svg.load(svgToQByteArray(svgStr))
+		self.svg.load(QByteArray(svgStr.encode()))
 		self.svg.setGeometry(0, 0, int(width), int(height))
