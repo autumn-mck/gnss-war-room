@@ -142,14 +142,24 @@ class MapWindow(QMainWindow):
 		"""Handle keybinds for scaling the map"""
 		if event.key() == Qt.Key.Key_Q:
 			self.windowConfig.scaleFactor *= 1.1
+			self.resetMapOnScale()
 		if event.key() == Qt.Key.Key_E:
 			self.windowConfig.scaleFactor /= 1.1
+			self.resetMapOnScale()
 
 		scaleMethods = ["constantScale", "withWidth", "withHeight", "fit"]
 		if event.key() == Qt.Key.Key_Z:
 			currentScaleIndex = scaleMethods.index(self.windowConfig.scaleMethod)
 			newScaleMethod = scaleMethods[(currentScaleIndex + 1) % len(scaleMethods)]
 			self.windowConfig.scaleMethod = newScaleMethod
+
+	def resetMapOnScale(self):
+		baseSvg = readBaseMap()
+		(self.initialMap, self.keySize) = prepareInitialMap(
+			baseSvg, self.customPalette, self.windowConfig
+		)
+		self.preFocusMap = self.initialMap
+		self.newSatelliteDataEvent()
 
 	def onNewData(self, satellites: list[SatelliteInView], latitude: float, longitude: float):
 		"""Handle new satellite data"""
