@@ -70,10 +70,7 @@ def updateGnssDataWithMessage(gnssData: GnssData, message: NMEAMessage, satellit
 		case "RMC":
 			gnssData.latitude = message.lat
 			gnssData.longitude = message.lon
-
-			# take the date from here and combine it with the time from GLL
-			time = gnssData.date.time()
-			gnssData.date = datetime.combine(message.date, time)  # type: ignore
+			gnssData.date = datetime.combine(message.date, message.time)  # type: ignore
 		case "GGA":
 			gnssData.latitude = message.lat
 			gnssData.longitude = message.lon

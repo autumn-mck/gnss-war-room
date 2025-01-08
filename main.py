@@ -80,20 +80,20 @@ def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData],
 		nonlocal lastMessageUpdateTime
 		nonlocal lastFinalMessageUpdateTime
 
-		finalMessageId = "GLL"
+		firstWithTimeMessageID = "RMC"
 		timeSinceLastFinalMessageUpdate = datetime.now() - lastFinalMessageUpdateTime
 		msg = NMEAReader.parse(rawMessage)
-		isFinalMessage = (
+		shouldForceUpdate = (
 			isinstance(msg, NMEAMessage)
-			and msg.msgID == finalMessageId
+			and msg.msgID == firstWithTimeMessageID
 			and timeSinceLastFinalMessageUpdate > timedelta(seconds=0.5)
 		)
-		if isFinalMessage:
+		if shouldForceUpdate:
 			lastFinalMessageUpdateTime = datetime.now()
 
 		# limit how often we update the windows, otherwise pyqt mostly freezes
 		timeSinceLastRawMessageUpdate = datetime.now() - lastMessageUpdateTime
-		if timeSinceLastRawMessageUpdate < timedelta(seconds=0.05) and not isFinalMessage:
+		if timeSinceLastRawMessageUpdate < timedelta(seconds=0.05) and not shouldForceUpdate:
 			return
 
 		for window in windows:
@@ -102,7 +102,7 @@ def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData],
 		lastMessageUpdateTime = datetime.now()
 
 		timeSinceLastUpdate = datetime.now() - lastUpdateTime
-		if timeSinceLastUpdate < timedelta(seconds=0.2) and not isFinalMessage:
+		if timeSinceLastUpdate < timedelta(seconds=0.2) and not shouldForceUpdate:
 			return
 		lastUpdateTime = datetime.now()
 
