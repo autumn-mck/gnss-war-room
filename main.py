@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtWidgets import QMainWindow
+from pynmeagps import NMEAReader, NMEAMessage
 from config import (
 	SignalChartConfig,
 	loadConfig,
@@ -23,7 +24,6 @@ from stats.window import MiscStatsWindow
 from rawMessages.window import RawMessageWindow
 from misc import fetchHp1345FilesIfNeeded
 from signalGraph.window import SignalGraphWindow
-from pynmeagps import NMEAReader, NMEAMessage
 
 
 def main():

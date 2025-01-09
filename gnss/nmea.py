@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
+from typing import Any
 from pynmeagps import NMEAMessage
 from gnss.satellite import SatelliteInView, isSameSatellite
 
@@ -21,6 +22,20 @@ class GnssData:
 	vdop: float = 0
 	fixQuality: int = 0
 	"""https://receiverhelp.trimble.com/alloy-gnss/en-us/NMEA-0183messages_GGA.html for meanings"""
+
+	def toJSON(self) -> dict[str, Any]:
+		return {
+			"latitude": self.latitude,
+			"longitude": self.longitude,
+			"date": self.date.isoformat(),
+			"altitude": self.altitude,
+			"geoidSeparation": self.geoidSeparation,
+			"pdop": self.pdop,
+			"hdop": self.hdop,
+			"vdop": self.vdop,
+			"fixQuality": self.fixQuality,
+			"satellites": [satellite.toJSON() for satellite in self.satellites],
+		}
 
 
 def filterMessagesToType(nmeaMessages: list[NMEAMessage], messageType: str) -> list[NMEAMessage]:

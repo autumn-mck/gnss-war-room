@@ -3,7 +3,9 @@ web/map.svg
 web/polarGrid.svg
 web/stats.svg
 web/snrChart.svg
+web/gnssData.json
 map/citiesCache.txt
+node_modules/
 
 # font files
 01347-80001.bin

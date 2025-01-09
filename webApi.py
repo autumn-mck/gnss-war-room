@@ -15,7 +15,7 @@ def styleRoute():
 
 @app.route("/script.js")
 def scriptRoute():
-	return send_file("web/script.js")
+	return send_file("dist/script.js")
 
 
 @app.route("/map")
@@ -36,6 +36,11 @@ def miscStatsRoute():
 @app.route("/snr-chart")
 def snrChartRoute():
 	return send_file("web/snrChart.svg")
+
+
+@app.route("/api/gnss")
+def satellitesRoute():
+	return send_file("web/gnssData.json")
 
 
 if __name__ == "__main__":

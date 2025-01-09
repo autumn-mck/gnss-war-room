@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 import time
 import threading
 
@@ -71,6 +72,13 @@ def updateChart():
 		f.write(snrChart)
 
 
+def updateData():
+	if LATEST_DATA is None:
+		return
+	with open("./web/gnssData.json", "w", encoding="utf-8") as f:
+		f.write(json.dumps(LATEST_DATA.toJSON()))
+
+
 def updateSVGsThread():
 	"""Update the SVGs in the background once per second"""
 	while True:
@@ -79,6 +87,7 @@ def updateSVGsThread():
 		updatePolarGrid()
 		updateStats()
 		updateChart()
+		updateData()
 		endTime = datetime.now()
 
 		# sleep for the rest of the second

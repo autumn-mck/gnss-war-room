@@ -1,8 +1,9 @@
 from datetime import datetime
 import math
 from dataclasses import dataclass
+from typing import Any
 
-from palettes.palette import Palette
+from palettes.palette import Palette, loadPalette
 
 
 @dataclass
@@ -16,6 +17,22 @@ class SatelliteInView:
 	snr: float = 0
 	lastSeen: datetime = datetime.fromtimestamp(0)
 
+	def toJSON(self) -> dict[str, Any]:
+		lat, long = getSatelliteLatLong(self)
+
+		return {
+			"prnNumber": self.prnNumber,
+			"network": self.network,
+			"elevation": self.elevation,
+			"azimuth": self.azimuth,
+			"snr": self.snr,
+			"lastSeen": self.lastSeen.isoformat(),
+			"lat": lat,
+			"long": long,
+			"colour": colourForNetwork(self.network),
+			"altitude": orbitHeightForNetwork(self.network),
+		}
+
 
 def groupSatellitesByPrn(satellites: list[SatelliteInView]) -> dict[int, list[SatelliteInView]]:
 	"""Group satellites by PRN number"""
@@ -27,7 +44,7 @@ def groupSatellitesByPrn(satellites: list[SatelliteInView]) -> dict[int, list[Sa
 	return satellitesByPrn
 
 
-def colourForNetwork(network: str, palette: Palette) -> str:
+def colourForNetwork(network: str, palette: Palette = loadPalette()) -> str:
 	networkName = networkCodeToName(network)
 	if networkName in palette.satelliteNetworks:
 		return palette.satelliteNetworks[networkName]
