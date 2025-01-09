@@ -17,8 +17,8 @@ class SatelliteInView:
 	snr: float = 0
 	lastSeen: datetime = datetime.fromtimestamp(0)
 
-	def toJSON(self) -> dict[str, Any]:
-		lat, long = getSatelliteLatLong(self)
+	def toJSON(self, measuredFromLat: float, measuredFromLong: float) -> dict[str, Any]:
+		lat, long = getSatelliteLatLong(self, measuredFromLat, measuredFromLong)
 
 		return {
 			"prnNumber": self.prnNumber,
@@ -159,10 +159,22 @@ def xyzToLatLong(x: float, y: float, z: float) -> tuple[float, float]:
 	return (lat, long)
 
 
-def getSatelliteLatLong(satellite: SatelliteInView) -> tuple[float, float]:
+def rotateXyzByLatitude(x: float, y: float, z: float, lat: float) -> tuple[float, float, float]:
+	"""Rotate the xyz coordinates by the given longitude"""
+	rotationAngle = math.radians(-lat)
+	x2 = x * math.cos(rotationAngle) - y * math.sin(rotationAngle)
+	y2 = x * math.sin(rotationAngle) + y * math.cos(rotationAngle)
+	return (x2, y2, z)
+
+
+def getSatelliteLatLong(
+	satellite: SatelliteInView, measuredFromLat: float, measuredFromLong: float
+) -> tuple[float, float]:
 	"""Get the lat long coordinates of a satellite"""
 	x, y, z = azimuthToWorldXyz(satellite)
+	x, y, z = rotateXyzByLatitude(x, y, z, measuredFromLat)
 	lat, long = xyzToLatLong(x, y, z)
+	long += measuredFromLong
 	return (lat, long)
 
 

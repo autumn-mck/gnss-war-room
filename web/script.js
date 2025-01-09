@@ -6,7 +6,7 @@ const globe = document.getElementById("globe");
 const comboBox = document.getElementById("toDisplay");
 
 const earth = createEarth();
-const satGeometry = new THREE.IcosahedronGeometry(8, 1);
+const satGeometry = new THREE.IcosahedronGeometry(10, 1);
 
 async function update() {
 	const toFetch = comboBox.value;
@@ -34,8 +34,8 @@ async function updateGlobe() {
 	let gnssData = await fetch('/api/gnss').then(res => res.json());
 
 	let satellites = gnssData.satellites.map(satellite => ({
-		latitude: satellite.lat + gnssData.latitude,
-		longitude: satellite.long + gnssData.longitude,
+		latitude: satellite.lat,
+		longitude: satellite.long,
 		altitude: satellite.altitude / 6.371,
 		label: `${satellite.network} ${satellite.prnNumber}`,
 		colour: satellite.colour,
@@ -58,8 +58,7 @@ function createEarth() {
 		return new THREE.Mesh(satGeometry, satMaterial)
 	});
 
-	// ideally this shouldn't be hardcoded - ether remove or fix
-	setTimeout(() => earth.pointOfView({ altitude: 10, lat: 54, lng: -5 }));
+	setTimeout(() => earth.pointOfView({ altitude: 10 }));
 
 	return earth;
 }

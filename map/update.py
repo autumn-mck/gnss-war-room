@@ -21,9 +21,7 @@ def genSatelliteMapGroup(
 
 	for satellite in satellites:
 		colour = colourForNetwork(satellite.network, palette)
-		(lat, long) = getSatelliteLatLong(satellite)
-		lat += measuredLatitude
-		long += measuredLongitude
+		(lat, long) = getSatelliteLatLong(satellite, measuredLatitude, measuredLongitude)
 
 		[x, y] = latLongToGallStereographic(lat, long, mapSize.width)
 		x += mapSize.width / 2

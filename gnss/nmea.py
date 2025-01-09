@@ -34,7 +34,9 @@ class GnssData:
 			"hdop": self.hdop,
 			"vdop": self.vdop,
 			"fixQuality": self.fixQuality,
-			"satellites": [satellite.toJSON() for satellite in self.satellites],
+			"satellites": [
+				satellite.toJSON(self.latitude, self.longitude) for satellite in self.satellites
+			],
 		}
 
 
