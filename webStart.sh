@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
+set -e
 
 bun install
 bun build ./web/script.js --outdir dist
