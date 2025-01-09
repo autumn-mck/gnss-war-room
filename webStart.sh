@@ -1,5 +1,6 @@
 #! /usr/bin/env bash
 
+bun install
 bun build ./web/script.js --outdir dist
 python3 webBackground.py &
 backgroundPid=$!
