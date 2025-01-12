@@ -18,10 +18,11 @@ async function update() {
 }
 
 async function updateSvg() {
-	const toFetch = comboBox.value;
+	map.innerHTML = "";
 	globe.style.display = "none";
 	map.style.display = "block";
 
+	const toFetch = comboBox.value;
 	const response = await fetch(`/${toFetch}`);
 	const svg = await response.text();
 	map.innerHTML = svg;
