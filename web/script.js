@@ -18,7 +18,6 @@ async function update() {
 }
 
 async function updateSvg() {
-	map.innerHTML = "";
 	globe.style.display = "none";
 	map.style.display = "block";
 
@@ -29,6 +28,7 @@ async function updateSvg() {
 }
 
 async function updateGlobe() {
+	map.innerHTML = "";
 	globe.style.display = "block";
 	map.style.display = "none";
 
