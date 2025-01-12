@@ -1,5 +1,6 @@
 from datetime import timedelta
 import os
+import time
 from typing import Any, Callable
 import paho.mqtt.enums as mqttEnums
 from paho.mqtt.client import Client as MqttClient, MQTTMessage
@@ -19,11 +20,12 @@ def createMqttSubscriberClient(
 
 	try:
 		mqttClient.connect(config.mqttHost, config.mqttPort)
-		mqttClient.subscribe("gnss/rawMessages")
 		mqttClient.loop_start()
 	except ConnectionRefusedError:
 		print("Error! Unable to connect to MQTT broker")
+		retryConnect(mqttClient, config)
 
+	mqttClient.subscribe("gnss/rawMessages")
 	return mqttClient
 
 
@@ -40,8 +42,23 @@ def createMqttPublisherClient(config: Config) -> MqttClient:
 		mqttClient.loop_start()
 	except ConnectionRefusedError:
 		print("Error! Unable to connect to MQTT broker")
+		retryConnect(mqttClient, config)
 
 	return mqttClient
+
+
+def retryConnect(mqttClient: MqttClient, config: Config, attemptsLeft=5):
+	if attemptsLeft < 0:
+		print("Failed to connect!")
+		os.abort()
+
+	time.sleep(1)
+	print(f"Retrying, {attemptsLeft} attempts remaining.")
+	try:
+		mqttClient.connect(config.mqttHost, config.mqttPort)
+		mqttClient.loop_start()
+	except ConnectionRefusedError:
+		retryConnect(mqttClient, config, attemptsLeft - 1)
 
 
 def createSubscriberCallback(
