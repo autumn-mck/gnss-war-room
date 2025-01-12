@@ -10,7 +10,7 @@ Install dependencies: `pip install -r requirements.txt`
 
 Start up the container for the MQTT broker: `podman compose up`
 
-Now, while the container is running, set a password for publishing to the broker: `podman exec mosquitto mosquitto_passwd -b /etc/mosquitto/passwd gnssreceiver <password>`. Create a file called `.env`, with the contents `GNSS_PUBLISHER_PASSWORD=<password>`.
+Now, while the container is running, set a password for publishing to the broker: `podman exec mosquitto mosquitto_passwd -b /etc/mosquitto/passwd gnssreceiver <password>`, replacing `<password>` with a password of your choosing, e.g. "Joshua". Create a file called `.env`, with the contents `GNSS_PUBLISHER_PASSWORD=<password>`.
 
 Finally, restart the broker container for it to read the new password.
 
