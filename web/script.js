@@ -48,6 +48,7 @@ async function updateGlobe() {
 function createEarth() {
 	const earth = new Globe(globe, { animateIn: false })
 		.globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+		.backgroundColor("#000000")
 		.objectLat("latitude")
 		.objectLng("longitude")
 		.objectLabel("label")
