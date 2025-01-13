@@ -3,7 +3,9 @@ import os
 import time
 from typing import Any, Callable
 import paho.mqtt.enums as mqttEnums
-from paho.mqtt.client import Client as MqttClient, MQTTMessage
+from paho.mqtt.client import Client as MqttClient, MQTTMessage, DisconnectFlags
+from paho.mqtt.reasoncodes import ReasonCode
+from paho.mqtt.properties import Properties
 from pynmeagps import NMEAReader, NMEAMessage
 from config import Config
 from gnss.nmea import GnssData, updateGnssDataWithMessage
@@ -22,9 +24,10 @@ def createMqttSubscriberClient(
 		mqttClient.connect(config.mqttHost, config.mqttPort)
 		mqttClient.loop_start()
 	except ConnectionRefusedError:
-		print("Error! Unable to connect to MQTT broker")
+		print("Error! Unable to connect to MQTT broker. Don't Panic!")
 		retryConnect(mqttClient, config)
 
+	mqttClient.on_disconnect = onDisconnect
 	mqttClient.subscribe("gnss/rawMessages")
 	return mqttClient
 
@@ -41,13 +44,15 @@ def createMqttPublisherClient(config: Config) -> MqttClient:
 		mqttClient.connect(config.mqttHost, config.mqttPort)
 		mqttClient.loop_start()
 	except ConnectionRefusedError:
-		print("Error! Unable to connect to MQTT broker")
+		print("Error! Unable to connect to MQTT broker. Don't Panic!")
 		retryConnect(mqttClient, config)
 
+	mqttClient.on_disconnect = onDisconnect
 	return mqttClient
 
 
 def retryConnect(mqttClient: MqttClient, config: Config, attemptsLeft=5):
+	"""Retry connecting to the MQTT broker if it fails on startup"""
 	if attemptsLeft < 0:
 		print("Failed to connect!")
 		os.abort()
@@ -59,6 +64,18 @@ def retryConnect(mqttClient: MqttClient, config: Config, attemptsLeft=5):
 		mqttClient.loop_start()
 	except ConnectionRefusedError:
 		retryConnect(mqttClient, config, attemptsLeft - 1)
+
+
+def onDisconnect(
+	_client: MqttClient,
+	_userdata: Any,
+	_disconnectFlags: DisconnectFlags,
+	_reasonCode: ReasonCode,
+	_properties: Properties,
+):
+	"""Exit the program if the MQTT broker disconnects, as attempting to reconnect doesn't seem to work"""
+	print("Disconnected from MQTT broker, exiting")
+	os.abort()
 
 
 def createSubscriberCallback(
