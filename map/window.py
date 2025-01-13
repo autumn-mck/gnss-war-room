@@ -97,6 +97,10 @@ class MapWindow(QMainWindow):
 		if event.key() == Qt.Key.Key_K:
 			self.windowConfig.hideKey = not self.windowConfig.hideKey
 
+		if event.key() == Qt.Key.Key_T:
+			self.windowConfig.hideSatelliteTrails = not self.windowConfig.hideSatelliteTrails
+			self.resetMapOnScale()
+
 		mapSvg = focusOnPoint(
 			self.preFocusMap,
 			self.windowConfig,
@@ -154,6 +158,7 @@ class MapWindow(QMainWindow):
 			self.windowConfig.scaleMethod = newScaleMethod
 
 	def resetMapOnScale(self):
+		"""Reset the map on scale to prevent any artifacts"""
 		baseSvg = readBaseMap()
 		(self.initialMap, self.keySize) = prepareInitialMap(
 			baseSvg, self.customPalette, self.windowConfig
