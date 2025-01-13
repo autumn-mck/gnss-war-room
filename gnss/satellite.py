@@ -1,6 +1,6 @@
 from datetime import datetime
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from palettes.palette import Palette, loadPalette
@@ -14,11 +14,14 @@ class SatelliteInView:
 	network: str = "??"
 	elevation: float = 0
 	azimuth: float = 0
+	previousPositions: list[tuple[float, float]] = field(default_factory=list)
 	snr: float = 0
 	lastSeen: datetime = datetime.fromtimestamp(0)
 
 	def toJSON(self, measuredFromLat: float, measuredFromLong: float) -> dict[str, Any]:
-		lat, long = getSatelliteLatLong(self, measuredFromLat, measuredFromLong)
+		lat, long = getSatelliteLatLong(
+			self.azimuth, self.elevation, self.network, measuredFromLat, measuredFromLong
+		)
 
 		return {
 			"prnNumber": self.prnNumber,
@@ -83,7 +86,9 @@ def orbitHeightForNetwork(network: str) -> float:
 			return 21.0  # in the middle-ish
 
 
-def azimuthToWorldXyz(satellite: SatelliteInView) -> tuple[float, float, float]:
+def azimuthToWorldXyz(
+	azimuth: float, elevation: float, satelliteNetwork: str
+) -> tuple[float, float, float]:
 	"""Projecting from the azimuth and elevation to the world xyz coordinates
 	:param azimuth: azimuth in radians
 	:param elevation: elevation in radians
@@ -91,11 +96,8 @@ def azimuthToWorldXyz(satellite: SatelliteInView) -> tuple[float, float, float]:
 	# https://www.desmos.com/3d/jxqcoesfg3 for visualisation of 3d,
 	# https://www.desmos.com/calculator/oskkcd5rdb for 2d
 
-	orbit = orbitHeightForNetwork(satellite.network)
+	orbit = orbitHeightForNetwork(satelliteNetwork)
 	ground = 6.37
-
-	elevation = satellite.elevation
-	azimuth = satellite.azimuth
 
 	x1, x2 = calcX(elevation, orbit, ground)
 	x1 *= math.cos(math.radians(azimuth))
@@ -168,10 +170,14 @@ def rotateXyzByLatitude(x: float, y: float, z: float, lat: float) -> tuple[float
 
 
 def getSatelliteLatLong(
-	satellite: SatelliteInView, measuredFromLat: float, measuredFromLong: float
+	azimuth: float,
+	elevation: float,
+	satelliteNetwork: str,
+	measuredFromLat: float,
+	measuredFromLong: float,
 ) -> tuple[float, float]:
 	"""Get the lat long coordinates of a satellite"""
-	x, y, z = azimuthToWorldXyz(satellite)
+	x, y, z = azimuthToWorldXyz(azimuth, elevation, satelliteNetwork)
 	x, y, z = rotateXyzByLatitude(x, y, z, measuredFromLat)
 	lat, long = xyzToLatLong(x, y, z)
 	long += measuredFromLong

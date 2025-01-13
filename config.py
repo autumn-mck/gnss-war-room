@@ -10,6 +10,7 @@ class MapConfig(JSONWizard):
 	scaleFactor: float = 1
 	scaleMethod: str = "fit"
 	hideKey: bool = False
+	hideSatelliteTrails: bool = False
 
 	focusLat: float = 0
 	focusLong: float = 10

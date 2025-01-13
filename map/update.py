@@ -19,17 +19,77 @@ def genSatelliteMapGroup(
 	radius = 30 / options.scaleFactor
 	satelliteStr = '\t<g id="Satellites">\n'
 
+	if not options.hideSatelliteTrails:
+		for satellite in satellites:
+			satelliteStr += generateSatelliteTrails(
+				satellite, mapSize, palette, measuredLatitude, measuredLongitude, radius
+			)
+
 	for satellite in satellites:
-		colour = colourForNetwork(satellite.network, palette)
-		(lat, long) = getSatelliteLatLong(satellite, measuredLatitude, measuredLongitude)
-
-		[x, y] = latLongToGallStereographic(lat, long, mapSize.width)
-		x += mapSize.width / 2
-		y += mapSize.height / 2
-
-		satelliteStr += f'\t\t<circle cx="{x:.4f}" cy="{y:.4f}" fill="{colour}" r="{radius}" />\n'
+		satelliteStr += generateSatellitePoint(
+			satellite, mapSize, palette, measuredLatitude, measuredLongitude, radius
+		)
 	satelliteStr += "\t</g>"
 	return satelliteStr
+
+
+def generateSatellitePoint(
+	satellite: SatelliteInView,
+	mapSize: Size,
+	palette: Palette,
+	measuredLatitude: float,
+	measuredLongitude: float,
+	radius: float,
+):
+	"""Generate a point for the given satellite"""
+	colour = colourForNetwork(satellite.network, palette)
+	(lat, long) = getSatelliteLatLong(
+		satellite.azimuth,
+		satellite.elevation,
+		satellite.network,
+		measuredLatitude,
+		measuredLongitude,
+	)
+
+	[x, y] = latLongToGallStereographic(lat, long, mapSize.width)
+	x += mapSize.width / 2
+	y += mapSize.height / 2
+
+	return f'\t\t<circle cx="{x:.4f}" cy="{y:.4f}" fill="{colour}" r="{radius}" />\n'
+
+
+def generateSatelliteTrails(
+	satellite: SatelliteInView,
+	mapSize: Size,
+	palette: Palette,
+	measuredLatitude: float,
+	measuredLongitude: float,
+	baseRadius: float,
+):
+	"""Generate a trail for the given satellite"""
+	if len(satellite.previousPositions) < 1:
+		return ""
+	colour = colourForNetwork(satellite.network, palette)
+
+	previousPositions = satellite.previousPositions.copy()
+	previousPositions.append((satellite.elevation, satellite.azimuth))
+	latLongs = [
+		getSatelliteLatLong(
+			azimuth, elevation, satellite.network, measuredLatitude, measuredLongitude
+		)
+		for (elevation, azimuth) in previousPositions
+	]
+	mapPoints = [latLongToGallStereographic(lat, long, mapSize.width) for lat, long in latLongs]
+	polylinePoints = " ".join(
+		f"{(x + mapSize.width / 2):.4f},{(y + mapSize.height / 2):.4f}" for x, y in mapPoints
+	)
+	return f"""\t\t<polyline
+	points='{polylinePoints}'
+	fill='none'
+	stroke='{colour}'
+	stroke-width='{baseRadius / 2}'
+	stroke-linecap='round'
+	stroke-linejoin='round' />\n"""
 
 
 def focusOnPoint(

@@ -13,6 +13,7 @@ class GnssData:
 	latitude: float = 0
 	longitude: float = 0
 	date: datetime = datetime.fromtimestamp(0)
+	lastRecordedTime: datetime = datetime.fromtimestamp(0)
 	altitude: float = 0
 	altitudeUnit: str = "M"
 	geoidSeparation: float = 0
@@ -57,6 +58,12 @@ def parseSatelliteInMessage(parsedData: NMEAMessage, updateTime: datetime) -> li
 			azimuth=tryParseFloat(getattr(parsedData, f"az_0{satNum+1}")),
 			snr=tryParseFloat(getattr(parsedData, f"cno_0{satNum+1}")),
 			lastSeen=updateTime,
+			previousPositions=[
+				(
+					tryParseFloat(getattr(parsedData, f"elv_0{satNum+1}")),
+					tryParseFloat(getattr(parsedData, f"az_0{satNum+1}")),
+				)
+			],
 		)
 		for satNum in range(3)
 		if hasattr(parsedData, f"svid_0{satNum+1}")
@@ -64,6 +71,7 @@ def parseSatelliteInMessage(parsedData: NMEAMessage, updateTime: datetime) -> li
 
 
 def tryParseFloat(string: str):
+	"""Try parse the given string as a float, return if successful, otherwise return 0"""
 	if str is None:
 		return 0
 	try:
@@ -80,6 +88,9 @@ def updateGnssDataWithMessage(gnssData: GnssData, message: NMEAMessage, satellit
 			gnssData.satellites = updateSatellitePositions(
 				gnssData.satellites, message, gnssData.date, satelliteTTL
 			)
+			if gnssData.date - gnssData.lastRecordedTime > timedelta(seconds=1200):
+				gnssData.lastRecordedTime = gnssData.date
+				gnssData.satellites = updateSaltellitePreviousPositions(gnssData.satellites)
 		case "GLL":
 			gnssData.latitude = message.lat
 			gnssData.longitude = message.lon
@@ -109,6 +120,12 @@ def updateGnssDataWithMessage(gnssData: GnssData, message: NMEAMessage, satellit
 	return gnssData
 
 
+def updateSaltellitePreviousPositions(satellites: list[SatelliteInView]) -> list[SatelliteInView]:
+	for satellite in satellites:
+		satellite.previousPositions.append((satellite.elevation, satellite.azimuth))
+	return satellites
+
+
 def updateSatellitePositions(
 	satellites: list[SatelliteInView],
 	nmeaSentence: NMEAMessage,
@@ -123,6 +140,7 @@ def updateSatellitePositions(
 			(newData for newData in newSatelliteData if isSameSatellite(newData, oldData)), None
 		)
 		if matchingNewData is not None:
+			matchingNewData.previousPositions = oldData.previousPositions
 			satellites[i] = matchingNewData
 
 	# remove satellites that haven't been seen in a while
