@@ -3,7 +3,7 @@ import os
 import time
 from typing import Any, Callable
 import paho.mqtt.enums as mqttEnums
-from paho.mqtt.client import Client as MqttClient, MQTTMessage, DisconnectFlags
+from paho.mqtt.client import Client as MqttClient, MQTTMessage, DisconnectFlags, ConnectFlags
 from paho.mqtt.reasoncodes import ReasonCode
 from paho.mqtt.properties import Properties
 from pynmeagps import NMEAReader, NMEAMessage
@@ -20,15 +20,15 @@ def createMqttSubscriberClient(
 		onNewDataCallback, timedelta(seconds=int(config.satelliteTTL))
 	)
 
+	mqttClient.on_disconnect = onDisconnect
+	mqttClient.on_connect = onConnect
+
 	try:
 		mqttClient.connect(config.mqttHost, config.mqttPort)
 		mqttClient.loop_start()
 	except ConnectionRefusedError:
 		print("Error! Unable to connect to MQTT broker. Don't Panic!")
 		retryConnect(mqttClient, config)
-
-	mqttClient.on_disconnect = onDisconnect
-	mqttClient.subscribe("gnss/rawMessages")
 	return mqttClient
 
 
@@ -40,14 +40,15 @@ def createMqttPublisherClient(config: Config) -> MqttClient:
 	if publisherPassword:
 		mqttClient.username_pw_set("gnssreceiver", publisherPassword)
 
+	mqttClient.on_disconnect = onDisconnect
+	mqttClient.on_connect = onConnect
+
 	try:
 		mqttClient.connect(config.mqttHost, config.mqttPort)
 		mqttClient.loop_start()
 	except ConnectionRefusedError:
 		print("Error! Unable to connect to MQTT broker. Don't Panic!")
 		retryConnect(mqttClient, config)
-
-	mqttClient.on_disconnect = onDisconnect
 	return mqttClient
 
 
@@ -66,16 +67,34 @@ def retryConnect(mqttClient: MqttClient, config: Config, attemptsLeft=5):
 		retryConnect(mqttClient, config, attemptsLeft - 1)
 
 
+def onConnect(
+	client: MqttClient, _userdata: Any, _flags: ConnectFlags, _rc: int, _properties: Properties
+):
+	client.subscribe("gnss/rawMessages")
+	client.loop_start()
+
+
 def onDisconnect(
-	_client: MqttClient,
+	client: MqttClient,
 	_userdata: Any,
 	_disconnectFlags: DisconnectFlags,
 	_reasonCode: ReasonCode,
 	_properties: Properties,
 ):
 	"""Exit the program if the MQTT broker disconnects, as attempting to reconnect doesn't seem to work"""
-	print("Disconnected from MQTT broker, exiting")
-	os.abort()
+	print("Disconnected from MQTT broker. Don't Panic!")
+	tryReconnect(client)
+
+
+def tryReconnect(mqttClient: MqttClient, attemptNum=1):
+	"""Attempt to reconnect to the MQTT broker if it disconnects"""
+	time.sleep(1)
+	print(f"Reconnecting to MQTT broker, attempt {attemptNum}")
+	try:
+		mqttClient.reconnect()
+		print("Reconnected to MQTT broker!")
+	except ConnectionRefusedError:
+		tryReconnect(mqttClient, attemptNum + 1)
 
 
 def createSubscriberCallback(
