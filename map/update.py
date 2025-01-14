@@ -80,16 +80,33 @@ def generateSatelliteTrails(
 		for (elevation, azimuth) in previousPositions
 	]
 	mapPoints = [latLongToGallStereographic(lat, long, mapSize.width) for lat, long in latLongs]
-	polylinePoints = " ".join(
-		f"{(x + mapSize.width / 2):.4f},{(y + mapSize.height / 2):.4f}" for x, y in mapPoints
-	)
-	return f"""\t\t<polyline
-	points='{polylinePoints}'
-	fill='none'
-	stroke='{colour}'
-	stroke-width='{baseRadius / 2}'
-	stroke-linecap='round'
-	stroke-linejoin='round' />\n"""
+
+	# split into seperate polylines when distance too big (e.g. crossing antimeridian)
+	mapPointsSplit: list[list[tuple[float, float]]] = []
+	for index in range(len(mapPoints)):
+		if (
+			index == 0
+			or abs(mapPoints[index][0] - mapPoints[index - 1][0]) > mapSize.width / 2
+			or abs(mapPoints[index][1] - mapPoints[index - 1][1]) > mapSize.height / 2
+		):
+			mapPointsSplit.append([mapPoints[index]])
+		else:
+			mapPointsSplit[-1].append(mapPoints[index])
+
+	polylines = ""
+
+	for mapPointsSet in mapPointsSplit:
+		polylinePoints = " ".join(
+			f"{(x + mapSize.width / 2):.4f},{(y + mapSize.height / 2):.4f}" for x, y in mapPointsSet
+		)
+		polylines += f"""\t\t<polyline
+		points='{polylinePoints}'
+		fill='none'
+		stroke='{colour}'
+		stroke-width='{baseRadius / 2}'
+		stroke-linecap='round'
+		stroke-linejoin='round' />\n"""
+	return polylines
 
 
 def focusOnPoint(
