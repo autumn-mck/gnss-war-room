@@ -101,6 +101,14 @@ class MapWindow(QMainWindow):
 			self.windowConfig.hideSatelliteTrails = not self.windowConfig.hideSatelliteTrails
 			self.resetMapOnScale()
 
+		if event.key() == Qt.Key.Key_X:
+			self.windowConfig.hideAdmin0Borders = not self.windowConfig.hideAdmin0Borders
+			self.resetMapOnScale()
+
+		if event.key() == Qt.Key.Key_C:
+			self.windowConfig.hideCities = not self.windowConfig.hideCities
+			self.resetMapOnScale()
+
 		mapSvg = focusOnPoint(
 			self.preFocusMap,
 			self.windowConfig,

@@ -29,6 +29,8 @@ Map controls:
 - Q: zoom in
 - E: zoom out
 - Z: rotate between scale methods (constant scale, scale to fit width, scale to fit height, fit to window)
+- X: toggle country borders
+- C: toggle cities
 - Arrow keys: move key
 - K: toggle key
 
