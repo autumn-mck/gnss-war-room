@@ -18,6 +18,16 @@ def scriptRoute():
 	return send_file("dist/script.js")
 
 
+@app.route("/favicon.ico")
+def faviconRoute():
+	return send_file("web/favicon.ico")
+
+
+@app.route("/robots.txt")
+def robotsRoute():
+	return send_file("web/robots.txt")
+
+
 @app.route("/map")
 def mapRoute():
 	return send_file("web/map.svg")
