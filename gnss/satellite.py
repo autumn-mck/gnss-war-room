@@ -19,6 +19,7 @@ class SatelliteInView:
 	lastSeen: datetime = datetime.fromtimestamp(0)
 
 	def toJSON(self, measuredFromLat: float, measuredFromLong: float) -> dict[str, Any]:
+		"""Return data as dictionary to be converted to json"""
 		lat, long = getSatelliteLatLong(
 			self.azimuth, self.elevation, self.network, measuredFromLat, measuredFromLong
 		)

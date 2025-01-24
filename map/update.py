@@ -83,27 +83,26 @@ def generateSatelliteTrails(
 
 	# split into seperate polylines when distance too big (e.g. crossing antimeridian)
 	mapPointsSplit: list[list[tuple[float, float]]] = []
-	for index in range(len(mapPoints)):
+	for index, point in enumerate(mapPoints):
 		if (
 			index == 0
-			or abs(mapPoints[index][0] - mapPoints[index - 1][0]) > mapSize.width / 2
-			or abs(mapPoints[index][1] - mapPoints[index - 1][1]) > mapSize.height / 2
+			or abs(point[0] - mapPoints[index - 1][0]) > mapSize.width / 2
+			or abs(point[1] - mapPoints[index - 1][1]) > mapSize.height / 2
 		):
-			mapPointsSplit.append([mapPoints[index]])
+			mapPointsSplit.append([point])
 		else:
-			mapPointsSplit[-1].append(mapPoints[index])
+			mapPointsSplit[-1].append(point)
 
 	polylines = ""
 
 	for mapPointsSet in mapPointsSplit:
-		polylinePoints = " ".join(
-			f"{(x + mapSize.width / 2):.4f},{(y + mapSize.height / 2):.4f}" for x, y in mapPointsSet
-		)
 		polylines += f"""\t\t<polyline
-		points='{polylinePoints}'
+		points='{" ".join(
+			f"{(x + mapSize.width / 2):.4f},{(y + mapSize.height / 2):.4f}" for x, y in mapPointsSet
+		)}'
 		fill='none'
 		stroke='{colour}'
-		stroke-width='{baseRadius / 2}'
+		stroke-width='{baseRadius / 3}'
 		stroke-linecap='round'
 		stroke-linejoin='round' />\n"""
 	return polylines
