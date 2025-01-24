@@ -6,6 +6,8 @@ web/snrChart.svg
 web/gnssData.json
 map/citiesCache.txt
 node_modules/
+web/borders.geojson
+web/continents.geojson
 
 # font files
 01347-80001.bin

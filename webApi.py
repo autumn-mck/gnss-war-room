@@ -53,5 +53,15 @@ def satellitesRoute():
 	return send_file("web/gnssData.json")
 
 
+@app.route("/continents.geojson")
+def continentsRoute():
+	return send_file("web/continents.geojson")
+
+
+@app.route("/borders.geojson")
+def bordersRoute():
+	return send_file("web/borders.geojson")
+
+
 if __name__ == "__main__":
 	app.run()

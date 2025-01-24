@@ -16,11 +16,23 @@ body {
 	padding: 0;
 }
 
-#map {
+#svgContainer {
 	width: 100vw;
 	height: 100vh;
 
 	svg {
+		width: 100%;
+		height: 100%;
+		display: block;
+		margin: auto;
+	}
+}
+
+#canvasContainer {
+	width: 100vw;
+	height: 100vh;
+
+	canvas {
 		width: 100%;
 		height: 100%;
 		display: block;

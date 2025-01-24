@@ -23,6 +23,12 @@ class SatelliteInView:
 			self.azimuth, self.elevation, self.network, measuredFromLat, measuredFromLong
 		)
 
+		previousPositions = [
+			getSatelliteLatLong(azimuth, elevation, self.network, measuredFromLat, measuredFromLong)
+			for (elevation, azimuth) in self.previousPositions
+		]
+		previousPositions.append((lat, long))
+
 		return {
 			"prnNumber": self.prnNumber,
 			"network": self.network,
@@ -34,6 +40,7 @@ class SatelliteInView:
 			"long": long,
 			"colour": colourForNetwork(self.network),
 			"altitude": orbitHeightForNetwork(self.network),
+			"previousPositions": previousPositions,
 		}
 
 

@@ -1,11 +1,12 @@
 {
-  "name": "gnss-war-room",
-  "type": "module",
-  "devDependencies": {
-    "@types/three": "^0.172.0"
-  },
-  "dependencies": {
-    "globe.gl": "^2.34.6",
-    "three": "^0.172.0"
-  }
+	"name": "gnss-war-room",
+	"type": "module",
+	"devDependencies": {
+		"@types/three": "^0.172.0",
+		"@types/geojson": "^7946.0.16"
+	},
+	"dependencies": {
+		"globe.gl": "^2.34.6",
+		"three": "^0.172.0"
+	}
 }
