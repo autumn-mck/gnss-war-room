@@ -4,8 +4,9 @@ import sys
 from typing import Callable
 from datetime import datetime, timedelta
 
-from PyQt6.QtWidgets import QApplication
-from PyQt6.QtWidgets import QMainWindow
+from PyQt6.QtWidgets import QApplication, QMainWindow
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+from PyQt6.QtCore import QUrl
 from pynmeagps import NMEAReader, NMEAMessage
 from config import (
 	SignalChartConfig,
@@ -14,6 +15,7 @@ from config import (
 	PolalGridConfig,
 	MiscStatsConfig,
 	RawMessageConfig,
+	GlobeConfig,
 )
 from gnss.nmea import GnssData
 from mqtt import createMqttSubscriberClient
@@ -49,11 +51,15 @@ def main():
 			window = RawMessageWindow(palette, windowConfig)
 		elif isinstance(windowConfig, SignalChartConfig):
 			window = SignalGraphWindow(palette, windowConfig)
+		elif isinstance(windowConfig, GlobeConfig):
+			window = QWebEngineView()
+			window.load(QUrl("http://0.0.0.0:2024/"))
+			window.show()
 		else:
 			raise ValueError(f"Unknown window type: {windowConfig.type}")
 		windows.append(window)
-		if appConfig.multiScreen:
-			handleMultiScreen(screens, window, count)
+		# if appConfig.multiScreen:
+		# 	handleMultiScreen(screens, window, count)
 		count += 1
 
 	onNewDataCallback = genWindowCallback(windows)

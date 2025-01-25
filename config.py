@@ -71,6 +71,12 @@ class SignalChartConfig(JSONWizard):
 
 
 @dataclass
+class GlobeConfig(JSONWizard):
+	class _(JSONWizard.Meta):
+		tag = "globe"
+
+
+@dataclass
 class Config(JSONWizard):
 	"""Configuration for the app"""
 
@@ -83,7 +89,12 @@ class Config(JSONWizard):
 	mqttPort: int
 	satelliteTTL: int
 	windows: list[
-		MapConfig | PolalGridConfig | MiscStatsConfig | RawMessageConfig | SignalChartConfig
+		MapConfig
+		| PolalGridConfig
+		| MiscStatsConfig
+		| RawMessageConfig
+		| SignalChartConfig
+		| GlobeConfig
 	]
 
 
