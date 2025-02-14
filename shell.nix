@@ -15,6 +15,7 @@ pkgs.mkShell {
 			dataclass-wizard
 			flask
 			gunicorn
+      h3
     ]))
   ];
 }
