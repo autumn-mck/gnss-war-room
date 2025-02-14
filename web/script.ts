@@ -4,17 +4,24 @@ import { Line2 } from "three/addons/lines/Line2.js";
 import { LineMaterial, type LineMaterialParameters } from "three/addons/lines/LineMaterial.js";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { drawThreeGeo, latLongToXyz } from "./threeGeoJSON.ts";
+import { SatelliteDisplay } from "./satelliteDisplay.ts";
 
 const svgContainer = document.getElementById("svgContainer") as HTMLDivElement;
 const comboBox = document.getElementById("toDisplay") as HTMLSelectElement;
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const canvasContainer = document.getElementById("canvasContainer") as HTMLDivElement;
+const satelliteDisplay = document.getElementById("satelliteDisplay") as SatelliteDisplay;
+
+let selectedSatellite: any = null;
+let latestGnssData: any = null;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
 renderer.setPixelRatio(window.devicePixelRatio);
 
 const camera = createCamera();
 const controls = createControls(camera, canvas);
+
+const raycaster = new THREE.Raycaster();
 
 const scene = new THREE.Scene();
 createEarth(scene);
@@ -43,6 +50,32 @@ function render(timeMs: number) {
 }
 requestAnimationFrame(render);
 
+function onclick(event: MouseEvent) {
+	// normalised pointer position (-1 to +1)
+	const pointer = new THREE.Vector2(
+		(event.clientX / window.innerWidth) * 2 - 1,
+		-(event.clientY / window.innerHeight) * 2 + 1
+	);
+
+	raycaster.setFromCamera(pointer, camera);
+
+	// calculate objects intersecting the picking ray
+	const intersects = raycaster.intersectObjects(scene.children);
+
+	if (intersects.length == 0) {
+		selectedSatellite = undefined;
+	}
+
+	for (let i = 0; i < intersects.length; i++) {
+		let obj = intersects[i].object;
+		if (obj.type !== "Mesh" || obj.geometry.type !== "IcosahedronGeometry") continue;
+		selectedSatellite = obj.userData;
+		obj.material.color.set(0xff0000);
+		obj.material.opacity = 1;
+	}
+	satelliteDisplay.update(selectedSatellite, latestGnssData);
+}
+
 async function update() {
 	const toFetch = comboBox.value;
 	if (toFetch === "globe") {
@@ -54,6 +87,7 @@ async function update() {
 
 async function updateSvg() {
 	canvasContainer.style.display = "none";
+	satelliteDisplay.style.display = "none";
 	svgContainer.style.display = "block";
 
 	const toFetch = comboBox.value;
@@ -65,9 +99,13 @@ async function updateSvg() {
 async function updateGlobe() {
 	svgContainer.innerHTML = "";
 	canvasContainer.style.display = "block";
+	satelliteDisplay.style.display = "block";
 	svgContainer.style.display = "none";
 
 	let gnssData = await fetch("/api/gnss").then((res) => res.json());
+	latestGnssData = gnssData;
+	// TODO update selected satellite
+	satelliteDisplay.update(selectedSatellite, latestGnssData);
 	satellitesObject.clear();
 
 	for (let satellite of gnssData.satellites) {
@@ -77,6 +115,21 @@ async function updateGlobe() {
 		satMesh.translateX(x);
 		satMesh.translateY(z);
 		satMesh.translateZ(y);
+		satMesh.userData = satellite;
+
+		const baseSelectGeometry = new THREE.IcosahedronGeometry(0.15, 0);
+		const baseSelectMaterial = new THREE.MeshBasicMaterial({
+			color: 0x000000,
+			transparent: true,
+			opacity: 0,
+		});
+
+		let satSelect = new THREE.Mesh(baseSelectGeometry, baseSelectMaterial);
+		satSelect.translateX(x);
+		satSelect.translateY(z);
+		satSelect.translateZ(y);
+		satSelect.userData = satellite;
+		satellitesObject.add(satSelect);
 
 		const trailMaterial = new LineMaterial({
 			color: satellite.colour,
@@ -154,6 +207,10 @@ comboBox.addEventListener("change", async () => update());
 
 resizeCanvasToDisplaySize();
 window.addEventListener("resize", resizeCanvasToDisplaySize);
+window.addEventListener("click", onclick);
+
+if (!customElements.get("satellite-display"))
+	customElements.define("satellite-display", SatelliteDisplay);
 
 function createEarth(scene: THREE.Scene) {
 	const baseSphereGeometry = new THREE.SphereGeometry(0.99);
@@ -166,7 +223,7 @@ function createEarth(scene: THREE.Scene) {
 	scene.add(geojsonContainer);
 
 	loadGeojson("/continents.geojson", geojsonContainer, { color: 0x63f68d });
-	loadGeojson("/borders.geojson", geojsonContainer, { color: 0xffffff });
+	// loadGeojson("/borders.geojson", geojsonContainer, { color: 0xffffff });
 }
 
 async function loadGeojson(
