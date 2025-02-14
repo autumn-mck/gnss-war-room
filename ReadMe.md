@@ -1,5 +1,14 @@
 # GNSS and Precision Time War Room
 
+![](./docs/readme-imgs/gnss.png)
+
+A project for displaying Global Navigation Satellite System (GNSS) and precision time data.
+
+The whole system will be covered in further detail in the dissertation.
+
+![](./docs/readme-imgs/cpsl.jpg)
+_Running at the Cyber Physical Systems Lab, Queen's University Belfast_
+
 ## Setup
 
 Create a virtual environment: `python -m venv .venv` and activate it: `source .venv/bin/activate`
@@ -25,6 +34,7 @@ Edit `config.json5` and set `mqttHost` to the hostname of the remote server. You
 Edit `config.pyjson5` as needed. To display the main PyQt GUI: `python main.py`
 
 Map controls:
+
 - WASD: move map
 - Q: zoom in
 - E: zoom out
@@ -35,3 +45,5 @@ Map controls:
 - K: toggle key
 
 To run the web frontend: `sh webStart.sh` (will default to port 2024)
+
+![](./docs/readme-imgs/dataflow.svg)
