@@ -11,7 +11,7 @@
 	"satelliteNetworks": {
 		"Galileo": "#8aadf4",
 		"GPS": "#8bd5ca",
-		"Glonass": "#ed8796",
+		"GLONASS": "#ed8796",
 		"BeiDou": "#eed49f",
 		"Unknown": "#f4dbd6"
 	}
