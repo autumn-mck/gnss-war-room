@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 import os
 import time
 from typing import Any, Callable
@@ -9,6 +9,7 @@ from paho.mqtt.properties import Properties
 from pynmeagps import NMEAReader, NMEAMessage
 from config import Config
 from gnss.nmea import GnssData, updateGnssDataWithMessage
+from scrape import tryLoadCachedGpsJam, gpsCsvToDict
 
 
 def createMqttSubscriberClient(
@@ -102,14 +103,21 @@ def createSubscriberCallback(
 ) -> Callable[[MqttClient, Any, MQTTMessage], None]:
 	"""Create a callback for the MQTT subscriber client to handle incoming messages"""
 	gnssData = GnssData()
+	h3Dict: dict[str, tuple[int, int]] = {}
 
 	def onMessage(_client: MqttClient, _userdata: Any, message: MQTTMessage):
 		nonlocal gnssData
+		nonlocal h3Dict
 		nonlocal onNewDataCallback
 		parsedMessage = NMEAReader.parse(message.payload)
 		if not isinstance(parsedMessage, NMEAMessage):
 			return
-		gnssData = updateGnssDataWithMessage(gnssData, parsedMessage, satelliteTTL)
+		gnssData = updateGnssDataWithMessage(gnssData, parsedMessage, satelliteTTL, h3Dict)
+
+		if not h3Dict and gnssData.date > datetime.fromisoformat("2022-02-15"):
+			csv = tryLoadCachedGpsJam(gnssData.date)
+			h3Dict = gpsCsvToDict(csv)
+
 		onNewDataCallback(message.payload, gnssData)
 
 	return onMessage

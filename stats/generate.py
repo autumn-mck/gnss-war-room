@@ -49,6 +49,7 @@ Geoid Separation: {data.geoidSeparation:.1f}{data.geoidSeparationUnit.lower()}
 PDOP: {data.pdop:.2f} ({classifyDOP(data.pdop)})
 HDOP: {data.hdop:.2f} ({classifyDOP(data.hdop)})
 VDOP: {data.vdop:.2f} ({classifyDOP(data.vdop)})
+Interference: {data.interference:.2f}%
 Fix Quality: {data.fixQuality} ({classifyFixQuality(data.fixQuality)})"""
 	strToDisplay = "\n\r".join(strToDisplay.split("\n"))
 

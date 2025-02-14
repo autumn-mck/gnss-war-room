@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 from typing import Any
+import h3
 from pynmeagps import NMEAMessage
 from gnss.satellite import SatelliteInView, isSameSatellite
 
@@ -21,6 +22,7 @@ class GnssData:
 	pdop: float = 0
 	hdop: float = 0
 	vdop: float = 0
+	interference: float = 0
 	fixQuality: int = 0
 	"""https://receiverhelp.trimble.com/alloy-gnss/en-us/NMEA-0183messages_GGA.html for meanings"""
 
@@ -80,7 +82,12 @@ def tryParseFloat(string: str):
 		return 0
 
 
-def updateGnssDataWithMessage(gnssData: GnssData, message: NMEAMessage, satelliteTTL: timedelta):
+def updateGnssDataWithMessage(
+	gnssData: GnssData,
+	message: NMEAMessage,
+	satelliteTTL: timedelta,
+	h3Dict: dict[str, tuple[int, int]],
+):
 	"""Update the gnss data with the new data from a message"""
 	# no clue what's up with the typing here, it's fine though so ignore
 	match message.msgID:
@@ -99,6 +106,12 @@ def updateGnssDataWithMessage(gnssData: GnssData, message: NMEAMessage, satellit
 			gnssData.latitude = message.lat
 			gnssData.longitude = message.lon
 			gnssData.date = datetime.combine(message.date, message.time)  # type: ignore
+
+			if h3Dict:
+				h3Cell = h3.latlng_to_cell(message.lat, message.lon, 4)
+				if h3Cell in h3Dict:
+					countGood, countBad = h3Dict[h3Cell]
+					gnssData.interference = countBad / (countGood + countBad) * 100
 		case "GGA":
 			gnssData.latitude = message.lat
 			gnssData.longitude = message.lon

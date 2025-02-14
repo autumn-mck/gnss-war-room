@@ -5,6 +5,7 @@ PyQt6-WebEngine==6.8.0
 # GNSS
 pynmeagps==1.0.43
 pyserial==3.5
+h3==4.2.1
 
 # Loading config
 pyjson5==1.6.7

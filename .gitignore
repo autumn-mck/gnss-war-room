@@ -5,6 +5,7 @@ web/stats.svg
 web/snrChart.svg
 web/gnssData.json
 map/citiesCache.txt
+map/gpsJamCache.csv
 node_modules/
 web/borders.geojson
 web/continents.geojson
