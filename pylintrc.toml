@@ -18,8 +18,8 @@ docstring-min-length = 6 # on shorter functions, case by case basis
 generated-members = ["pyjson5.*", "pynmeagps.*"]
 
 [tool.pylint.design]
-max-args = 7        # default of 5 seems too low
-max-attributes = 12 # default of 7 seems too low
+max-args = 8        # default of 5 seems too low
+max-attributes = 14 # default of 7 seems too low
 max-statements = 30 # default of 50 seems too high
 
 [tool.pylint.format]

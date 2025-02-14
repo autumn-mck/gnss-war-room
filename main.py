@@ -37,7 +37,6 @@ def main():
 	appConfig = loadConfig()
 
 	palette = loadPalette(appConfig.paletteName)
-	screens = app.screens()
 	windows = []
 	count = 0
 	for windowConfig in appConfig.windows:

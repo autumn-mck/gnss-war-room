@@ -5,6 +5,7 @@ import h3
 
 
 def main():
+	"""Fetch the latest gpsJam data and print the data for Belfast-ish"""
 	date = datetime.now()
 	csv = tryLoadCachedGpsJam(date)
 	h3dict = gpsCsvToDict(csv)
