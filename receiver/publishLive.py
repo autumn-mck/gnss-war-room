@@ -1,9 +1,10 @@
 from dotenv import load_dotenv
 from paho.mqtt.client import Client as MqttClient
 from pynmeagps import NMEAMessage
+
 from misc.config import loadConfig
-from receiver.serialMonitor import monitorSerial
 from misc.mqtt import createMqttPublisherClient
+from receiver.serialMonitor import monitorSerial
 
 
 def createPublishCallback(mqttClient: MqttClient):

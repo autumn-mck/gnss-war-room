@@ -1,8 +1,8 @@
 from misc.size import Size
+from misc.config import MapConfig
 from palettes.palette import Palette
 from views.map.cities import getCities
 from views.map.gallStereographic import latLongToGallStereographic
-from misc.config import MapConfig
 from font.hp1345Font import Font
 from font.mksvgs import makeTextGroup
 

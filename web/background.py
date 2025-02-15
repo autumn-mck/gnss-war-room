@@ -3,10 +3,10 @@ import json
 import time
 import threading
 
+from misc.mqtt import GnssData, createMqttSubscriberClient
 from misc.config import MiscStatsConfig, loadConfig, MapConfig, SignalChartConfig
 from font.hp1345Font import Font
 from font.fetch import fetchHp1345FilesIfNeeded
-from misc.mqtt import GnssData, createMqttSubscriberClient
 from palettes.palette import loadPalette
 from views.map.generate import readBaseMap, prepareInitialMap, getMapSize
 from views.map.update import genSatelliteMapGroup, focusOnPoint
