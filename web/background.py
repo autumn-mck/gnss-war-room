@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 import json
 import time
@@ -42,7 +43,7 @@ def updateMap():
 	latestMap = baseMap.replace("<!-- satellites go here -->", satelliteGroup)
 	mapSize = getMapSize()
 	latestMap = focusOnPoint(latestMap, mapConfig, mapSize, keySize)
-	with open("./web/map.svg", "w", encoding="utf-8") as f:
+	with open("./web/generated/map.svg", "w", encoding="utf-8") as f:
 		f.write(latestMap)
 
 
@@ -51,7 +52,7 @@ def updatePolarGrid():
 	if LATEST_DATA is None:
 		return
 	polarGrid = addSatellitesToPolarGrid(basePolarGrid, PALETTE, LATEST_DATA.satellites)
-	with open("./web/polarGrid.svg", "w", encoding="utf-8") as f:
+	with open("./web/generated/polarGrid.svg", "w", encoding="utf-8") as f:
 		f.write(polarGrid)
 
 
@@ -60,7 +61,7 @@ def updateStats():
 	if LATEST_DATA is None:
 		return
 	(statsSvg, _, _) = generateStats(LATEST_DATA, PALETTE, FONT, mistStatsConfig)
-	with open("./web/stats.svg", "w", encoding="utf-8") as f:
+	with open("./web/generated/stats.svg", "w", encoding="utf-8") as f:
 		f.write(statsSvg)
 
 
@@ -68,14 +69,14 @@ def updateChart():
 	if LATEST_DATA is None:
 		return
 	snrChart = generateBarChart(chartConfig, PALETTE, FONT, LATEST_DATA.satellites, 854, 480)
-	with open("./web/snrChart.svg", "w", encoding="utf-8") as f:
+	with open("./web/generated/snrChart.svg", "w", encoding="utf-8") as f:
 		f.write(snrChart)
 
 
 def updateData():
 	if LATEST_DATA is None:
 		return
-	with open("./web/gnssData.json", "w", encoding="utf-8") as f:
+	with open("./web/generated/gnssData.json", "w", encoding="utf-8") as f:
 		f.write(json.dumps(LATEST_DATA.toJSON()))
 
 
@@ -106,6 +107,9 @@ def genOnNewDataCallback():
 def main():
 	fetchHp1345FilesIfNeeded()
 	createMqttSubscriberClient(CONFIG, genOnNewDataCallback())
+
+	if not os.path.exists("./web/generated"):
+		os.makedirs("./web/generated")
 
 	thread = threading.Thread(target=updateSVGsThread)
 	thread.start()

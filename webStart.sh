@@ -1,8 +1,8 @@
 #! /usr/bin/env bash
 
 bun install
-bunx mapshaper -i map/1981_polygons.geojson snap snap-interval=0.1 -dissolve2 -o precision=0.1 web/continents.geojson
-cp map/1981_lines.geojson web/borders.geojson
+bunx mapshaper -i views/map/1981_polygons.geojson snap snap-interval=0.1 -dissolve2 -o precision=0.1 web/generated/continents.geojson
+cp views/map/1981_lines.geojson web/generated/borders.geojson
 bun build ./web/script.ts --outdir dist
 
 python3 -m web.background &
