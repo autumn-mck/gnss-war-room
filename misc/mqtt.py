@@ -7,9 +7,9 @@ from paho.mqtt.client import Client as MqttClient, MQTTMessage, DisconnectFlags,
 from paho.mqtt.reasoncodes import ReasonCode
 from paho.mqtt.properties import Properties
 from pynmeagps import NMEAReader, NMEAMessage
-from config import Config
+from misc.config import Config
 from gnss.nmea import GnssData, updateGnssDataWithMessage
-from scrape import tryLoadCachedGpsJam, gpsCsvToDict
+from misc.scrape import tryLoadCachedGpsJam, gpsCsvToDict
 
 
 def createMqttSubscriberClient(

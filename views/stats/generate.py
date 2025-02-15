@@ -1,7 +1,7 @@
-from config import MiscStatsConfig
+from misc.config import MiscStatsConfig
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
-from map.cities import findNearestCityWithCache
+from views.map.cities import findNearestCityWithCache
 from gnss.nmea import GnssData
 from palettes.palette import Palette
 

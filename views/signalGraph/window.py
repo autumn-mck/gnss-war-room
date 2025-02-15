@@ -2,11 +2,11 @@ from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtCore import pyqtSignal, QByteArray
 from PyQt6.QtGui import QResizeEvent
-from config import SignalChartConfig
+from misc.config import SignalChartConfig
 from font.hp1345Font import Font
 from gnss.nmea import GnssData
 from palettes.palette import Palette
-from signalGraph.generate import generateBarChart
+from views.signalGraph.generate import generateBarChart
 
 
 class SignalGraphWindow(QMainWindow):

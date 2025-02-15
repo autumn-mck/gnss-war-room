@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import QApplication, QMainWindow
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtCore import QUrl
 from pynmeagps import NMEAReader, NMEAMessage
-from config import (
+from misc.config import (
 	SignalChartConfig,
 	loadConfig,
 	MapConfig,
@@ -18,14 +18,14 @@ from config import (
 	GlobeConfig,
 )
 from gnss.nmea import GnssData
-from mqtt import createMqttSubscriberClient
+from misc.mqtt import createMqttSubscriberClient
 from palettes.palette import loadPalette
-from map.window import MapWindow
-from polarGrid.window import PolarGridWindow
-from stats.window import MiscStatsWindow
-from rawMessages.window import RawMessageWindow
-from misc import fetchHp1345FilesIfNeeded
-from signalGraph.window import SignalGraphWindow
+from views.map.window import MapWindow
+from views.polarGrid.window import PolarGridWindow
+from views.stats.window import MiscStatsWindow
+from views.rawMessages.window import RawMessageWindow
+from font.fetch import fetchHp1345FilesIfNeeded
+from views.signalGraph.window import SignalGraphWindow
 
 
 def main():

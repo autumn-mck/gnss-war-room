@@ -2,12 +2,12 @@ from PyQt6.QtCore import pyqtSignal, QByteArray
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtGui import QResizeEvent
-from config import MiscStatsConfig
+from misc.config import MiscStatsConfig
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
 from gnss.nmea import GnssData
 from palettes.palette import Palette
-from stats.generate import generateStats
+from views.stats.generate import generateStats
 
 
 class MiscStatsWindow(QMainWindow):

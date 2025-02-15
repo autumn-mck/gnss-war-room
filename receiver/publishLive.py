@@ -1,15 +1,15 @@
 from dotenv import load_dotenv
 from paho.mqtt.client import Client as MqttClient
 from pynmeagps import NMEAMessage
-from config import loadConfig
-from serialMonitor import monitorSerial
-from mqtt import createMqttPublisherClient
+from misc.config import loadConfig
+from receiver.serialMonitor import monitorSerial
+from misc.mqtt import createMqttPublisherClient
 
 
 def createPublishCallback(mqttClient: MqttClient):
 	def onNewData(rawData: bytes, _: NMEAMessage):
 		data = rawData.decode("utf-8").strip()
-		mqttClient.publish("gnss/rawMessages", data, qos=0)
+		mqttClient.publish("gnss/rawMessages", data, qos=2)
 
 	return onNewData
 

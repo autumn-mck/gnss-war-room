@@ -1,6 +1,5 @@
 import os
 import urllib.request
-from dataclasses import dataclass
 
 
 def fetchHp1345FilesIfNeeded():
@@ -23,9 +22,3 @@ def fetchHp1345FilesIfNeeded():
 	urllib.request.urlretrieve(charIndexRomUrl, "./font/1816-1500.bin")
 	urllib.request.urlretrieve(firmwareRomUrl, "./font/01347-80010.bin")
 	print("Done downloading HP1345 font files")
-
-
-@dataclass
-class Size:
-	width: float
-	height: float

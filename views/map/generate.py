@@ -1,15 +1,15 @@
-from misc import Size
+from misc.size import Size
 from palettes.palette import Palette
-from map.cities import getCities
-from map.gallStereographic import latLongToGallStereographic
-from config import MapConfig
+from views.map.cities import getCities
+from views.map.gallStereographic import latLongToGallStereographic
+from misc.config import MapConfig
 from font.hp1345Font import Font
 from font.mksvgs import makeTextGroup
 
 
 def readBaseMap() -> str:
 	"""Read the base SVG map file."""
-	with open("map/1981.svg", "r", encoding="utf8") as f:
+	with open("views/map/1981.svg", "r", encoding="utf8") as f:
 		return f.read()
 
 

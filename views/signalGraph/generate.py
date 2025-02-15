@@ -1,4 +1,4 @@
-from config import SignalChartConfig
+from misc.config import SignalChartConfig
 from font.hp1345Font import Font
 from font.mksvgs import makeTextGroup
 from gnss.satellite import SatelliteInView, colourForNetwork

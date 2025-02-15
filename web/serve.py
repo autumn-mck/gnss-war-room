@@ -5,62 +5,62 @@ app = Flask(__name__)
 
 @app.route("/")
 def indexRoute():
-	return send_file("web/index.html")
+	return send_file("index.html")
 
 
 @app.route("/style.css")
 def styleRoute():
-	return send_file("web/style.css")
+	return send_file("style.css")
 
 
 @app.route("/script.js")
 def scriptRoute():
-	return send_file("dist/script.js")
+	return send_file("../dist/script.js")
 
 
 @app.route("/favicon.ico")
 def faviconRoute():
-	return send_file("web/favicon.ico")
+	return send_file("favicon.ico")
 
 
 @app.route("/robots.txt")
 def robotsRoute():
-	return send_file("web/robots.txt")
+	return send_file("robots.txt")
 
 
 @app.route("/map")
 def mapRoute():
-	return send_file("web/map.svg")
+	return send_file("generated/map.svg")
 
 
 @app.route("/polarGrid")
 def polarGridRoute():
-	return send_file("web/polarGrid.svg")
+	return send_file("generated/polarGrid.svg")
 
 
 @app.route("/stats")
 def miscStatsRoute():
-	return send_file("web/stats.svg")
+	return send_file("generated/stats.svg")
 
 
 @app.route("/snr-chart")
 def snrChartRoute():
-	return send_file("web/snrChart.svg")
+	return send_file("generated/snrChart.svg")
 
 
 @app.route("/api/gnss")
 def satellitesRoute():
-	return send_file("web/gnssData.json")
+	return send_file("generated/gnssData.json")
 
 
 @app.route("/continents.geojson")
 def continentsRoute():
-	return send_file("web/continents.geojson")
+	return send_file("generated/continents.geojson")
 
 
 @app.route("/borders.geojson")
 def bordersRoute():
-	return send_file("web/borders.geojson")
+	return send_file("generated/borders.geojson")
 
 
 if __name__ == "__main__":

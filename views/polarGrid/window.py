@@ -4,8 +4,8 @@ from PyQt6.QtGui import QResizeEvent
 from PyQt6.QtCore import pyqtSignal, QByteArray
 from palettes.palette import Palette
 from gnss.satellite import SatelliteInView
-from polarGrid.generate import readBasePolarGrid, prepareIntialPolarGrid
-from polarGrid.update import addSatellitesToPolarGrid
+from views.polarGrid.generate import readBasePolarGrid, prepareIntialPolarGrid
+from views.polarGrid.update import addSatellitesToPolarGrid
 
 
 class PolarGridWindow(QMainWindow):

@@ -75,7 +75,7 @@ def calcMaxNumCitiesToInclude(countryInfo: list[str]) -> int:
 
 def readCityInfo() -> dict[str, list[list[str]]]:
 	"""Read the city info from the file and group it by country"""
-	rawCityInfo = readTSV("./map/cities15000.txt")
+	rawCityInfo = readTSV("./views/map/cities15000.txt")
 	cityInfo = {
 		country: list(cities)
 		for country, cities in itertools.groupby(rawCityInfo, key=lambda x: x[8])
@@ -83,7 +83,7 @@ def readCityInfo() -> dict[str, list[list[str]]]:
 	return cityInfo
 
 
-def findNearestCity(lat: float, long: float, file: str = "./map/cities15000.txt"):
+def findNearestCity(lat: float, long: float, file: str = "./views/map/cities15000.txt"):
 	"""Find the nearest city to a given lat/long"""
 	cities = readTSV(file)
 
@@ -105,14 +105,14 @@ def findNearestCity(lat: float, long: float, file: str = "./map/cities15000.txt"
 
 def findNearestCityWithCache(lat: float, long: float):
 	"""Find the nearest city to the given lat/long, using the cache file if possible"""
-	nearestCity = findNearestCity(lat, long, "./map/citiesCache.txt")
+	nearestCity = findNearestCity(lat, long, "./views/map/citiesCache.txt")
 
 	if len(nearestCity) > 0:
 		margin = 0.1
 		if abs(lat - float(nearestCity[4])) < margin and abs(long - float(nearestCity[5])) < margin:
 			return nearestCity[2]
 
-	nearestCity = findNearestCity(lat, long, "./map/cities15000.txt")
+	nearestCity = findNearestCity(lat, long, "./views/map/cities15000.txt")
 	appendToCache(nearestCity)
 	return nearestCity[2]
 
@@ -124,7 +124,7 @@ def appendToCache(city: list[str]):
 		strToAppend += string
 		if index != len(city) - 1:
 			strToAppend += "\t"
-	with open("./map/citiesCache.txt", "a", encoding="utf-8") as file:
+	with open("./views/map/citiesCache.txt", "a", encoding="utf-8") as file:
 		file.write(strToAppend + "\n")
 
 
@@ -133,7 +133,7 @@ def distBetweenPoints(lat1: float, long1: float, lat2: float, long2: float) -> f
 
 
 def readCountryInfo() -> dict[str, list[str]]:
-	rawCountryInfo = readTSV("./map/countryInfo.txt")
+	rawCountryInfo = readTSV("./views/map/countryInfo.txt")
 	countryInfo = {row[0]: row for row in rawCountryInfo}  # key is the country code
 	return countryInfo
 

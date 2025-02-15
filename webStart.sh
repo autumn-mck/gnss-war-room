@@ -5,10 +5,10 @@ bunx mapshaper -i map/1981_polygons.geojson snap snap-interval=0.1 -dissolve2 -o
 cp map/1981_lines.geojson web/borders.geojson
 bun build ./web/script.ts --outdir dist
 
-python3 webBackground.py &
+python3 -m web.background &
 backgroundPid=$!
 
-gunicorn -w 4 -b 0.0.0.0:2024 webApi:app &
+gunicorn -w 4 -b 0.0.0.0:2024 web.serve:app &
 webPid=$!
 
 trap "echo $backgroundPid & kill $backgroundPid & kill $webPid; exit" SIGINT

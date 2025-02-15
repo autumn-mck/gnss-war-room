@@ -3,8 +3,8 @@ from time import sleep
 import paho.mqtt.client as mqtt
 from dotenv import load_dotenv
 
-from mqtt import createMqttPublisherClient
-from config import loadConfig
+from misc.config import loadConfig
+from misc.mqtt import createMqttPublisherClient
 
 
 def parseAndPublishLines(lines: list[str], mqttClient: mqtt.Client):
@@ -19,7 +19,7 @@ def parseAndPublishLines(lines: list[str], mqttClient: mqtt.Client):
 
 		if lastTimestamp is not None:
 			delta = parsedTimestamp - lastTimestamp
-			sleep(delta.total_seconds() / 1)
+			sleep(delta.total_seconds() / 100)
 		print(nmeaMessage)
 		mqttClient.publish("gnss/rawMessages", nmeaMessage, qos=0)
 		lastTimestamp = parsedTimestamp
@@ -30,7 +30,7 @@ def main():
 	load_dotenv()
 	config = loadConfig()
 	mqttClient = createMqttPublisherClient(config)
-	with open("test.nmea", "r", encoding="utf-8") as f:
+	with open("test3.nmea", "r", encoding="utf-8") as f:
 		lines = f.readlines()
 	parseAndPublishLines(lines, mqttClient)
 

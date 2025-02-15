@@ -2,7 +2,7 @@ from palettes.palette import Palette
 
 
 def readBasePolarGrid() -> str:
-	with open("polarGrid/polar.svg", "r", encoding="utf8") as f:
+	with open("views/polarGrid/polar.svg", "r", encoding="utf8") as f:
 		return f.read()
 
 

@@ -28,7 +28,7 @@ def fetchAndSaveLatestData(beforeDate: datetime):
 	url = f"https://gpsjam.org/data/{beforeDate.strftime('%Y-%m-%d')}-h3_4.csv"
 	try:
 		file = scrapeFile(url)
-		with open("map/gpsJamCache.csv", "w", encoding="utf-8") as f:
+		with open("views/map/gpsJamCache.csv", "w", encoding="utf-8") as f:
 			f.write(f"{beforeDate.strftime('%Y-%m-%d')}\n")
 			f.write(file)
 		return file
