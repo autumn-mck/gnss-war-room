@@ -21,6 +21,7 @@ generated-members = ["pyjson5.*", "pynmeagps.*"]
 max-args = 8        # default of 5 seems too low
 max-attributes = 14 # default of 7 seems too low
 max-statements = 30 # default of 50 seems too high
+max-locals = 20     # default of 15 seems too low
 
 [tool.pylint.format]
 indent-string = "\t"
