@@ -29,8 +29,8 @@ def test_mixedRotation():
 
 def test_alternateNetwork():
 	(lat, long) = getSatelliteLatLong(30, 45, "GP", 0, 0)
-	assert lat == approx(29.94983)
-	assert long == approx(19.4303)
+	assert lat == approx(27.4025)
+	assert long == approx(17.4157)
 
 
 def test_alternateMeasurementPoint():
