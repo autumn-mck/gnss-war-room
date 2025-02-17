@@ -1,5 +1,5 @@
 # pylint: skip-file
-from map.cities import findNearestCityWithCache
+from views.map.cities import findNearestCityWithCache
 
 
 def test_finds_nearest_city():
