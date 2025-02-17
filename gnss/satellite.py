@@ -16,7 +16,7 @@ class SatelliteInView:
 	azimuth: float = 0
 	previousPositions: list[tuple[float, float]] = field(default_factory=list)
 	snr: float = 0
-	lastSeen: datetime = datetime.fromtimestamp(0)
+	lastSeen: datetime = field(default_factory=lambda: datetime.fromtimestamp(0))
 
 	def toJSON(self, measuredFromLat: float, measuredFromLong: float) -> dict[str, Any]:
 		"""Return data as dictionary to be converted to json"""
@@ -55,7 +55,8 @@ def groupSatellitesByPrn(satellites: list[SatelliteInView]) -> dict[int, list[Sa
 	return satellitesByPrn
 
 
-def colourForNetwork(network: str, palette: Palette = loadPalette()) -> str:
+def colourForNetwork(network: str, palette: Palette = None) -> str:
+	palette = palette or loadPalette()
 	networkName = networkCodeToName(network)
 	if networkName in palette.satelliteNetworks:
 		return palette.satelliteNetworks[networkName]
@@ -84,10 +85,8 @@ def orbitHeightForNetwork(network: str) -> float:
 			return 20.18
 		case "GL":  # GLONASS
 			return 19.13
-		case (
-			"BD"
-			| "GB"
-		):  # BeiDou (todo: there appears to be satellites at a few different orbit heights)
+		case ("BD" | "GB"):
+			# BeiDou (todo: there appears to be satellites at a few different orbit heights)
 			return 21.528
 		case _:  # something else I need to add
 			print(network)
@@ -163,7 +162,9 @@ def quadraticFormula(a: float, b: float, c: float) -> tuple[float, float]:
 
 
 def xyzToLatLong(x: float, y: float, z: float) -> tuple[float, float]:
-	"""Projecting from the xyz coordinates to the lat long coordinates. XYZ should be in the range [-1, 1]"""
+	"""Projecting from the xyz coordinates to the lat long coordinates. XYZ should be in the range
+	[-1, 1]
+	"""
 	lat = math.degrees(math.asin(x))
 	long = math.degrees(math.atan2(z, y))
 	return (lat, long)

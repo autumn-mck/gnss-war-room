@@ -33,23 +33,20 @@ def vectorlist(wl):
 	def line(x, y):
 		ox, oy = vl[-1][-1]
 		if attr[1] in (2, 3):
-			l = math.hypot(x - ox, y - oy)
-			dx = (x - ox) / l
-			dy = (y - oy) / l
-			if attr[1] == 2:
-				dl = 400.0 / 13.0
-			else:
-				dl = 400.0 / 31.0
+			line = math.hypot(x - ox, y - oy)
+			dx = (x - ox) / line
+			dy = (y - oy) / line
+			dl = 400.0 / 13.0 if attr[1] == 2 else 400.0 / 31.0
 			ddx = dx * dl
 			ddy = dy * dl
-			while l > dl:
+			while line > dl:
 				vl[-1].append((ox + ddx, oy + ddy))
 				ox += ddx * 2
 				oy += ddy * 2
 				vl.append([ii, (ox, oy)])
-				l -= dl * 2
-			if l > 0:
-				vl[-1].append((ox + l * dx, oy + l * dy))
+				line -= dl * 2
+			if line > 0:
+				vl[-1].append((ox + line * dx, oy + line * dy))
 
 		if attr[1] != 5:
 			vl[-1].append((x, y))
@@ -72,14 +69,14 @@ def vectorlist(wl):
 				siz = int(siz * 2)
 			tl = font.vectors(a & 0x0FF)
 			for i in tl:
-				l = [ii]
+				lines = [ii]
 				for dx, dy in i:
 					ddx = dx * rot[0] + dy * rot[1]
 					ddy = dx * rot[2] + dy * rot[3]
 					x += ddx * siz
 					y += ddy * siz
-					l.append((x, y))
-				vl.append(l)
+					lines.append((x, y))
+				vl.append(lines)
 		elif c == 0x2000:
 			# Graph
 			b = a & 0x7FF
@@ -128,14 +125,16 @@ def writeSvg(fileName: str, wl, scale=0.25):
 			svg.write('  <polyline points="')
 			for x, y in i[1:]:
 				svg.write(
-					f" {(offset + scale * x):.1f},{(scale * (height - y * aspectRatio) + offset):.1f}"
+					f" {(offset + scale * x):.1f}"
+					f",{(scale * (height - y * aspectRatio) + offset):.1f}"
 				)
 			svg.write(f'" stroke="#{c:02x}{c:02x}{c:02x}"')
 			svg.write("/>\n")
 		elif i[0] == 2.0:
 			x, y = i[1]
 			svg.write(
-				f'  <circle cx="{offset + scale * x}" cy="{scale * (height - y * aspectRatio) + offset}"'
+				f'  <circle cx="{offset + scale * x}" '
+				f'cy="{scale * (height - y * aspectRatio) + offset}"'
 			)
 			svg.write(f' r="{(5 * scale):.1f}" fill="black" />\n')
 
@@ -146,19 +145,13 @@ def writeSvg(fileName: str, wl, scale=0.25):
 
 def main():
 	b = bytearray(open("01347-80010.bin", "rb").read())
-	l = []
-	for a in range(0x31E, 0x400, 2):
-		l.append((b[a] << 8) | b[a + 1])
-	writeSvg("_focus.svg", l, 0.3)
+	lines = [(b[a] << 8) | b[a + 1] for a in range(0x31E, 0x400, 2)]
+	writeSvg("_focus.svg", lines, 0.3)
 
-	l = []
-	for a in range(0x122, 0x150, 2):
-		l.append((b[a] << 8) | b[a + 1])
-	for a in range(0x150, 0x200, 2):
-		l.append((b[a] << 8) | b[a + 1])
-	for a in range(0x222, 0x2C8, 2):
-		l.append((b[a] << 8) | b[a + 1])
-	writeSvg("_align.svg", l, 0.3)
+	lines = [(b[a] << 8) | b[a + 1] for a in range(0x122, 0x150, 2)]
+	lines.extend([(b[a] << 8) | b[a + 1] for a in range(0x200, 0x222, 2)])
+	lines.extend([(b[a] << 8) | b[a + 1] for a in range(0x222, 0x2C8, 2)])
+	writeSvg("_align.svg", lines, 0.3)
 
 
 if __name__ == "__main__":

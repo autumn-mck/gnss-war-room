@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from misc.config import SignalChartConfig
 from font.hp1345Font import Font
 from font.mksvgs import makeTextGroup
@@ -14,9 +16,9 @@ def generateYTick(
 ) -> str:
 	"""That short horizontal line off the left axis"""
 	return f"""<line
-		x1='{settings.marginLeft - settings.markerWidth  - settings.markerStrokeWidth / 2}'
+		x1='{settings.marginLeft - settings.markerWidth - settings.markerStrokeWidth / 2}'
 		y1='{settings.marginTop + currentMarker * chartHeight / markerCount}'
-		x2='{settings.marginLeft  - settings.markerStrokeWidth / 2}'
+		x2='{settings.marginLeft - settings.markerStrokeWidth / 2}'
 		y2='{settings.marginTop + currentMarker * chartHeight / markerCount}'
 		stroke='{palette.foreground}' stroke-width='{settings.markerStrokeWidth}' />\n"""
 
@@ -182,7 +184,7 @@ def generateBar(
 	y='{chartHeight - height + settings.marginTop}'
 	width='{barWidth}'
 	height='{height}'
-	fill='{colourForNetwork(satellite.network, palette)}' />\n"""
+	fill='{colourForNetwork(satellite.network, palette)}' />"""
 
 
 def generateBars(
@@ -195,25 +197,20 @@ def generateBars(
 	"""Generate the bars for the given satellite's SNRs"""
 	barGap = chartWidth / 100
 	barWidth = chartWidth / len(satellites) - barGap
-	bars = ""
-	barsDrawn = 0
-	for satellite in satellites:
-		bars += generateBar(settings, palette, satellite, chartHeight, barsDrawn, barWidth, barGap)
-		barsDrawn += 1
-
-	return bars
+	return "\n".join(
+		generateBar(settings, palette, satellite, chartHeight, barsDrawn, barWidth, barGap)
+		for barsDrawn, satellite in enumerate(satellites)
+	)
 
 
 def sortSatellitesByNetworkThenPrn(satellites: list[SatelliteInView]):
 	"""Order the given satellites, first by which network they belong to, then their PRN"""
-	satellitesByNetwork: dict[str, list[SatelliteInView]] = {}
+	satellitesByNetwork: dict[str, list[SatelliteInView]] = defaultdict(list)
 	for satellite in satellites:
-		if satellite.network not in satellitesByNetwork:
-			satellitesByNetwork[satellite.network] = []
 		satellitesByNetwork[satellite.network].append(satellite)
 
 	satellites = []
-	for _, satellitesInNetwork in satellitesByNetwork.items():
+	for satellitesInNetwork in satellitesByNetwork.values():
 		satellites.extend(sortSatellitesByPrn(satellitesInNetwork))
 
 	return satellites

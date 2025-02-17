@@ -81,7 +81,7 @@ def generateSatelliteTrails(
 	]
 	mapPoints = [latLongToGallStereographic(lat, long, mapSize.width) for lat, long in latLongs]
 
-	# split into seperate polylines when distance too big (e.g. crossing antimeridian)
+	# split into separate polylines when distance too big (e.g. crossing antimeridian)
 	mapPointsSplit: list[list[tuple[float, float]]] = []
 	for index, point in enumerate(mapPoints):
 		if (
@@ -186,6 +186,7 @@ def calcNewDimensions(
 				newHeight = mapSize.height / scaleFactor
 				newWidth = newHeight * desiredSize.width / desiredSize.height
 		case _:
-			raise ValueError(f"Invalid scale method: {scaleMethod}")
+			msg = f"Invalid scale method: {scaleMethod}"
+			raise ValueError(msg)
 
 	return Size(newWidth, newHeight)

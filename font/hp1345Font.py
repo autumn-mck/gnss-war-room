@@ -33,7 +33,7 @@ class Font:
 			if not stroke[sa] and not stroke[sa + 1]:
 				return
 
-			l = []
+			lines = []
 			while True:
 				if used[sa]:
 					return
@@ -48,19 +48,19 @@ class Font:
 					dy = -dy
 
 				if not stroke[sa] & 0x80:
-					l.append([])
+					lines.append([])
 
-				if len(l) == 0:
-					l.append([(0, 0)])
+				if len(lines) == 0:
+					lines.append([(0, 0)])
 
-				l[-1].append((dx, dy))
+				lines[-1].append((dx, dy))
 
 				if stroke[sa + 1] & 0x80:
 					break
 
 				sa += 2
 
-			self.v[char] = l
+			self.v[char] = lines
 
 		for i in range(128):
 			buildchar(i)

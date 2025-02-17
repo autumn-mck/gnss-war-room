@@ -1,6 +1,6 @@
 import time
 from typing import Any
-from matplotlib import pyplot
+from matplotlib import pyplot as plt
 import paho.mqtt.enums as mqttEnums
 from paho.mqtt.client import Client as MqttClient, MQTTMessage
 from dotenv import load_dotenv
@@ -9,7 +9,7 @@ from misc.mqtt import createMqttPublisherClient
 
 
 def main():
-	"""Send a bunch of messages to the MQTT broker and measure how long each of these 'ping's takes"""
+	"""Send numerous messages to the MQTT broker and measure how long each of these 'ping's takes"""
 	load_dotenv()
 	config = loadConfig()
 	publisher = createMqttPublisherClient(config)
@@ -22,8 +22,8 @@ def main():
 		if timeMs < 80:
 			times.append(timeMs)
 
-	pyplot.hist(times, bins=100)
-	pyplot.show()
+	plt.hist(times, bins=100)
+	plt.show()
 
 
 def createMqttClient(config: Config) -> MqttClient:

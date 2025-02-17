@@ -47,7 +47,7 @@ pre {
 
 		this.shadowRoot!.getElementById("satelliteInfo")!.innerText = `PRN: ${satellite.prnNumber}
 Orbit height: ${satellite.altitude}km
-Dist from reciever: ${distToSatellite}km
+Dist from receiver: ${distToSatellite}km
 Network: ${satellite.network}
 Lat: ${roundLat}
 Long: ${roundLong}

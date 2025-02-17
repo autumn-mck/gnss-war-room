@@ -39,8 +39,7 @@ def createMqttPublisherClient(config: Config) -> MqttClient:
 	"""Create the publisher MQTT client"""
 	mqttClient = MqttClient(mqttEnums.CallbackAPIVersion.VERSION2, client_id="publisher")
 
-	publisherPassword = os.environ.get("GNSS_PUBLISHER_PASSWORD")
-	if publisherPassword:
+	if publisherPassword := os.environ.get("GNSS_PUBLISHER_PASSWORD"):
 		mqttClient.username_pw_set("gnssreceiver", publisherPassword)
 
 	mqttClient.on_disconnect = onDisconnect
@@ -84,7 +83,9 @@ def onDisconnect(
 	_reasonCode: ReasonCode,
 	_properties: Properties,
 ):
-	"""Exit the program if the MQTT broker disconnects, as attempting to reconnect doesn't seem to work"""
+	"""Exit the program if the MQTT broker disconnects, as attempting to reconnect does not seem to
+	work
+	"""
 	print("Disconnected from MQTT broker. Don't Panic!")
 	tryReconnect(client)
 

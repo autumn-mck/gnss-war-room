@@ -19,8 +19,7 @@ def main():
 def scrapeFile(url):
 	print(f"Fetching {url}")
 	with urllib.request.urlopen(url) as gzippedFile:
-		file = gzip.decompress(gzippedFile.read()).decode("utf-8")
-		return file
+		return gzip.decompress(gzippedFile.read()).decode("utf-8")
 
 
 def fetchAndSaveLatestData(beforeDate: datetime):
@@ -41,14 +40,9 @@ def gpsCsvToDict(csv: str) -> dict[str, tuple[int, int]]:
 	"""Convert the given gpsJam CSV to a dict of h3 hexes to (lat, long) tuples"""
 	h3Dict = {}
 	for line in csv.split("\n"):
-		if line.startswith("hex"):
-			continue
-		if line == "":
-			continue
-		line = line.split(",")
-		good = int(line[1])
-		bad = int(line[2])
-		h3Dict[line[0]] = (good, bad)
+		if line and not line.startswith("hex"):
+			key, good, bad = line.split(",")[:3]
+			h3Dict[key] = (int(good), int(bad))
 	return h3Dict
 
 

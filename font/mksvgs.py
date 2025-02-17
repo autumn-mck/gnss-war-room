@@ -74,26 +74,26 @@ def createGrid(
 	# Make a list of grid lines and sort them by marker
 	# to avoid lighter lines overlapping darker lines.
 
-	l: list[tuple[int, str, int, int, int, int]] = []
+	lines: list[tuple[int, str, int, int, int, int]] = []
 	for x in range(x0, x1 + 1):
 		m = ""
 		for a, b in markers:
 			if x % a == 0:
 				m = b
-		l.append((a, m, x, y0, x, y1))
+		lines.append((a, m, x, y0, x, y1))
 	for y in range(y0, y1 + 1):
 		m = ""
 		for a, b in markers:
 			if y % a == 0:
 				m = b
-		l.append((a, m, x0, y, x1, y))
+		lines.append((a, m, x0, y, x1, y))
 
-	l.sort()
-	writePolylines(svg, ind, l)
+	lines.sort()
+	writePolylines(svg, ind, lines)
 
 
-def writePolylines(svg: TextIOWrapper, ind: int, l: list[tuple[int, str, int, int, int, int]]):
-	for _, b, x0, y0, x1, y1 in l:
+def writePolylines(svg: TextIOWrapper, ind: int, lines: list[tuple[int, str, int, int, int, int]]):
+	for _, b, x0, y0, x1, y1 in lines:
 		svg.write(f'{" " * ind}<polyline points="{x0},{y0} {x1},{y1}" {b} />\n')
 
 
@@ -206,10 +206,7 @@ def makeSvgString(
 	svg.write(f'	<g stroke-width="{fontThickness}" stroke="{fontColour}">\n')
 	x, y = 0, 0
 
-	if drawShadow:
-		shadow = 'stroke-width=".4" stroke="#99eeee"'
-	else:
-		shadow = None
+	shadow = 'stroke-width=".4" stroke="#99eeee"' if drawShadow else None
 
 	for char in ss:
 		x, y = polylines(
@@ -317,7 +314,7 @@ def saveCharsToTable(font: Font):
 	svg.write(">\n")
 
 	svg.write('	<g stroke="#000000">\n')
-	for i in range(0, 16):
+	for i in range(16):
 		b = bytearray("-%x".encode("ascii") % i)
 		x = 5
 		y = (15 - i) * grid + 10
@@ -355,7 +352,8 @@ def saveCharsToTable(font: Font):
 			scy = (grid - 0.0) / (boundingBox[3] - boundingBox[1])
 			sc = min(scx, scy, 1.8)
 			svg.write(
-				f' transform="matrix({sc:.2f},0,0,{sc:.2f},{x - sc * boundingBox[0]},{y - sc * boundingBox[1]})" '
+				f' transform="matrix({sc:.2f},0,0,{sc:.2f},{x - sc * boundingBox[0]},'
+				f'{y - sc * boundingBox[1]})" '
 			)
 			svg.write(" >\n")
 			polylines(svg, 10, font, char)

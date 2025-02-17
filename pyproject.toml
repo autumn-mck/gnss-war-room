@@ -1,5 +1,16 @@
+[tool.codespell]
+ignore-words-list = "siz"
+skip = "*.geojson,*.lock,*.svg,./views/map/*.txt"
+
 [tool.ruff]
 line-length = 100
+lint.select = ["B", "C4", "C90", "E", "F", "ICN", "PERF", "PIE", "PL", "RET", "RUF", "SIM", "W"]
+lint.ignore = ["SIM115", "W191"]
+lint.mccabe.max-complexity = 21
+lint.pylint.allow-magic-value-types = ["float", "int", "str"]
+lint.pylint.max-args = 10  # Default is 5
+lint.pylint.max-branches = 15  # Default is 12
+lint.pylint.max-statements = 72  # Default is 50
 
 [tool.ruff.format]
 indent-style = "tab"

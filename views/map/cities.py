@@ -39,14 +39,12 @@ def filterToPopPercent(
 	""":param citiesInCountry: sorted list of cities in a country"""
 	countryPop = float(countryInfo[7])
 	addedPop = 0
-	addedCount = 0
 
 	filteredCities = []
-	for city in citiesInCountry:
+	for addedCount, city in enumerate(citiesInCountry, 1):
 		filteredCities.append(city)
 
 		addedPop += int(city[14])
-		addedCount += 1
 
 		if addedPop > countryPop * percent and addedCount > minCities:
 			break
@@ -64,7 +62,9 @@ def sortCitiesByPop(citiesInCountry: list[list[str]]):
 
 
 def calcMaxNumCitiesToInclude(countryInfo: list[str]) -> int:
-	"""Calculate the maximum number of cities to include in a country, based on both its population and area"""
+	"""Calculate the maximum number of cities to include in a country, based on both its population
+	and area
+	"""
 	extraCityPerMillion = 0.05
 	extraCityPerThousandKm2 = 0.05
 
@@ -76,11 +76,10 @@ def calcMaxNumCitiesToInclude(countryInfo: list[str]) -> int:
 def readCityInfo() -> dict[str, list[list[str]]]:
 	"""Read the city info from the file and group it by country"""
 	rawCityInfo = readTSV("./views/map/cities15000.txt")
-	cityInfo = {
+	return {
 		country: list(cities)
 		for country, cities in itertools.groupby(rawCityInfo, key=lambda x: x[8])
 	}
-	return cityInfo
 
 
 def findNearestCity(lat: float, long: float, file: str = "./views/map/cities15000.txt"):
@@ -134,8 +133,7 @@ def distBetweenPoints(lat1: float, long1: float, lat2: float, long2: float) -> f
 
 def readCountryInfo() -> dict[str, list[str]]:
 	rawCountryInfo = readTSV("./views/map/countryInfo.txt")
-	countryInfo = {row[0]: row for row in rawCountryInfo}  # key is the country code
-	return countryInfo
+	return {row[0]: row for row in rawCountryInfo}  # key is the country code
 
 
 def readTSV(filename: str) -> list[list[str]]:

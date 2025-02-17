@@ -25,7 +25,7 @@ def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> tupl
 	if not options.hideCities:
 		mapSvg = mapSvg.replace("</svg>", genCitiesGroup(mapSize, options, palette) + "\n</svg>")
 
-	# add comment for where sattelites will go
+	# add comment for where satellites will go
 	mapSvg = mapSvg.replace("</svg>", "\n<!-- satellites go here -->\n</svg>")
 
 	# key (will be hidden later if needed)

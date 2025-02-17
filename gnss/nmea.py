@@ -13,8 +13,8 @@ class GnssData:
 	satellites: list[SatelliteInView] = field(default_factory=list)
 	latitude: float = 0
 	longitude: float = 0
-	date: datetime = datetime.fromtimestamp(0)
-	lastRecordedTime: datetime = datetime.fromtimestamp(0)
+	date: datetime = field(default_factory=lambda: datetime.fromtimestamp(0))
+	lastRecordedTime: datetime = field(default_factory=lambda: datetime.fromtimestamp(0))
 	altitude: float = 0
 	altitudeUnit: str = "M"
 	geoidSeparation: float = 0
@@ -50,25 +50,26 @@ def filterMessagesToType(nmeaMessages: list[NMEAMessage], messageType: str) -> l
 def parseSatelliteInMessage(parsedData: NMEAMessage, updateTime: datetime) -> list[SatelliteInView]:
 	"""Parse a GSV message into a list of SatelliteInView objects"""
 	if parsedData.msgID != "GSV":
-		raise ValueError(f"Expected GSV message, got {parsedData.msgID}")
+		msg = f"Expected GSV message, got {parsedData.msgID}"
+		raise ValueError(msg)
 
 	return [
 		SatelliteInView(
-			prnNumber=getattr(parsedData, f"svid_0{satNum+1}"),
+			prnNumber=getattr(parsedData, f"svid_0{satNum + 1}"),
 			network=parsedData.talker,
-			elevation=tryParseFloat(getattr(parsedData, f"elv_0{satNum+1}")),
-			azimuth=tryParseFloat(getattr(parsedData, f"az_0{satNum+1}")),
-			snr=tryParseFloat(getattr(parsedData, f"cno_0{satNum+1}")),
+			elevation=tryParseFloat(getattr(parsedData, f"elv_0{satNum + 1}")),
+			azimuth=tryParseFloat(getattr(parsedData, f"az_0{satNum + 1}")),
+			snr=tryParseFloat(getattr(parsedData, f"cno_0{satNum + 1}")),
 			lastSeen=updateTime,
 			previousPositions=[
 				(
-					tryParseFloat(getattr(parsedData, f"elv_0{satNum+1}")),
-					tryParseFloat(getattr(parsedData, f"az_0{satNum+1}")),
+					tryParseFloat(getattr(parsedData, f"elv_0{satNum + 1}")),
+					tryParseFloat(getattr(parsedData, f"az_0{satNum + 1}")),
 				)
 			],
 		)
 		for satNum in range(3)
-		if hasattr(parsedData, f"svid_0{satNum+1}")
+		if hasattr(parsedData, f"svid_0{satNum + 1}")
 	]
 
 
