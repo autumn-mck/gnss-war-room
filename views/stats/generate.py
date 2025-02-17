@@ -41,8 +41,8 @@ def generateStats(
 
 	strToDisplay = f"""Lat: {data.latitude:.6f}
 Long: {data.longitude:.6f}
-Date: {data.date.strftime('%Y-%m-%d')}
-Time: {data.date.strftime('%H:%M:%S')}
+Date: {data.date.strftime("%Y-%m-%d")}
+Time: {data.date.strftime("%H:%M:%S")}
 City: {nearestCity}
 Altitude: {data.altitude:.1f}{data.altitudeUnit.lower()}
 Geoid Separation: {data.geoidSeparation:.1f}{data.geoidSeparationUnit.lower()}

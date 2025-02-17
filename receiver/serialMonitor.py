@@ -8,7 +8,8 @@ def getSerialLocation() -> str:
 	"""Get the serial location of the receiver"""
 	serialLocation = "/dev/ttyUSB0"  # default to linux, TODO ACM0
 	if os.name == "nt":
-		serialLocation = "COM4"  # on windows, COM4 is default for my receiver? although the other one defaults to COM3
+		# on windows, COM4 is default for my receiver? although the other one defaults to COM3
+		serialLocation = "COM4"
 	return serialLocation
 
 

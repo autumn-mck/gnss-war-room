@@ -30,6 +30,7 @@ baseMap, keySize = prepareInitialMap(baseMap, PALETTE, mapConfig)
 basePolarGrid = readBasePolarGrid()
 basePolarGrid = prepareIntialPolarGrid(basePolarGrid, PALETTE)
 
+# ruff: noqa: PLW0603
 LATEST_DATA = None
 
 

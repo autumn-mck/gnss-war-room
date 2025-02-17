@@ -39,7 +39,6 @@ def main():
 
 	palette = loadPalette(appConfig.paletteName)
 	windows = []
-	count = 0
 	for windowConfig in appConfig.windows:
 		if isinstance(windowConfig, MapConfig):
 			window = MapWindow(palette, windowConfig)
@@ -56,11 +55,11 @@ def main():
 			window.load(QUrl("http://0.0.0.0:2024/"))
 			window.show()
 		else:
-			raise ValueError(f"Unknown window type: {windowConfig.type}")
+			msg = f"Unknown window type: {windowConfig.type}"
+			raise ValueError(msg)
 		windows.append(window)
 		# if appConfig.multiScreen:
 		# 	handleMultiScreen(screens, window, count)
-		count += 1
 
 	onNewDataCallback = genWindowCallback(windows)
 	createMqttSubscriberClient(appConfig, onNewDataCallback)

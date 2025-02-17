@@ -25,6 +25,4 @@ def addSatellitesToPolarGrid(
 		satelliteStr += f'<circle cx="{x}" cy="{y}" r="2" fill="{colour}" />'
 	satelliteStr += "</g></svg>"
 
-	svgData = svgData.replace("</svg>", satelliteStr)
-
-	return svgData
+	return svgData.replace("</svg>", satelliteStr)

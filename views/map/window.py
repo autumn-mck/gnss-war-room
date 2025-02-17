@@ -55,7 +55,7 @@ class MapWindow(QMainWindow):
 		)
 		mapSvg = self.initialMap.replace("<!-- satellites go here -->", satelliteGroup)
 		self.preFocusMap = mapSvg
-		mapSvg = focusOnPoint(
+		return focusOnPoint(
 			mapSvg,
 			self.windowConfig,
 			Size(self.map.width(), self.map.height()),
@@ -63,7 +63,6 @@ class MapWindow(QMainWindow):
 			self.keyXMult,
 			self.keyYMult,
 		)
-		return mapSvg
 
 	def resizeEvent(self, event: QResizeEvent):
 		"""Resize map when window is resized"""
