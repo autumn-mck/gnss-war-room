@@ -1,10 +1,16 @@
 {
 	paletteName: "warGames",
 	multiScreen: false,
+	satelliteTTL: 3000,
+
 	// mqttHost: "localhost",
 	mqttHost: "gnss-mqtt.mck.is",
 	mqttPort: 1883,
-	satelliteTTL: 3000,
+
+	// On linux it's likely /dev/ttyACM0 or /dev/ttyUSB0
+	// while Windows will be COM[number]
+	gnssSerialPort: "/dev/ttyACM0",
+
 	windows: [
 		{
 			// map of the whole world at once

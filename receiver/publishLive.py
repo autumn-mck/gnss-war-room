@@ -19,7 +19,7 @@ def main():
 	load_dotenv()
 	config = loadConfig()
 	client = createMqttPublisherClient(config)
-	monitorSerial(createPublishCallback(client))
+	monitorSerial(createPublishCallback(client), config.gnssSerialPort)
 
 
 if __name__ == "__main__":
