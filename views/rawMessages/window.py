@@ -13,7 +13,6 @@ from palettes.palette import Palette
 class RawMessageWindow(QMainWindow):
 	"""Window for displaying raw messages"""
 
-	satelliteReceivedEvent = pyqtSignal()
 	textScale = 1.0
 
 	def __init__(self, palette: Palette, config: RawMessageConfig):
@@ -48,8 +47,6 @@ class RawMessageWindow(QMainWindow):
 		self.svg.load(QByteArray(svgStr.encode()))
 		self.svg.setGeometry(0, 0, width, height)
 
-		self.satelliteReceivedEvent.connect(self.updateMessageLog)
-
 		self.setGeometry(0, 0, 500, 500)
 		self.show()
 
@@ -75,8 +72,6 @@ class RawMessageWindow(QMainWindow):
 		)
 		self.messageSvgGroups.insert(0, newGroup)
 		self.messageSvgGroups.pop()
-
-		self.satelliteReceivedEvent.emit()
 
 	def updateMessageLog(self):
 		"""Update the displayed message log"""

@@ -76,13 +76,11 @@ def handleMultiScreen(screens: list, window: QMainWindow, index: int):
 def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData], None]:
 	"""Generate a callback for the windows to handle new data"""
 	lastUpdateTime = datetime.now()
-	lastMessageUpdateTime = datetime.now()
 	lastFinalMessageUpdateTime = datetime.now()
 
 	def updateWindowsOnNewData(rawMessage: bytes, gnssData: GnssData):
 		nonlocal windows
 		nonlocal lastUpdateTime
-		nonlocal lastMessageUpdateTime
 		nonlocal lastFinalMessageUpdateTime
 
 		firstWithTimeMessageID = "RMC"
@@ -96,16 +94,11 @@ def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData],
 		if shouldForceUpdate:
 			lastFinalMessageUpdateTime = datetime.now()
 
-		# limit how often we update the windows, otherwise pyqt mostly freezes
-		timeSinceLastRawMessageUpdate = datetime.now() - lastMessageUpdateTime
-		if timeSinceLastRawMessageUpdate < timedelta(seconds=0.05) and not shouldForceUpdate:
-			return
-
 		for window in windows:
 			if isinstance(window, RawMessageWindow):
 				window.onNewData(rawMessage)
-		lastMessageUpdateTime = datetime.now()
 
+		# limit how often we update the windows, otherwise pyqt mostly freezes
 		timeSinceLastUpdate = datetime.now() - lastUpdateTime
 		if timeSinceLastUpdate < timedelta(seconds=0.2) and not shouldForceUpdate:
 			return
@@ -120,8 +113,7 @@ def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData],
 				case MiscStatsWindow():
 					window.onNewData(gnssData)
 				case RawMessageWindow():
-					# is updated above
-					pass
+					window.updateMessageLog()
 				case SignalGraphWindow():
 					window.onNewData(gnssData)
 				case _:
