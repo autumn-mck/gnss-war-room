@@ -13,6 +13,7 @@
 		"GPS": "#8bd5ca",
 		"GLONASS": "#ed8796",
 		"BeiDou": "#eed49f",
+		"QZSS": "#3950ff",
 		"Unknown": "#f4dbd6"
 	}
 }

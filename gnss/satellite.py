@@ -73,6 +73,8 @@ def networkCodeToName(networkCode: str) -> str:
 			return "GLONASS"
 		case "BD" | "GB":
 			return "BeiDou"
+		case "GQ":
+			return "QZSS"
 		case _:
 			return "Unknown"
 
@@ -85,9 +87,11 @@ def orbitHeightForNetwork(network: str) -> float:
 			return 20.18
 		case "GL":  # GLONASS
 			return 19.13
-		case ("BD" | "GB"):
+		case "BD" | "GB":
 			# BeiDou (todo: there appears to be satellites at a few different orbit heights)
 			return 21.528
+		case "GQ":
+			return 42.164
 		case _:  # something else I need to add
 			print(network)
 			return 21.0  # in the middle-ish
