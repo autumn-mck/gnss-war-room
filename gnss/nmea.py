@@ -55,7 +55,7 @@ def parseSatelliteInMessage(parsedData: NMEAMessage, updateTime: datetime) -> li
 
 	return [
 		SatelliteInView(
-			prnNumber=getattr(parsedData, f"svid_0{satNum + 1}"),
+			prnNumber=getattr(parsedData, f"svid_0{satNum + 1}") or 0,
 			network=parsedData.talker,
 			elevation=tryParseFloat(getattr(parsedData, f"elv_0{satNum + 1}")),
 			azimuth=tryParseFloat(getattr(parsedData, f"az_0{satNum + 1}")),
