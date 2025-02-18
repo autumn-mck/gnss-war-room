@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from PyQt6.QtWidgets import QApplication, QMainWindow
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtCore import QUrl
-from pynmeagps import NMEAReader, NMEAMessage
 
 from misc.config import (
 	SignalChartConfig,
@@ -83,24 +82,13 @@ def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData],
 		nonlocal lastUpdateTime
 		nonlocal lastFinalMessageUpdateTime
 
-		firstWithTimeMessageID = "RMC"
-		timeSinceLastFinalMessageUpdate = datetime.now() - lastFinalMessageUpdateTime
-		msg = NMEAReader.parse(rawMessage)
-		shouldForceUpdate = (
-			isinstance(msg, NMEAMessage)
-			and msg.msgID == firstWithTimeMessageID
-			and timeSinceLastFinalMessageUpdate > timedelta(seconds=0.5)
-		)
-		if shouldForceUpdate:
-			lastFinalMessageUpdateTime = datetime.now()
-
 		for window in windows:
 			if isinstance(window, RawMessageWindow):
 				window.onNewData(rawMessage)
 
 		# limit how often we update the windows, otherwise pyqt mostly freezes
 		timeSinceLastUpdate = datetime.now() - lastUpdateTime
-		if timeSinceLastUpdate < timedelta(seconds=0.2) and not shouldForceUpdate:
+		if timeSinceLastUpdate < timedelta(seconds=0.5):
 			return
 		lastUpdateTime = datetime.now()
 
