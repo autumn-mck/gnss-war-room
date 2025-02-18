@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtCore import QByteArray
+from PyQt6.QtCore import QByteArray, pyqtSignal
 from PyQt6.QtGui import QResizeEvent
 
 from font.hp1345Font import Font
@@ -14,6 +14,7 @@ class RawMessageWindow(QMainWindow):
 	"""Window for displaying raw messages"""
 
 	textScale = 1.0
+	satelliteReceivedEvent = pyqtSignal()
 
 	def __init__(self, palette: Palette, config: RawMessageConfig):
 		super().__init__()
@@ -22,7 +23,7 @@ class RawMessageWindow(QMainWindow):
 		self.customPalette = palette
 		self.config = config
 
-		self.messages = [""] * config.numMessagesToKeep
+		self.satelliteReceivedEvent.connect(self.updateMessageLog)
 		self.messageSvgGroups = [""] * config.numMessagesToKeep
 
 		self.svgFont = Font()
@@ -60,9 +61,6 @@ class RawMessageWindow(QMainWindow):
 
 	def onNewData(self, message: bytes):
 		"""Update the raw message window with new data"""
-		self.messages.insert(0, message.decode("utf-8"))
-		self.messages.pop()
-
 		(newGroup, _, _) = makeTextGroup(
 			self.svgFont,
 			message,

@@ -101,7 +101,7 @@ def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData],
 				case MiscStatsWindow():
 					window.onNewData(gnssData)
 				case RawMessageWindow():
-					window.updateMessageLog()
+					window.satelliteReceivedEvent.emit()
 				case SignalGraphWindow():
 					window.onNewData(gnssData)
 				case _:
