@@ -27,9 +27,9 @@
 			hideKey: false,
 			hideSatelliteTrails: false,
 		},
-		{
-			type: "globe",
-		},
+		// {
+		// 	type: "globe",
+		// },
 		{
 			type: "miscStats",
 			fontThickness: 1.5,
