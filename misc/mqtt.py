@@ -72,7 +72,7 @@ def retryConnect(mqttClient: MqttClient, config: Config, attemptsLeft=5):
 def onConnect(
 	client: MqttClient, _userdata: Any, _flags: ConnectFlags, _rc: int, _properties: Properties
 ):
-	client.subscribe("gnss/rawMessages")
+	client.subscribe("gnss/rawMessages", qos=2)
 	client.loop_start()
 
 
