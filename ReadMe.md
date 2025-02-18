@@ -46,4 +46,10 @@ Map controls:
 
 To run the web frontend: `sh webStart.sh` (will default to port 2024)
 
+## Sending data
+
+To send live data to the system, modify `config.json5` to set `gnssSerialPort` to the correct serial port, and run `python -m receiver.publishLive`.
+
+For prerecorded samples that can be replayed to test the system at any time using `python -m receiver.publishLog`, see https://github.com/autumn-mck/gnss-nmea-samples
+
 ![](./docs/readme-imgs/dataflow.svg)
