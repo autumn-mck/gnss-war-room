@@ -6,6 +6,7 @@ from misc.config import MiscStatsConfig
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
 from gnss.nmea import GnssData
+from misc.size import Size
 from palettes.palette import Palette
 from views.stats.generate import generateStats
 
@@ -14,6 +15,7 @@ class MiscStatsWindow(QMainWindow):
 	"""Window for displaying miscellaneous statistics"""
 
 	satelliteReceivedEvent = pyqtSignal()
+	defaultSize = Size(500, 500)
 
 	def __init__(self, palette: Palette, config: MiscStatsConfig):
 		super().__init__()
@@ -36,7 +38,7 @@ class MiscStatsWindow(QMainWindow):
 		self.svg.load(QByteArray(svgStr.encode()))
 		self.svg.setGeometry(0, 0, width, height)
 
-		self.setGeometry(0, 0, 500, 500)
+		self.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
 		self.show()
 
 	def resizeEvent(self, event: QResizeEvent):

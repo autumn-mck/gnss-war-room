@@ -5,6 +5,7 @@ from PyQt6.QtGui import QResizeEvent
 from misc.config import SignalChartConfig
 from font.hp1345Font import Font
 from gnss.nmea import GnssData
+from misc.size import Size
 from palettes.palette import Palette
 from views.signalGraph.generate import generateBarChart
 
@@ -14,6 +15,7 @@ class SignalGraphWindow(QMainWindow):
 
 	satelliteReceivedEvent = pyqtSignal()
 	textScale = 1.0
+	defaultSize = Size(500, 500)
 
 	def __init__(self, palette: Palette, config: SignalChartConfig):
 		super().__init__()
@@ -26,12 +28,12 @@ class SignalGraphWindow(QMainWindow):
 
 		self.svgFont = Font()
 		self.svg = QSvgWidget(parent=self)
-		self.svg.setGeometry(0, 0, 500, 500)
+		self.svg.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
 		self.updateGraph()
 
 		self.satelliteReceivedEvent.connect(self.updateGraph)
 
-		self.setGeometry(0, 0, 500, 500)
+		self.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
 		self.show()
 
 	def resizeEvent(self, event: QResizeEvent):

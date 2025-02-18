@@ -15,6 +15,7 @@ class RawMessageWindow(QMainWindow):
 
 	textScale = 1.0
 	satelliteReceivedEvent = pyqtSignal()
+	defaultSize = Size(700, 500)
 
 	def __init__(self, palette: Palette, config: RawMessageConfig):
 		super().__init__()
@@ -48,7 +49,7 @@ class RawMessageWindow(QMainWindow):
 		self.svg.load(QByteArray(svgStr.encode()))
 		self.svg.setGeometry(0, 0, width, height)
 
-		self.setGeometry(0, 0, 500, 500)
+		self.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
 		self.show()
 
 	def resizeEvent(self, event: QResizeEvent):
