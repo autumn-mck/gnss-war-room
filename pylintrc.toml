@@ -25,7 +25,6 @@ max-locals = 20     # default of 15 seems too low
 
 [tool.pylint.format]
 indent-string = "\t"
-max-line-length = 120 # default of 100 is too low
 
 [tool.pylint.refactoring]
 max-nested-blocks = 2 # default of 5 is too high
