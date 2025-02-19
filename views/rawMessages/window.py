@@ -1,12 +1,12 @@
-from PyQt6.QtWidgets import QMainWindow
-from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtCore import QByteArray, pyqtSignal
 from PyQt6.QtGui import QResizeEvent
+from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import QMainWindow
 
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString, makeTextGroup
-from misc.size import Size
 from misc.config import RawMessageConfig
+from misc.size import Size
 from palettes.palette import Palette
 
 

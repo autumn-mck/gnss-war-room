@@ -1,8 +1,10 @@
-from datetime import datetime, timedelta
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from typing import Any
+
 import h3
 from pynmeagps import NMEAMessage
+
 from gnss.satellite import SatelliteInView, isSameSatellite
 
 

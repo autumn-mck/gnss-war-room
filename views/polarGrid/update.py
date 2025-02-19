@@ -1,6 +1,7 @@
 import math
-from palettes.palette import Palette
+
 from gnss.satellite import SatelliteInView, colourForNetwork
+from palettes.palette import Palette
 
 
 def azimuthToPolarCoords(azimuth: float, elevation: float, scale: float):

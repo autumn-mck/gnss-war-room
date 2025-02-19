@@ -1,6 +1,7 @@
 from typing import Callable
+
+from pynmeagps import NMEAMessage, NMEAReader
 from serial import Serial
-from pynmeagps import NMEAReader, NMEAMessage
 
 
 def monitorSerial(onMessage: Callable[[bytes, NMEAMessage], None], serialLocation: str):

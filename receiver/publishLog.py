@@ -1,4 +1,5 @@
 from time import sleep
+
 import paho.mqtt.client as mqtt
 from dotenv import load_dotenv
 

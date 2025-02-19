@@ -13,6 +13,7 @@
 # pylint: skip-file
 
 import math
+
 from hp1345Font import Font
 
 

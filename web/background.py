@@ -1,20 +1,20 @@
-import os
-from datetime import datetime
 import json
-import time
+import os
 import threading
+import time
+from datetime import datetime
 
-from misc.mqtt import GnssData, createMqttSubscriberClient
-from misc.config import MiscStatsConfig, loadConfig, MapConfig, SignalChartConfig
-from font.hp1345Font import Font
 from font.fetch import fetchHp1345FilesIfNeeded
+from font.hp1345Font import Font
+from misc.config import MapConfig, MiscStatsConfig, SignalChartConfig, loadConfig
+from misc.mqtt import GnssData, createMqttSubscriberClient
 from palettes.palette import loadPalette
-from views.map.generate import readBaseMap, prepareInitialMap, getMapSize
-from views.map.update import genSatelliteMapGroup, focusOnPoint
-from views.polarGrid.generate import readBasePolarGrid, prepareIntialPolarGrid
+from views.map.generate import getMapSize, prepareInitialMap, readBaseMap
+from views.map.update import focusOnPoint, genSatelliteMapGroup
+from views.polarGrid.generate import prepareIntialPolarGrid, readBasePolarGrid
 from views.polarGrid.update import addSatellitesToPolarGrid
-from views.stats.generate import generateStats
 from views.signalGraph.generate import generateBarChart
+from views.stats.generate import generateStats
 
 mapConfig = MapConfig()
 chartConfig = SignalChartConfig()

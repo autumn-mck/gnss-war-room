@@ -1,6 +1,6 @@
-from datetime import datetime
 import math
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any
 
 from palettes.palette import Palette, loadPalette

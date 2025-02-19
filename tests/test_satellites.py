@@ -1,5 +1,6 @@
 # pylint: skip-file
 from pytest import approx
+
 from gnss.satellite import getSatelliteLatLong
 
 

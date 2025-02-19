@@ -1,9 +1,12 @@
 import time
 from typing import Any
-from matplotlib import pyplot as plt
+
 import paho.mqtt.enums as mqttEnums
-from paho.mqtt.client import Client as MqttClient, MQTTMessage
 from dotenv import load_dotenv
+from matplotlib import pyplot as plt
+from paho.mqtt.client import Client as MqttClient
+from paho.mqtt.client import MQTTMessage
+
 from misc.config import Config, loadConfig
 from misc.mqtt import createMqttPublisherClient
 

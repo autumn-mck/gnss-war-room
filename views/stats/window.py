@@ -1,11 +1,12 @@
-from PyQt6.QtCore import pyqtSignal, QByteArray, QSize
-from PyQt6.QtWidgets import QMainWindow
-from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtCore import QByteArray, QSize, pyqtSignal
 from PyQt6.QtGui import QResizeEvent
-from misc.config import MiscStatsConfig
+from PyQt6.QtSvgWidgets import QSvgWidget
+from PyQt6.QtWidgets import QMainWindow
+
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
 from gnss.nmea import GnssData
+from misc.config import MiscStatsConfig
 from misc.size import Size
 from palettes.palette import Palette
 from views.stats.generate import generateStats

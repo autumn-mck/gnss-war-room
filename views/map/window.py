@@ -1,13 +1,14 @@
-from PyQt6.QtWidgets import QMainWindow
+from PyQt6.QtCore import QByteArray, Qt, pyqtSignal
+from PyQt6.QtGui import QKeyEvent, QResizeEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtCore import Qt, pyqtSignal, QByteArray
-from PyQt6.QtGui import QResizeEvent, QKeyEvent
-from views.map.update import genSatelliteMapGroup, focusOnPoint
-from views.map.generate import readBaseMap, prepareInitialMap
-from misc.size import Size
-from misc.config import MapConfig
+from PyQt6.QtWidgets import QMainWindow
+
 from gnss.satellite import SatelliteInView
+from misc.config import MapConfig
+from misc.size import Size
 from palettes.palette import Palette
+from views.map.generate import prepareInitialMap, readBaseMap
+from views.map.update import focusOnPoint, genSatelliteMapGroup
 
 
 class MapWindow(QMainWindow):

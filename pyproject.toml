@@ -4,18 +4,36 @@ skip = "*.geojson,*.lock,*.svg,./views/map/*.txt"
 
 [tool.ruff]
 line-length = 100
-lint.select = ["B", "C4", "C90", "E", "F", "ICN", "PERF", "PIE", "PL", "RET", "RUF", "SIM", "W"]
+lint.select = [
+	"B",
+	"C4",
+	"C90",
+	"E",
+	"F",
+	"ICN",
+	"PERF",
+	"PIE",
+	"PL",
+	"RET",
+	"RUF",
+	"SIM",
+	"W",
+	"I",
+]
 lint.ignore = ["SIM115", "W191"]
 lint.mccabe.max-complexity = 21
 lint.pylint.allow-magic-value-types = ["float", "int", "str"]
-lint.pylint.max-args = 10  # Default is 5
-lint.pylint.max-branches = 15  # Default is 12
-lint.pylint.max-statements = 72  # Default is 50
+lint.pylint.max-args = 10 # Default is 5
+lint.pylint.max-branches = 15 # Default is 12
+lint.pylint.max-statements = 72 # Default is 50
 
 [tool.ruff.format]
 indent-style = "tab"
 docstring-code-format = true
 skip-magic-trailing-comma = true
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
 
 [tool.pytest.ini_options]
 addopts = ["--import-mode=importlib"]

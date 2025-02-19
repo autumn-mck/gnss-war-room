@@ -1,8 +1,10 @@
-from io import TextIOWrapper
 from datetime import datetime
+from io import TextIOWrapper
+
 from pynmeagps import NMEAMessage
-from receiver.serialMonitor import monitorSerial
+
 from misc.config import loadConfig
+from receiver.serialMonitor import monitorSerial
 
 
 def createWriteCallback(logFile: TextIOWrapper):

@@ -1,6 +1,7 @@
-import urllib.request
 import gzip
+import urllib.request
 from datetime import datetime, timedelta
+
 import h3
 
 

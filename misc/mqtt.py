@@ -1,17 +1,18 @@
-from datetime import timedelta, datetime
 import os
 import time
+from datetime import datetime, timedelta
 from typing import Any, Callable
 
 import paho.mqtt.enums as mqttEnums
-from paho.mqtt.client import Client as MqttClient, MQTTMessage, DisconnectFlags, ConnectFlags
-from paho.mqtt.reasoncodes import ReasonCode
+from paho.mqtt.client import Client as MqttClient
+from paho.mqtt.client import ConnectFlags, DisconnectFlags, MQTTMessage
 from paho.mqtt.properties import Properties
-from pynmeagps import NMEAReader, NMEAMessage
+from paho.mqtt.reasoncodes import ReasonCode
+from pynmeagps import NMEAMessage, NMEAReader
 
-from misc.config import Config
-from misc.scrape import tryLoadCachedGpsJam, gpsCsvToDict
 from gnss.nmea import GnssData, updateGnssDataWithMessage
+from misc.config import Config
+from misc.scrape import gpsCsvToDict, tryLoadCachedGpsJam
 
 
 def createMqttSubscriberClient(

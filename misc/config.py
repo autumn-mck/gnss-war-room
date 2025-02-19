@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 import pyjson5
 from dataclass_wizard import JSONWizard
 

@@ -1,9 +1,9 @@
-from misc.config import MiscStatsConfig
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
-from views.map.cities import findNearestCityWithCache
 from gnss.nmea import GnssData
+from misc.config import MiscStatsConfig
 from palettes.palette import Palette
+from views.map.cities import findNearestCityWithCache
 
 
 def classifyDOP(dop: float) -> str:

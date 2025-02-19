@@ -13,6 +13,7 @@
 
 import io
 from io import TextIOWrapper
+
 from font.hp1345Font import Font
 
 

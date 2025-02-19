@@ -1,6 +1,6 @@
 from gnss.satellite import SatelliteInView, colourForNetwork, getSatelliteLatLong
-from misc.size import Size
 from misc.config import MapConfig
+from misc.size import Size
 from palettes.palette import Palette
 from views.map.gallStereographic import latLongToGallStereographic
 from views.map.generate import getMapSize

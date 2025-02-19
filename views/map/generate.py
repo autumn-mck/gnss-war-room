@@ -1,10 +1,10 @@
-from misc.size import Size
+from font.hp1345Font import Font
+from font.mksvgs import makeTextGroup
 from misc.config import MapConfig
+from misc.size import Size
 from palettes.palette import Palette
 from views.map.cities import getCities
 from views.map.gallStereographic import latLongToGallStereographic
-from font.hp1345Font import Font
-from font.mksvgs import makeTextGroup
 
 
 def readBaseMap() -> str:
