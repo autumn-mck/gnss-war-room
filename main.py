@@ -35,10 +35,11 @@ def main():
 	app = QApplication(sys.argv)
 
 	appConfig = loadConfig()
-
 	palette = loadPalette(appConfig.paletteName)
+
+	screens = app.screens()
 	windows = []
-	for windowConfig in appConfig.windows:
+	for index, windowConfig in enumerate(appConfig.windows):
 		if isinstance(windowConfig, MapConfig):
 			window = MapWindow(palette, windowConfig)
 		elif isinstance(windowConfig, PolalGridConfig):
@@ -56,20 +57,20 @@ def main():
 		else:
 			msg = f"Unknown window type: {windowConfig.type}"
 			raise ValueError(msg)
+
+		if appConfig.warRoom:
+			screen = screens[index % len(screens)]
+			screenGeometry = screen.geometry()
+			window.setScreen(screen)
+			window.move(screenGeometry.topLeft())
+			window.resize(screenGeometry.size())
+			window.showFullScreen()
+
 		windows.append(window)
-		# if appConfig.multiScreen:
-		# 	handleMultiScreen(screens, window, count)
 
 	onNewDataCallback = genWindowCallback(windows)
 	createMqttSubscriberClient(appConfig, onNewDataCallback)
 	app.exec()  # blocks until the app is closed
-
-
-def handleMultiScreen(screens: list, window: QMainWindow, index: int):
-	"""Handle multi-screen setup"""
-	screen = screens[index]
-	qr = screen.geometry()
-	window.move(qr.left(), qr.top())
 
 
 def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData], None]:

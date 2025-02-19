@@ -2,6 +2,7 @@
 	paletteName: "warGames",
 	multiScreen: false,
 	satelliteTTL: 3000,
+	warRoom: false,
 
 	// mqttHost: "localhost",
 	mqttHost: "gnss-mqtt.mck.is",

@@ -89,6 +89,7 @@ class Config(JSONWizard):
 	mqttPort: int
 	satelliteTTL: int
 	gnssSerialPort: str
+	warRoom: bool
 	windows: list[
 		MapConfig
 		| PolalGridConfig
