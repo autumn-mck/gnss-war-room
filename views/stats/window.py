@@ -1,4 +1,4 @@
-from PyQt6.QtCore import pyqtSignal, QByteArray
+from PyQt6.QtCore import pyqtSignal, QByteArray, QSize
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtGui import QResizeEvent
@@ -43,8 +43,11 @@ class MiscStatsWindow(QMainWindow):
 
 	def resizeEvent(self, event: QResizeEvent):
 		"""Resize the text to always fit the window"""
-		newWidth = event.size().width()
-		newHeight = event.size().height()
+		self.resizeSvg(event.size())
+
+	def resizeSvg(self, size: QSize):
+		newWidth = size.width()
+		newHeight = size.height()
 		oldWidth = self.svg.width()
 		oldHeight = self.svg.height()
 
@@ -77,3 +80,5 @@ class MiscStatsWindow(QMainWindow):
 
 		self.svg.load(QByteArray(svgStr.encode()))
 		self.svg.setGeometry(0, 0, int(width), int(height))
+
+		self.resizeSvg(self.size())
