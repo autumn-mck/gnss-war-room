@@ -1,6 +1,5 @@
 [tool.codespell]
-ignore-words-list = "siz"
-skip = "*.geojson,*.lock,*.svg,./views/map/*.txt"
+skip = "*.geojson,*.nmea,*.tsv,*.lock,*.svg,./views/map/*.txt,dist,node_modules"
 
 [tool.ruff]
 line-length = 100
