@@ -1,17 +1,17 @@
 {
 	"$schema": "./schema.json",
-	"background": "#eff1f5",
+	"background": "#dce0e8",
 	"foreground": "#4c4f69",
 	"continentsBorder": "#40a02b",
 	"admin0Border": "#4c4f69",
 	"cities": "#4c4f69",
 	"polarGrid": "#6c6f85",
 	"satelliteNetworks": {
-		"Galileo": "#1e66f5",
-		"GPS": "#179299",
+		"Galileo": "#8839ef",
+		"GPS": "#209fb5",
 		"GLONASS": "#d20f39",
 		"BeiDou": "#df8e1d",
-		"QZSS": "#3950ff",
+		"QZSS": "#179299",
 		"Unknown": "#dc8a78"
 	}
 }
