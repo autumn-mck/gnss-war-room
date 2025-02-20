@@ -45,17 +45,7 @@ class SatelliteInView:
 		}
 
 
-def groupSatellitesByPrn(satellites: list[SatelliteInView]) -> dict[int, list[SatelliteInView]]:
-	"""Group satellites by PRN number"""
-	satellitesByPrn = {}
-	for satellite in satellites:
-		if satellite.prnNumber not in satellitesByPrn:
-			satellitesByPrn[satellite.prnNumber] = []
-		satellitesByPrn[satellite.prnNumber].append(satellite)
-	return satellitesByPrn
-
-
-def colourForNetwork(network: str, palette: Palette = None) -> str:
+def colourForNetwork(network: str, palette: Palette | None = None) -> str:
 	palette = palette or loadPalette()
 	networkName = networkCodeToName(network)
 	if networkName in palette.satelliteNetworks:
