@@ -84,7 +84,7 @@ class RawMessageWindow(QMainWindow):
 			</g>"""
 			svgToDisplay += strToAdd
 
-		charsWide = 75
+		charsWide = 80
 		totalWidth = charsWide * self.charSize.width
 
 		newWidth = self.svg.width()
