@@ -8,9 +8,10 @@ from PyQt6.QtCore import QUrl
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QApplication, QMainWindow
 
-from font.fetch import fetchHp1345FilesIfNeeded
+from font.fetch import fetchFontRomsIfNeeded
 from gnss.nmea import GnssData
 from misc.config import (
+	Config,
 	GlobeConfig,
 	MapConfig,
 	MiscStatsConfig,
@@ -19,8 +20,8 @@ from misc.config import (
 	SignalChartConfig,
 	loadConfig,
 )
-from misc.mqtt import createMqttSubscriberClient
-from palettes.palette import loadPalette
+from misc.mqtt import createMqttSubscriber
+from palettes.palette import Palette, loadPalette
 from views.map.window import MapWindow
 from views.polarGrid.window import PolarGridWindow
 from views.rawMessages.window import RawMessageWindow
@@ -30,68 +31,77 @@ from views.stats.window import MiscStatsWindow
 
 def main():
 	"""Main function"""
-	fetchHp1345FilesIfNeeded()
+	fetchFontRomsIfNeeded()
 
 	app = QApplication(sys.argv)
-
 	appConfig = loadConfig()
 	palette = loadPalette(appConfig.paletteName)
+	windows = createWindows(appConfig, palette)
 
-	screens = app.screens()
-	windows = []
-	for index, windowConfig in enumerate(appConfig.windows):
-		if isinstance(windowConfig, MapConfig):
-			window = MapWindow(palette, windowConfig)
-		elif isinstance(windowConfig, PolalGridConfig):
-			window = PolarGridWindow(palette)
-		elif isinstance(windowConfig, MiscStatsConfig):
-			window = MiscStatsWindow(palette, windowConfig)
-		elif isinstance(windowConfig, RawMessageConfig):
-			window = RawMessageWindow(palette, windowConfig)
-		elif isinstance(windowConfig, SignalChartConfig):
-			window = SignalGraphWindow(palette, windowConfig)
-		elif isinstance(windowConfig, GlobeConfig):
-			window = QWebEngineView()
-			window.load(QUrl("http://0.0.0.0:2024/"))
-			window.show()
-		else:
-			msg = f"Unknown window type: {windowConfig.type}"
-			raise ValueError(msg)
+	if appConfig.warRoom:
+		fullscreenWindowsOnAllScreens(app, windows)
 
-		if appConfig.warRoom:
-			screen = screens[index % len(screens)]
-			screenGeometry = screen.geometry()
-			window.setScreen(screen)
-			window.move(screenGeometry.topLeft())
-			window.resize(screenGeometry.size())
-			window.showFullScreen()
-
-		windows.append(window)
-
-	onNewDataCallback = genWindowCallback(windows)
-	createMqttSubscriberClient(appConfig, onNewDataCallback)
+	onNewData = updateWindows(windows)
+	createMqttSubscriber(appConfig, onNewData)
 	app.exec()  # blocks until the app is closed
 
 
-def genWindowCallback(windows: list[QMainWindow]) -> Callable[[bytes, GnssData], None]:
+def fullscreenWindowsOnAllScreens(app: QApplication, windows: list[QMainWindow]):
+	"""Make all the windows fullscreen on all available screens"""
+	screens = app.screens()
+	for index, window in enumerate(windows):
+		screen = screens[index % len(screens)]
+		screenGeometry = screen.geometry()
+		window.setScreen(screen)
+		window.move(screenGeometry.topLeft())
+		window.resize(screenGeometry.size())
+		window.showFullScreen()
+
+
+def createWindows(appConfig: Config, palette: Palette):
+	"""Create the windows from the given config"""
+	windows: list[QMainWindow] = []
+	for windowConfig in appConfig.windows:
+		match windowConfig:
+			case MapConfig():
+				window = MapWindow(palette, windowConfig)
+			case PolalGridConfig():
+				window = PolarGridWindow(palette)
+			case MiscStatsConfig():
+				window = MiscStatsWindow(palette, windowConfig)
+			case RawMessageConfig():
+				window = RawMessageWindow(palette, windowConfig)
+			case SignalChartConfig():
+				window = SignalGraphWindow(palette, windowConfig)
+			case GlobeConfig():
+				window = QWebEngineView()
+				window.load(QUrl("http://0.0.0.0:2024/"))
+				window.show()
+			case _:
+				msg = f"Unknown window type: {windowConfig.type}"
+				raise ValueError(msg)
+
+		windows.append(window)
+	return windows
+
+
+def updateWindows(windows: list[QMainWindow]) -> Callable[[bytes, GnssData], None]:
 	"""Generate a callback for the windows to handle new data"""
-	lastUpdateTime = datetime.now()
-	lastFinalMessageUpdateTime = datetime.now()
+	lastUpdatedAt = datetime.now()
 
 	def updateWindowsOnNewData(rawMessage: bytes, gnssData: GnssData):
 		nonlocal windows
-		nonlocal lastUpdateTime
-		nonlocal lastFinalMessageUpdateTime
+		nonlocal lastUpdatedAt
 
 		for window in windows:
 			if isinstance(window, RawMessageWindow):
 				window.onNewData(rawMessage)
 
 		# limit how often we update the windows, otherwise pyqt mostly freezes
-		timeSinceLastUpdate = datetime.now() - lastUpdateTime
+		timeSinceLastUpdate = datetime.now() - lastUpdatedAt
 		if timeSinceLastUpdate < timedelta(seconds=0.5):
 			return
-		lastUpdateTime = datetime.now()
+		lastUpdatedAt = datetime.now()
 
 		for window in windows:
 			match window:

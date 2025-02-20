@@ -15,17 +15,17 @@ from misc.config import Config
 from misc.scrape import gpsCsvToDict, tryLoadCachedGpsJam
 
 
-def createMqttSubscriberClient(
-	config: Config, onNewDataCallback: Callable[[bytes, GnssData], None]
+def createMqttSubscriber(
+	config: Config, onNewData: Callable[[bytes, GnssData], None]
 ) -> MqttClient:
 	"""Create the subscriber MQTT client"""
 	mqttClient = MqttClient(mqttEnums.CallbackAPIVersion.VERSION2)
-	mqttClient.on_message = createSubscriberCallback(
-		onNewDataCallback, timedelta(seconds=int(config.satelliteTTL))
+	mqttClient.on_message = callbaackOnMessage(
+		onNewData, timedelta(seconds=int(config.satelliteTTL))
 	)
 
-	mqttClient.on_disconnect = onDisconnect
-	mqttClient.on_connect = onConnect
+	mqttClient.on_disconnect = reconnectOnDisconnect
+	mqttClient.on_connect = subscribeOnConnect
 
 	try:
 		mqttClient.connect(config.mqttHost, config.mqttPort)
@@ -36,15 +36,14 @@ def createMqttSubscriberClient(
 	return mqttClient
 
 
-def createMqttPublisherClient(config: Config) -> MqttClient:
+def createMqttPublisher(config: Config) -> MqttClient:
 	"""Create the publisher MQTT client"""
 	mqttClient = MqttClient(mqttEnums.CallbackAPIVersion.VERSION2, client_id="publisher")
 
 	if publisherPassword := os.environ.get("GNSS_PUBLISHER_PASSWORD"):
 		mqttClient.username_pw_set("gnssreceiver", publisherPassword)
 
-	mqttClient.on_disconnect = onDisconnect
-	mqttClient.on_connect = onConnect
+	mqttClient.on_disconnect = reconnectOnDisconnect
 
 	try:
 		mqttClient.connect(config.mqttHost, config.mqttPort)
@@ -70,14 +69,14 @@ def retryConnect(mqttClient: MqttClient, config: Config, attemptsLeft=5):
 		retryConnect(mqttClient, config, attemptsLeft - 1)
 
 
-def onConnect(
+def subscribeOnConnect(
 	client: MqttClient, _userdata: Any, _flags: ConnectFlags, _rc: int, _properties: Properties
 ):
 	client.subscribe("gnss/rawMessages", qos=2)
 	client.loop_start()
 
 
-def onDisconnect(
+def reconnectOnDisconnect(
 	client: MqttClient,
 	_userdata: Any,
 	_disconnectFlags: DisconnectFlags,
@@ -88,10 +87,10 @@ def onDisconnect(
 	work
 	"""
 	print("Disconnected from MQTT broker. Don't Panic!")
-	tryReconnect(client)
+	tryReconnectAfterDisconnect(client)
 
 
-def tryReconnect(mqttClient: MqttClient, attemptNum=1):
+def tryReconnectAfterDisconnect(mqttClient: MqttClient, attemptNum=1):
 	"""Attempt to reconnect to the MQTT broker if it disconnects"""
 	time.sleep(1)
 	print(f"Reconnecting to MQTT broker, attempt {attemptNum}")
@@ -99,29 +98,31 @@ def tryReconnect(mqttClient: MqttClient, attemptNum=1):
 		mqttClient.reconnect()
 		print("Reconnected to MQTT broker!")
 	except ConnectionRefusedError:
-		tryReconnect(mqttClient, attemptNum + 1)
+		tryReconnectAfterDisconnect(mqttClient, attemptNum + 1)
 
 
-def createSubscriberCallback(
-	onNewDataCallback: Callable[[bytes, GnssData], None], satelliteTTL: timedelta
+def callbaackOnMessage(
+	onNewData: Callable[[bytes, GnssData], None], satelliteTTL: timedelta
 ) -> Callable[[MqttClient, Any, MQTTMessage], None]:
 	"""Create a callback for the MQTT subscriber client to handle incoming messages"""
 	gnssData = GnssData()
-	h3Dict: dict[str, tuple[int, int]] = {}
+	gpsJamData: dict[str, tuple[int, int]] = {}
 
 	def onMessage(_client: MqttClient, _userdata: Any, message: MQTTMessage):
 		nonlocal gnssData
-		nonlocal h3Dict
-		nonlocal onNewDataCallback
+		nonlocal gpsJamData
+		nonlocal onNewData
+
 		parsedMessage = NMEAReader.parse(message.payload)
 		if not isinstance(parsedMessage, NMEAMessage):
 			return
-		gnssData = updateGnssDataWithMessage(gnssData, parsedMessage, satelliteTTL, h3Dict)
+		gnssData = updateGnssDataWithMessage(gnssData, parsedMessage, satelliteTTL, gpsJamData)
 
-		if not h3Dict and gnssData.date > datetime.fromisoformat("2022-02-15"):
+		gpsJamStartDate = datetime.fromisoformat("2022-02-15")
+		if not gpsJamData and gnssData.date > gpsJamStartDate:
 			csv = tryLoadCachedGpsJam(gnssData.date)
-			h3Dict = gpsCsvToDict(csv)
+			gpsJamData = gpsCsvToDict(csv)
 
-		onNewDataCallback(message.payload, gnssData)
+		onNewData(message.payload, gnssData)
 
 	return onMessage

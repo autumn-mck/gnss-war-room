@@ -21,6 +21,7 @@ class MiscStatsWindow(QMainWindow):
 	def __init__(self, palette: Palette, config: MiscStatsConfig):
 		super().__init__()
 		self.setWindowTitle("Misc Stats")
+		self.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
 		self.customPalette = palette
 		self.config = config
@@ -39,7 +40,6 @@ class MiscStatsWindow(QMainWindow):
 		self.svg.load(QByteArray(svgStr.encode()))
 		self.svg.setGeometry(0, 0, width, height)
 
-		self.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
 		self.show()
 
 	def resizeEvent(self, event: QResizeEvent):
@@ -47,6 +47,7 @@ class MiscStatsWindow(QMainWindow):
 		self.resizeSvg(event.size())
 
 	def resizeSvg(self, size: QSize):
+		"""Resize the SVG to always fit within the window"""
 		newWidth = size.width()
 		newHeight = size.height()
 		oldWidth = self.svg.width()

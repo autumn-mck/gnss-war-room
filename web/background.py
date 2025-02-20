@@ -4,10 +4,10 @@ import threading
 import time
 from datetime import datetime
 
-from font.fetch import fetchHp1345FilesIfNeeded
+from font.fetch import fetchFontRomsIfNeeded
 from font.hp1345Font import Font
 from misc.config import MapConfig, MiscStatsConfig, SignalChartConfig, loadConfig
-from misc.mqtt import GnssData, createMqttSubscriberClient
+from misc.mqtt import GnssData, createMqttSubscriber
 from palettes.palette import loadPalette
 from views.map.generate import getMapSize, prepareInitialMap, readBaseMap
 from views.map.update import focusOnPoint, genSatelliteMapGroup
@@ -106,8 +106,9 @@ def genOnNewDataCallback():
 
 
 def main():
-	fetchHp1345FilesIfNeeded()
-	createMqttSubscriberClient(CONFIG, genOnNewDataCallback())
+	"""Update the generated SVGs/JSON files for the web app"""
+	fetchFontRomsIfNeeded()
+	createMqttSubscriber(CONFIG, genOnNewDataCallback())
 
 	if not os.path.exists("./web/generated"):
 		os.makedirs("./web/generated")

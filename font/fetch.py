@@ -2,7 +2,7 @@ import os
 import urllib.request
 
 
-def fetchHp1345FilesIfNeeded():
+def fetchFontRomsIfNeeded():
 	"""Download the HP1345A font files if they don't exist"""
 	if os.path.isfile("./font/01347-80012.bin"):
 		return

@@ -8,14 +8,14 @@ from paho.mqtt.client import Client as MqttClient
 from paho.mqtt.client import MQTTMessage
 
 from misc.config import Config, loadConfig
-from misc.mqtt import createMqttPublisherClient
+from misc.mqtt import createMqttPublisher
 
 
 def main():
 	"""Send numerous messages to the MQTT broker and measure how long each of these 'ping's takes"""
 	load_dotenv()
 	config = loadConfig()
-	publisher = createMqttPublisherClient(config)
+	publisher = createMqttPublisher(config)
 	subscriber = createMqttClient(config)
 
 	times: list[float] = []

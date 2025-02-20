@@ -45,10 +45,6 @@ class GnssData:
 		}
 
 
-def filterMessagesToType(nmeaMessages: list[NMEAMessage], messageType: str) -> list[NMEAMessage]:
-	return [parsedData for parsedData in nmeaMessages if parsedData.msgID == messageType]
-
-
 def parseSatelliteInMessage(parsedData: NMEAMessage, updateTime: datetime) -> list[SatelliteInView]:
 	"""Parse a GSV message into a list of SatelliteInView objects"""
 	if parsedData.msgID != "GSV":
@@ -89,7 +85,7 @@ def updateGnssDataWithMessage(
 	gnssData: GnssData,
 	message: NMEAMessage,
 	satelliteTTL: timedelta,
-	h3Dict: dict[str, tuple[int, int]],
+	gpsJamData: dict[str, tuple[int, int]],
 ):
 	"""Update the gnss data with the new data from a message"""
 	# no clue what's up with the typing here, it's fine though so ignore
@@ -98,6 +94,7 @@ def updateGnssDataWithMessage(
 			gnssData.satellites = updateSatellitePositions(
 				gnssData.satellites, message, gnssData.date, satelliteTTL
 			)
+
 			if gnssData.date - gnssData.lastRecordedTime > timedelta(seconds=1200):
 				gnssData.lastRecordedTime = gnssData.date
 				gnssData.satellites = updateSaltellitePreviousPositions(gnssData.satellites)
@@ -110,10 +107,10 @@ def updateGnssDataWithMessage(
 			gnssData.longitude = message.lon
 			gnssData.date = datetime.combine(message.date, message.time)  # type: ignore
 
-			if h3Dict:
+			if gpsJamData:
 				h3Cell = h3.latlng_to_cell(message.lat, message.lon, 4)
-				if h3Cell in h3Dict:
-					countGood, countBad = h3Dict[h3Cell]
+				if h3Cell in gpsJamData:
+					countGood, countBad = gpsJamData[h3Cell]
 					gnssData.interference = countBad / (countGood + countBad) * 100
 		case "GGA":
 			gnssData.latitude = message.lat
@@ -125,7 +122,7 @@ def updateGnssDataWithMessage(
 			gnssData.hdop = message.HDOP  # type: ignore
 			gnssData.fixQuality = message.quality  # type: ignore
 		case "VTG":
-			# seems useless
+			# not useful for this project, ignore
 			pass
 		case "GSA":
 			gnssData.pdop = message.PDOP  # type: ignore
