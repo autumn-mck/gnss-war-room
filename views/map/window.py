@@ -87,7 +87,6 @@ class MapWindow(QMainWindow):
 		self.windowConfig.focusLat += lat
 		self.windowConfig.focusLong += long
 
-	# key bindings
 	def keyPressEvent(self, event: QKeyEvent):
 		"""Handle keybinds"""
 		self.handleMoveMapKeys(event)
@@ -108,6 +107,9 @@ class MapWindow(QMainWindow):
 		if event.key() == Qt.Key.Key_C:
 			self.windowConfig.hideCities = not self.windowConfig.hideCities
 			self.resetMapOnScale()
+
+		if event.key() == Qt.Key.Key_F:
+			self.setWindowState(self.windowState() ^ Qt.WindowState.WindowFullScreen)
 
 		mapSvg = focusOnPoint(
 			self.preFocusMap,

@@ -1,5 +1,5 @@
-from PyQt6.QtCore import QByteArray, QSize, pyqtSignal
-from PyQt6.QtGui import QResizeEvent
+from PyQt6.QtCore import QByteArray, QSize, Qt, pyqtSignal
+from PyQt6.QtGui import QKeyEvent, QResizeEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QMainWindow
 
@@ -41,6 +41,10 @@ class MiscStatsWindow(QMainWindow):
 		self.svg.setGeometry(0, 0, width, height)
 
 		self.show()
+
+	def keyPressEvent(self, event: QKeyEvent):
+		if event.key() == Qt.Key.Key_F:
+			self.setWindowState(self.windowState() ^ Qt.WindowState.WindowFullScreen)
 
 	def resizeEvent(self, event: QResizeEvent):
 		"""Resize the text to always fit the window"""

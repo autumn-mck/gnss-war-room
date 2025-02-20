@@ -1,5 +1,5 @@
-from PyQt6.QtCore import QByteArray, pyqtSignal
-from PyQt6.QtGui import QResizeEvent
+from PyQt6.QtCore import QByteArray, Qt, pyqtSignal
+from PyQt6.QtGui import QKeyEvent, QResizeEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QMainWindow
 
@@ -42,6 +42,10 @@ class SignalGraphWindow(QMainWindow):
 		newHeight = event.size().height()
 		self.updateGraph()
 		self.svg.setGeometry(0, 0, newWidth, newHeight)
+
+	def keyPressEvent(self, event: QKeyEvent):
+		if event.key() == Qt.Key.Key_F:
+			self.setWindowState(self.windowState() ^ Qt.WindowState.WindowFullScreen)
 
 	def onNewData(self, gnssData: GnssData):
 		self.latestData = gnssData

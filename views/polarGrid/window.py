@@ -1,5 +1,5 @@
-from PyQt6.QtCore import QByteArray, pyqtSignal
-from PyQt6.QtGui import QResizeEvent
+from PyQt6.QtCore import QByteArray, Qt, pyqtSignal
+from PyQt6.QtGui import QKeyEvent, QResizeEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QMainWindow
 
@@ -53,6 +53,10 @@ class PolarGridWindow(QMainWindow):
 		self.polarGrid.setGeometry(
 			int((newX - minSize) / 2), int((newY - minSize) / 2), minSize, minSize
 		)
+
+	def keyPressEvent(self, event: QKeyEvent):
+		if event.key() == Qt.Key.Key_F:
+			self.setWindowState(self.windowState() ^ Qt.WindowState.WindowFullScreen)
 
 	def onNewData(self, satellites: list[SatelliteInView]):
 		self.latestSatellites = satellites
