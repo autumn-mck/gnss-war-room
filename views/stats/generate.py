@@ -39,16 +39,25 @@ def generateStats(
 	"""Generate an SVG of stats for the given data"""
 	nearestCity = findNearestCityWithCache(data.latitude, data.longitude)
 
-	strToDisplay = f"""Lat: {data.latitude:.8f}{chr(0x1a)}
+	strToDisplay = f"""{chr(0x7f)} Location
+Lat: {data.latitude:.8f}{chr(0x1a)}
 Long: {data.longitude:.8f}{chr(0x1a)}
-Date: {data.date.strftime("%Y-%m-%d")}
-Time: {data.date.strftime("%H:%M:%S")}
 City: {nearestCity}
-Altitude: {data.altitude:.1f}{data.altitudeUnit.lower()}
-Geoid Separation: {data.geoidSeparation:.1f}{data.geoidSeparationUnit.lower()}
+
+{chr(0x7f)} DOP
 PDOP: {data.pdop:.2f} ({classifyDOP(data.pdop)})
 HDOP: {data.hdop:.2f} ({classifyDOP(data.hdop)})
 VDOP: {data.vdop:.2f} ({classifyDOP(data.vdop)})
+
+{chr(0x7f)} Time
+Time: {data.date.strftime("%H:%M:%S")}
+Date: {data.date.strftime("%Y-%m-%d")}
+
+{chr(0x7f)} Altitude
+Altitude: {data.altitude:.1f}{data.altitudeUnit.lower()}
+Geoid: {data.geoidSeparation:.1f}{data.geoidSeparationUnit.lower()}
+
+{chr(0x7f)} Stability
 Interference: {data.interference:.2f}%
 Fix Quality: {data.fixQuality} ({classifyFixQuality(data.fixQuality)})"""
 	strToDisplay = "\n\r".join(strToDisplay.split("\n"))
