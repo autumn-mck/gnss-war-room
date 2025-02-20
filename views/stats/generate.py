@@ -1,3 +1,5 @@
+from itertools import zip_longest
+
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
 from gnss.nmea import GnssData
@@ -33,24 +35,61 @@ def classifyFixQuality(fixQuality: int) -> str:
 	return "Unknown"
 
 
+def combineWithPadding(left: list[str], right: list[str], padToWidth: int) -> list[str]:
+	output = []
+	for leftLine, rightLine in zip_longest(left, right, fillvalue=""):
+		paddedLeftLine = leftLine.ljust(padToWidth)
+		output.append(f"{paddedLeftLine}{rightLine}")
+	return output
+
+
 def generateStats(
 	data: GnssData, palette: Palette, font: Font, config: MiscStatsConfig
 ) -> tuple[str, int, int]:
 	"""Generate an SVG of stats for the given data"""
 	nearestCity = findNearestCityWithCache(data.latitude, data.longitude)
 
-	strToDisplay = f"""{chr(0x7f)} Location             {chr(0x7f)} DOP
-Lat: {data.latitude:.8f}{chr(0x1a)}      PDOP: {data.pdop:.2f} ({classifyDOP(data.pdop)})
-Long: {data.longitude:.8f}{chr(0x1a)}     HDOP: {data.hdop:.2f} ({classifyDOP(data.hdop)})
-City: {nearestCity}          VDOP: {data.vdop:.2f} ({classifyDOP(data.vdop)})
+	location = [
+		f"{chr(0x7f)} Location",
+		f"Lat: {data.latitude:.8f}{chr(0x1a)}",
+		f"Long: {data.longitude:.8f}{chr(0x1a)}",
+		f"City: {nearestCity}",
+	]
 
-{chr(0x7f)} Time                 {chr(0x7f)} Altitude
-Time: {data.date.strftime("%H:%M:%S")}         Altitude: {data.altitude:.1f}{data.altitudeUnit.lower()}
-Date: {data.date.strftime("%Y-%m-%d")}       Geoid: {data.geoidSeparation:.1f}{data.geoidSeparationUnit.lower()}
+	time = [
+		f"{chr(0x7f)} Time",
+		f"Time: {data.date.strftime("%H:%M:%S")}",
+		f"Date: {data.date.strftime("%Y-%m-%d")}",
+	]
 
-{chr(0x7f)} Stability
-Interference: {data.interference:.2f}%
-Fix Quality: {data.fixQuality} ({classifyFixQuality(data.fixQuality)})"""
+	stability = [
+		f"{chr(0x7f)} Stability",
+		f"Interference: {data.interference:.2f}%",
+		f"Fix Quality: {data.fixQuality} ({classifyFixQuality(data.fixQuality)})",
+	]
+
+	dop = [
+		f"{chr(0x7f)} DOP",
+		f"PDOP: {data.pdop:.2f} ({classifyDOP(data.pdop)})",
+		f"HDOP: {data.hdop:.2f} ({classifyDOP(data.hdop)})",
+		f"VDOP: {data.vdop:.2f} ({classifyDOP(data.vdop)})",
+	]
+
+	altitude = [
+		f"{chr(0x7f)} Altitude",
+		f"Altitude: {data.altitude:.1f}{data.altitudeUnit.lower()}",
+		f"Geoid: {data.geoidSeparation:.1f}{data.geoidSeparationUnit.lower()}",
+	]
+
+	padTo = 22
+	locDop = combineWithPadding(location, dop, padTo)
+	timeAlt = combineWithPadding(time, altitude, padTo)
+
+	strToDisplay = f"""{"\n".join(locDop)}
+
+{"\n".join(timeAlt)}
+
+{"\n".join(stability)}"""
 	strToDisplay = "\n\r".join(strToDisplay.split("\n"))
 
 	(svgStr, width, height) = makeSvgString(
