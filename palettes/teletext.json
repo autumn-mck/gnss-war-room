@@ -1,0 +1,17 @@
+{
+	"$schema": "./schema.json",
+	"background": "#000",
+	"foreground": "#FFF",
+	"continentsBorder": "#0F0",
+	"admin0Border": "#FFF",
+	"cities": "#FFF",
+	"polarGrid": "#FFF",
+	"satelliteNetworks": {
+		"Galileo": "#F0F",
+		"GPS": "#0FF",
+		"GLONASS": "#F00",
+		"BeiDou": "#FF0",
+		"QZSS": "#00F",
+		"Unknown": "#FFF"
+	}
+}
