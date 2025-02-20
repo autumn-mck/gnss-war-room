@@ -39,8 +39,8 @@ def generateStats(
 	"""Generate an SVG of stats for the given data"""
 	nearestCity = findNearestCityWithCache(data.latitude, data.longitude)
 
-	strToDisplay = f"""Lat: {data.latitude:.8f}
-Long: {data.longitude:.8f}
+	strToDisplay = f"""Lat: {data.latitude:.8f}{chr(0x1a)}
+Long: {data.longitude:.8f}{chr(0x1a)}
 Date: {data.date.strftime("%Y-%m-%d")}
 Time: {data.date.strftime("%H:%M:%S")}
 City: {nearestCity}
