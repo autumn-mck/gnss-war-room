@@ -85,7 +85,6 @@ class Config(JSONWizard):
 		tag_key = "type"
 
 	paletteName: str
-	multiScreen: bool
 	mqttHost: str
 	mqttPort: int
 	satelliteTTL: int

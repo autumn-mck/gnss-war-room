@@ -1,6 +1,5 @@
 {
 	paletteName: "warGames",
-	multiScreen: false,
 	satelliteTTL: 3000,
 	warRoom: false,
 
