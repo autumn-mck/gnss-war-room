@@ -4,8 +4,6 @@
 	"foreground": "#4c4f69",
 	"continentsBorder": "#40a02b",
 	"admin0Border": "#4c4f69",
-	"admin1Border": "#ff0000",
-	"water": "#1e66f5",
 	"cities": "#4c4f69",
 	"polarGrid": "#6c6f85",
 	"satelliteNetworks": {

@@ -13,7 +13,7 @@ def main():
 	svg = ""
 
 	coloursToIgnore = ["#ff0000", "#FF0000"]
-	attributesToIgnore = ["water"]
+	attributesToIgnore = []
 
 	count = 0
 	coloursAlreadyUsed = []

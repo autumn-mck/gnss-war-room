@@ -36,17 +36,6 @@ def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> tupl
 	continentBorderWidth = 6 / options.scaleFactor
 	admin0BorderWidth = 2 / options.scaleFactor
 
-	# waterbodies
-	mapSvg = mapSvg.replace(".st0{fill:#50C8F4;", f".st0{{fill:{palette.water};")
-	mapSvg = mapSvg.replace(
-		".st3{fill:none;stroke:#50C8F4;", f".st3{{fill:none;stroke:{palette.water};"
-	)
-
-	# admin1 borders
-	mapSvg = mapSvg.replace(
-		".st1{fill:none;stroke:#808080;", f".st1{{fill:none;stroke:{palette.admin1Border};"
-	)
-
 	# admin0 borders
 	mapSvg = mapSvg.replace(
 		".st2{fill:none;stroke:#000000;", f".st2{{fill:none;stroke:{palette.admin0Border};"
@@ -67,19 +56,15 @@ def prepareInitialMap(mapSvg: str, palette: Palette, options: MapConfig) -> tupl
 			'g id="Admin_x5F_0_x5F_lines"', 'g id="Admin_x5F_0_x5F_lines" style="display:none"'
 		)
 
-	if options.hideAdmin1Borders:
-		mapSvg = mapSvg.replace(
-			'g id="Admin_1_Polygon"', 'g id="Admin_1_Polygon" style="display:none"'
-		)
-		mapSvg = mapSvg.replace(
-			'g id="Admin_x5F_1_x5F_lines"', 'g id="Admin_x5F_1_x5F_lines" style="display:none"'
-		)
+	# hide admin1 borders
+	mapSvg = mapSvg.replace('g id="Admin_1_Polygon"', 'g id="Admin_1_Polygon" style="display:none"')
+	mapSvg = mapSvg.replace(
+		'g id="Admin_x5F_1_x5F_lines"', 'g id="Admin_x5F_1_x5F_lines" style="display:none"'
+	)
 
-	if options.hideRivers:
-		mapSvg = mapSvg.replace('g id="Rivers"', 'g id="Rivers" style="display:none"')
-
-	if options.hideLakes:
-		mapSvg = mapSvg.replace('g id="Waterbodies"', 'g id="Waterbodies" style="display:none"')
+	# hide rivers and lakes
+	mapSvg = mapSvg.replace('g id="Rivers"', 'g id="Rivers" style="display:none"')
+	mapSvg = mapSvg.replace('g id="Waterbodies"', 'g id="Waterbodies" style="display:none"')
 
 	# hide metadata
 	mapSvg = mapSvg.replace('g id="MetaData"', 'g id="MetaData" style="display:none"')

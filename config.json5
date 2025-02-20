@@ -15,9 +15,6 @@
 		{
 			// map of the whole world at once
 			type: "worldMap",
-			hideRivers: true,
-			hideLakes: true,
-			hideAdmin1Borders: true,
 			hideAdmin0Borders: true,
 			hideCities: true,
 			focusLat: 0,
@@ -55,9 +52,6 @@
 		{
 			// map focused mostly on NI/europe
 			type: "worldMap",
-			hideRivers: true,
-			hideLakes: true,
-			hideAdmin1Borders: true,
 			hideAdmin0Borders: true,
 			hideCities: false,
 			focusLat: 54.6,

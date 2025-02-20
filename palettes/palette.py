@@ -9,9 +9,7 @@ class Palette(JSONWizard):
 
 	background: str
 	foreground: str
-	water: str
 	admin0Border: str
-	admin1Border: str
 	continentsBorder: str
 	cities: str
 	polarGrid: str

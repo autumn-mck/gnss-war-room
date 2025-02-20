@@ -8,13 +8,7 @@
 		"foreground": {
 			"type": "string"
 		},
-		"water": {
-			"type": "string"
-		},
 		"admin0Border": {
-			"type": "string"
-		},
-		"admin1Border": {
 			"type": "string"
 		},
 		"continentsBorder": {
@@ -39,9 +33,7 @@
 	"required": [
 		"background",
 		"foreground",
-		"water",
 		"admin0Border",
-		"admin1Border",
 		"continentsBorder",
 		"cities",
 		"satelliteNetworks",

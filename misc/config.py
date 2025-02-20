@@ -18,9 +18,6 @@ class MapConfig(JSONWizard):
 
 	hideCities: bool = True
 	hideAdmin0Borders: bool = False
-	hideAdmin1Borders: bool = True
-	hideRivers: bool = True
-	hideLakes: bool = True
 
 	class _(JSONWizard.Meta):
 		tag = "worldMap"
