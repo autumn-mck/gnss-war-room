@@ -3,11 +3,12 @@ from typing import Callable
 from pynmeagps import NMEAMessage, NMEAReader
 from serial import Serial
 
+from misc.config import GnssConfig
 
-def monitorSerial(onMessage: Callable[[bytes, NMEAMessage], None], serialLocation: str):
+
+def monitorSerial(onMessage: Callable[[bytes, NMEAMessage], None], config: GnssConfig):
 	"""Monitor a serial stream and log NMEA data"""
-	baudRate = 38400
-	with Serial(serialLocation, baudRate, timeout=3) as stream:
+	with Serial(config.serialPort, config.baudRate, timeout=3) as stream:
 		nmr = NMEAReader(stream)
 		while True:
 			(rawData, parsedData) = nmr.read()

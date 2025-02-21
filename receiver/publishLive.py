@@ -18,9 +18,9 @@ def createPublishCallback(mqttClient: MqttClient):
 def main():
 	load_dotenv()
 	config = loadConfig()
-	client = createMqttPublisher(config)
+	client = createMqttPublisher(config.mqtt)
 	onMessage = createPublishCallback(client)
-	monitorSerial(onMessage, config.gnssSerialPort)
+	monitorSerial(onMessage, config.gnss)
 
 
 if __name__ == "__main__":

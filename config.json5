@@ -3,13 +3,17 @@
 	satelliteTTL: 3000,
 	warRoom: false,
 
-	// mqttHost: "localhost",
-	mqttHost: "gnss-mqtt.mck.is",
-	mqttPort: 1883,
+	mqtt: {
+		host: "localhost",
+		port: 1883,
+	},
 
-	// On linux it's likely /dev/ttyACM0 or /dev/ttyUSB0
-	// while Windows will be COM[number]
-	gnssSerialPort: "/dev/ttyACM0",
+	gnss: {
+		// On linux it's likely /dev/ttyACM0 or /dev/ttyUSB0
+		// while Windows will be COM[number]
+		serialPort: "/dev/ttyACM0",
+		baudRate: 38400,
+	},
 
 	windows: [
 		{

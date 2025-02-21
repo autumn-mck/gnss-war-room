@@ -24,7 +24,7 @@ def parseAndPublishLines(file: TextIOWrapper, mqttClient: mqtt.Client):
 def main():
 	load_dotenv()
 	config = loadConfig()
-	mqttClient = createMqttPublisher(config)
+	mqttClient = createMqttPublisher(config.mqtt)
 	with open("120k.tsv", "r", encoding="utf-8") as file:
 		parseAndPublishLines(file, mqttClient)
 

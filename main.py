@@ -34,15 +34,15 @@ def main():
 	fetchFontRomsIfNeeded()
 
 	app = QApplication(sys.argv)
-	appConfig = loadConfig()
-	palette = loadPalette(appConfig.paletteName)
-	windows = createWindows(appConfig, palette)
+	config = loadConfig()
+	palette = loadPalette(config.paletteName)
+	windows = createWindows(config, palette)
 
-	if appConfig.warRoom:
+	if config.warRoom:
 		fullscreenWindowsOnAllScreens(app, windows)
 
 	onNewData = updateWindows(windows)
-	createMqttSubscriber(appConfig, onNewData)
+	createMqttSubscriber(config.mqtt, config.satelliteTTL, onNewData)
 	app.exec()  # blocks until the app is closed
 
 

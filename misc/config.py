@@ -75,6 +75,18 @@ class GlobeConfig(JSONWizard):
 
 
 @dataclass
+class MqttConfig(JSONWizard):
+	host: str
+	port: int
+
+
+@dataclass
+class GnssConfig(JSONWizard):
+	serialPort: str
+	baudRate: int
+
+
+@dataclass
 class Config(JSONWizard):
 	"""Configuration for the app"""
 
@@ -82,10 +94,9 @@ class Config(JSONWizard):
 		tag_key = "type"
 
 	paletteName: str
-	mqttHost: str
-	mqttPort: int
+	mqtt: MqttConfig
+	gnss: GnssConfig
 	satelliteTTL: int
-	gnssSerialPort: str
 	warRoom: bool
 	windows: list[
 		MapConfig

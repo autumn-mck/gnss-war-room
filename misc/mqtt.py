@@ -11,24 +11,22 @@ from paho.mqtt.reasoncodes import ReasonCode
 from pynmeagps import NMEAMessage, NMEAReader
 
 from gnss.nmea import GnssData, updateGnssDataWithMessage
-from misc.config import Config
+from misc.config import MqttConfig
 from misc.scrape import gpsCsvToDict, tryLoadCachedGpsJam
 
 
 def createMqttSubscriber(
-	config: Config, onNewData: Callable[[bytes, GnssData], None]
+	config: MqttConfig, satelliteTTL: int, onNewData: Callable[[bytes, GnssData], None]
 ) -> MqttClient:
 	"""Create the subscriber MQTT client"""
 	mqttClient = MqttClient(mqttEnums.CallbackAPIVersion.VERSION2)
-	mqttClient.on_message = callbaackOnMessage(
-		onNewData, timedelta(seconds=int(config.satelliteTTL))
-	)
+	mqttClient.on_message = callbaackOnMessage(onNewData, timedelta(seconds=int(satelliteTTL)))
 
 	mqttClient.on_disconnect = reconnectOnDisconnect
 	mqttClient.on_connect = subscribeOnConnect
 
 	try:
-		mqttClient.connect(config.mqttHost, config.mqttPort)
+		mqttClient.connect(config.host, config.port)
 		mqttClient.loop_start()
 	except ConnectionRefusedError:
 		print("Error! Unable to connect to MQTT broker. Don't Panic!")
@@ -36,7 +34,7 @@ def createMqttSubscriber(
 	return mqttClient
 
 
-def createMqttPublisher(config: Config) -> MqttClient:
+def createMqttPublisher(config: MqttConfig) -> MqttClient:
 	"""Create the publisher MQTT client"""
 	mqttClient = MqttClient(mqttEnums.CallbackAPIVersion.VERSION2, client_id="publisher")
 
@@ -46,7 +44,7 @@ def createMqttPublisher(config: Config) -> MqttClient:
 	mqttClient.on_disconnect = reconnectOnDisconnect
 
 	try:
-		mqttClient.connect(config.mqttHost, config.mqttPort)
+		mqttClient.connect(config.host, config.port)
 		mqttClient.loop_start()
 	except ConnectionRefusedError:
 		print("Error! Unable to connect to MQTT broker. Don't Panic!")
@@ -54,7 +52,7 @@ def createMqttPublisher(config: Config) -> MqttClient:
 	return mqttClient
 
 
-def retryConnect(mqttClient: MqttClient, config: Config, attemptsLeft=5):
+def retryConnect(mqttClient: MqttClient, config: MqttConfig, attemptsLeft=5):
 	"""Retry connecting to the MQTT broker if it fails on startup"""
 	if attemptsLeft < 0:
 		print("Failed to connect!")
@@ -63,7 +61,7 @@ def retryConnect(mqttClient: MqttClient, config: Config, attemptsLeft=5):
 	time.sleep(1)
 	print(f"Retrying, {attemptsLeft} attempts remaining.")
 	try:
-		mqttClient.connect(config.mqttHost, config.mqttPort)
+		mqttClient.connect(config.host, config.port)
 		mqttClient.loop_start()
 	except ConnectionRefusedError:
 		retryConnect(mqttClient, config, attemptsLeft - 1)
