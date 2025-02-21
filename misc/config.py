@@ -1,5 +1,5 @@
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import pyjson5
 from dataclass_wizard import JSONWizard
@@ -40,8 +40,8 @@ class MiscStatsConfig(JSONWizard):
 
 @dataclass
 class RawMessageConfig(JSONWizard):
-	fontThickness: float
-	numMessagesToKeep: int
+	fontThickness: float = 1.5
+	numMessagesToKeep: int = 50
 
 	class _(JSONWizard.Meta):
 		tag = "rawMessages"
@@ -77,14 +77,14 @@ class GlobeConfig(JSONWizard):
 
 @dataclass
 class MqttConfig(JSONWizard):
-	host: str
-	port: int
+	host: str = "localhost"
+	port: int = 1883
 
 
 @dataclass
 class GnssConfig(JSONWizard):
-	serialPort: str
-	baudRate: int
+	serialPort: str = "/dev/ttyUSB0"
+	baudRate: int = 38400
 
 
 @dataclass
@@ -94,11 +94,12 @@ class Config(JSONWizard):
 	class _(JSONWizard.Meta):
 		tag_key = "type"
 
-	paletteName: str
-	mqtt: MqttConfig
-	gnss: GnssConfig
-	satelliteTTL: int
-	warRoom: bool
+	paletteName: str = "warGames"
+	mqtt: MqttConfig = field(default_factory=MqttConfig)
+	multiTrackBroadcasting: list[MqttConfig] = field(default_factory=list)
+	gnss: GnssConfig = field(default_factory=GnssConfig)
+	satelliteTTL: int = 3600
+	warRoom: bool = False
 	windows: list[
 		MapConfig
 		| PolalGridConfig
@@ -106,11 +107,28 @@ class Config(JSONWizard):
 		| RawMessageConfig
 		| SignalChartConfig
 		| GlobeConfig
-	]
+	] = field(
+		default_factory=lambda: [
+			MapConfig(),
+			PolalGridConfig(),
+			MiscStatsConfig(),
+			RawMessageConfig(),
+			SignalChartConfig(),
+		]
+	)
 
 
 def loadConfig() -> Config:
 	"""Load the configuration from a file"""
 	configFile = os.getenv("GNSS_CONFIG_FILE") or "config.json5"
-	with open(configFile, "r", encoding="utf8") as f:
-		return Config.from_dict(pyjson5.decode(f.read()))
+
+	try:
+		with open(configFile, "r", encoding="utf8") as f:
+			config = Config.from_dict(pyjson5.decode(f.read()))
+	except OSError:
+		print("Warning: Failed to read config file, continuing with defaults...")
+		config = Config()
+
+	if len(config.windows) == 0:
+		config.windows = [MiscStatsConfig()]
+	return config
