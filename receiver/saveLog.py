@@ -1,6 +1,7 @@
 from datetime import datetime
 from io import TextIOWrapper
 
+from dotenv import load_dotenv
 from pynmeagps import NMEAMessage
 
 from misc.config import loadConfig
@@ -20,6 +21,7 @@ def createWriteCallback(logFile: TextIOWrapper):
 
 
 def main():
+	load_dotenv()
 	config = loadConfig()
 	with open("test.nmea", "w", encoding="utf-8") as logFile:
 		monitorSerial(createWriteCallback(logFile), config.gnssSerialPort)

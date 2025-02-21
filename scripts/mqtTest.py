@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from paho.mqtt.client import Client as MqttClient
 from paho.mqtt.client import MQTTMessage
 
-from misc.config import Config, loadConfig
+from misc.config import MqttConfig, loadConfig
 from misc.mqtt import createMqttPublisher
 
 
@@ -15,8 +15,8 @@ def main():
 	"""Send numerous messages to the MQTT broker and measure how long each of these 'ping's takes"""
 	load_dotenv()
 	config = loadConfig()
-	publisher = createMqttPublisher(config)
-	subscriber = createMqttClient(config)
+	publisher = createMqttPublisher(config.mqtt)
+	subscriber = createMqttClient(config.mqtt)
 
 	times: list[float] = []
 	for i in range(100_000):
@@ -29,13 +29,13 @@ def main():
 	plt.show()
 
 
-def createMqttClient(config: Config) -> MqttClient:
+def createMqttClient(config: MqttConfig) -> MqttClient:
 	"""Create the subscriber MQTT client"""
 	mqttClient = MqttClient(mqttEnums.CallbackAPIVersion.VERSION2)
 
 	mqttClient.on_connect = print
 	mqttClient.on_message = print
-	mqttClient.connect(config.mqttHost, config.mqttPort)
+	mqttClient.connect(config.host, config.port)
 	mqttClient.subscribe("gnss/rawMessages", qos=0)
 	mqttClient.loop_start()
 	return mqttClient

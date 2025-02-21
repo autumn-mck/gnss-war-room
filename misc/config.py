@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 
 import pyjson5
@@ -110,5 +111,6 @@ class Config(JSONWizard):
 
 def loadConfig() -> Config:
 	"""Load the configuration from a file"""
-	with open("config.json5", "r", encoding="utf8") as f:
+	configFile = os.getenv("GNSS_CONFIG_FILE") or "config.json5"
+	with open(configFile, "r", encoding="utf8") as f:
 		return Config.from_dict(pyjson5.decode(f.read()))

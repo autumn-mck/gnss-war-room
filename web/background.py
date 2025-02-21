@@ -4,6 +4,8 @@ import threading
 import time
 from datetime import datetime
 
+from dotenv import load_dotenv
+
 from font.fetch import fetchFontRomsIfNeeded
 from font.hp1345Font import Font
 from misc.config import MapConfig, MiscStatsConfig, SignalChartConfig, loadConfig
@@ -20,6 +22,7 @@ mapConfig = MapConfig()
 chartConfig = SignalChartConfig()
 mistStatsConfig = MiscStatsConfig()
 
+load_dotenv()
 CONFIG = loadConfig()
 PALETTE = loadPalette("warGames")
 FONT = Font()
@@ -108,7 +111,7 @@ def genOnNewDataCallback():
 def main():
 	"""Update the generated SVGs/JSON files for the web app"""
 	fetchFontRomsIfNeeded()
-	createMqttSubscriber(CONFIG, genOnNewDataCallback())
+	createMqttSubscriber(CONFIG.mqtt, CONFIG.satelliteTTL, genOnNewDataCallback())
 
 	if not os.path.exists("./web/generated"):
 		os.makedirs("./web/generated")

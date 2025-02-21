@@ -4,6 +4,7 @@ import sys
 from datetime import datetime, timedelta
 from typing import Callable
 
+from dotenv import load_dotenv
 from PyQt6.QtCore import QUrl
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QApplication, QMainWindow
@@ -34,6 +35,7 @@ def main():
 	fetchFontRomsIfNeeded()
 
 	app = QApplication(sys.argv)
+	load_dotenv()
 	config = loadConfig()
 	palette = loadPalette(config.paletteName)
 	windows = createWindows(config, palette)
