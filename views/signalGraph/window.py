@@ -47,10 +47,14 @@ class SignalGraphWindow(QMainWindow):
 		self.svg.setGeometry(0, 0, newWidth, newHeight)
 
 	def keyPressEvent(self, event: QKeyEvent):
+		"""Handle key presses"""
 		if event.key() == Qt.Key.Key_F:
 			self.setWindowState(self.windowState() ^ Qt.WindowState.WindowFullScreen)
 		if event.key() == Qt.Key.Key_S:
 			self.sortMethodIndex = (self.sortMethodIndex + 1) % len(self.sortMethods)
+			self.updateGraph()
+		if event.key() == Qt.Key.Key_U:
+			self.config.countUntrackedSatellites = not self.config.countUntrackedSatellites
 			self.updateGraph()
 
 	def onNewData(self, gnssData: GnssData):
