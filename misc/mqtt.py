@@ -1,3 +1,4 @@
+import json
 import os
 import time
 from datetime import datetime, timedelta
@@ -11,8 +12,14 @@ from paho.mqtt.reasoncodes import ReasonCode
 from pynmeagps import NMEAMessage, NMEAReader
 
 from gnss.nmea import GnssData, updateGnssDataWithMessage
-from misc.config import MqttConfig
+from misc.config import Config, MqttConfig
 from misc.scrape import gpsCsvToDict, tryLoadCachedGpsJam
+
+
+def figureOutPublishingConfig(config: Config):
+	if len(config.multiTrackBroadcasting) > 0:
+		return config.multiTrackBroadcasting
+	return [config.mqtt]
 
 
 def createMqttSubscriber(
@@ -34,12 +41,25 @@ def createMqttSubscriber(
 	return mqttClient
 
 
-def createMqttPublisher(config: MqttConfig) -> MqttClient:
-	"""Create the publisher MQTT client"""
-	mqttClient = MqttClient(mqttEnums.CallbackAPIVersion.VERSION2, client_id="publisher")
+def createMqttPublishers(configs: list[MqttConfig]) -> list[MqttClient]:
+	"""Create on or more publisher MQTT clients"""
 
-	if publisherPassword := os.environ.get("GNSS_PUBLISHER_PASSWORD"):
-		mqttClient.username_pw_set("gnssreceiver", publisherPassword)
+	if len(configs) > 0:
+		passwords = json.loads(os.environ.get("GNSS_MULTI_TRACK_PASSWORDS") or "[]")
+	else:
+		passwords = [os.environ.get("GNSS_PUBLISHER_PASSWORD") or ""]
+
+	publishers = []
+	for config, password in zip(configs, passwords):
+		publishers.append(createMqttPublisher(config, password))
+
+	return publishers
+
+
+def createMqttPublisher(config: MqttConfig, password: str) -> MqttClient:
+	"""Create a single publisher MQTT client with the given configuration and password"""
+	mqttClient = MqttClient(mqttEnums.CallbackAPIVersion.VERSION2, client_id="publisher")
+	mqttClient.username_pw_set("gnssreceiver", password)
 
 	mqttClient.on_disconnect = reconnectOnDisconnect
 

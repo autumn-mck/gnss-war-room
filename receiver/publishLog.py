@@ -5,10 +5,10 @@ import paho.mqtt.client as mqtt
 from dotenv import load_dotenv
 
 from misc.config import loadConfig
-from misc.mqtt import createMqttPublisher
+from misc.mqtt import createMqttPublishers, figureOutPublishingConfig
 
 
-def parseAndPublishLines(file: TextIOWrapper, mqttClient: mqtt.Client):
+def parseAndPublishLines(file: TextIOWrapper, mqttClients: list[mqtt.Client]):
 	"""Parse and publish lines from the file, waiting for the given delta time between each"""
 
 	for line in file:
@@ -18,15 +18,19 @@ def parseAndPublishLines(file: TextIOWrapper, mqttClient: mqtt.Client):
 
 		sleep(timeToSleep / 1)
 		print(nmeaMessage)
-		mqttClient.publish("gnss/rawMessages", nmeaMessage, qos=2)
+		for mqttClient in mqttClients:
+			mqttClient.publish("gnss/rawMessages", nmeaMessage, qos=2)
 
 
 def main():
+	"""Publish the prerecorded messages"""
 	load_dotenv()
 	config = loadConfig()
-	mqttClient = createMqttPublisher(config.mqtt)
+	mqttConfig = figureOutPublishingConfig(config)
+	mqttClients = createMqttPublishers(mqttConfig)
+
 	with open("120k.tsv", "r", encoding="utf-8") as file:
-		parseAndPublishLines(file, mqttClient)
+		parseAndPublishLines(file, mqttClients)
 
 
 if __name__ == "__main__":

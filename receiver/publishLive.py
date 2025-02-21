@@ -3,23 +3,29 @@ from paho.mqtt.client import Client as MqttClient
 from pynmeagps import NMEAMessage
 
 from misc.config import loadConfig
-from misc.mqtt import createMqttPublisher
+from misc.mqtt import createMqttPublishers, figureOutPublishingConfig
 from receiver.serialMonitor import monitorSerial
 
 
-def createPublishCallback(mqttClient: MqttClient):
+def createPublishCallback(mqttClients: list[MqttClient]):
+	"""Create a function to publish any time a message is received"""
+
 	def publishMessage(rawData: bytes, _: NMEAMessage):
 		data = rawData.decode("utf-8").strip()
-		mqttClient.publish("gnss/rawMessages", data, qos=2)
+		for mqttClient in mqttClients:
+			mqttClient.publish("gnss/rawMessages", data, qos=2)
 
 	return publishMessage
 
 
 def main():
+	"""Publish the live data"""
 	load_dotenv()
 	config = loadConfig()
-	client = createMqttPublisher(config.mqtt)
-	onMessage = createPublishCallback(client)
+	mqttConfig = figureOutPublishingConfig(config)
+
+	clients = createMqttPublishers(mqttConfig)
+	onMessage = createPublishCallback(clients)
 	monitorSerial(onMessage, config.gnss)
 
 
