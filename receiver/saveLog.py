@@ -24,7 +24,7 @@ def main():
 	load_dotenv()
 	config = loadConfig()
 	with open("test.nmea", "w", encoding="utf-8") as logFile:
-		monitorSerial(createWriteCallback(logFile), config.gnssSerialPort)
+		monitorSerial(createWriteCallback(logFile), config.gnss)
 
 
 if __name__ == "__main__":
