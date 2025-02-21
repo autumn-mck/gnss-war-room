@@ -1,5 +1,6 @@
 from font.hp1345Font import Font
 from font.mksvgs import makeTextGroup
+from gnss.satellite import nameToNetworkCode
 from misc.config import MapConfig
 from misc.size import Size
 from palettes.palette import Palette
@@ -99,7 +100,10 @@ def genKey(palette: Palette) -> tuple[str, Size]:
 	maxWidth = 0
 	heightSoFar = 0
 
-	for networkName, colour in palette.satelliteNetworks.items():
+	satelliteNetworks = list(palette.satelliteNetworks.items())
+	satelliteNetworks.sort(key=lambda network: nameToNetworkCode(network[0]))
+
+	for networkName, colour in satelliteNetworks:
 		networkScale = 3.5
 
 		(network, width, height) = makeTextGroup(

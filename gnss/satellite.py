@@ -69,6 +69,22 @@ def networkCodeToName(networkCode: str) -> str:
 			return "Unknown"
 
 
+def nameToNetworkCode(name: str) -> str:
+	match name:
+		case "Galileo":
+			return "GA"
+		case "GPS":
+			return "GP"
+		case "GLONASS":
+			return "GL"
+		case "BeiDou":
+			return "GB"
+		case "QZSS":
+			return "GQ"
+		case _:
+			return "GZ"
+
+
 def orbitHeightForNetwork(network: str) -> float:
 	match network:
 		case "GA":  # Galileo
