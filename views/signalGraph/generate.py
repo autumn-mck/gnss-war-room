@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 from font.hp1345Font import Font
 from font.mksvgs import makeTextGroup
 from gnss.satellite import SatelliteInView, colourForNetwork
@@ -204,20 +202,15 @@ def generateBars(
 
 
 def sortSatellitesByNetworkThenPrn(satellites: list[SatelliteInView]):
-	"""Order the given satellites, first by which network they belong to, then their PRN"""
-	satellitesByNetwork: dict[str, list[SatelliteInView]] = defaultdict(list)
-	for satellite in satellites:
-		satellitesByNetwork[satellite.network].append(satellite)
-
-	satellites = []
-	for satellitesInNetwork in satellitesByNetwork.values():
-		satellites.extend(sortSatellitesByPrn(satellitesInNetwork))
-
-	return satellites
+	return sorted(satellites, key=lambda satellite: (satellite.network, int(satellite.prnNumber)))
 
 
-def sortSatellitesByPrn(satellites: list[SatelliteInView]) -> list[SatelliteInView]:
-	return sorted(satellites, key=lambda satellite: int(satellite.prnNumber))
+def sortSatellitesBySnr(satellites: list[SatelliteInView]):
+	return sorted(satellites, key=lambda satellite: satellite.snr)
+
+
+def sortSatellitesByElevation(satellites: list[SatelliteInView]):
+	return sorted(satellites, key=lambda satellite: satellite.elevation)
 
 
 def generateBarChart(
@@ -227,6 +220,7 @@ def generateBarChart(
 	satellites: list[SatelliteInView],
 	availableWidth: float,
 	availableHeight: float,
+	sortMethod: str = "networkThenPrn",
 ) -> str:
 	"""Generate a full SVG SNR bar chart of the given satellites"""
 	if not settings.countUntrackedSatellites:
@@ -235,7 +229,12 @@ def generateBarChart(
 	if len(satellites) == 0:
 		return f"<svg version='1.1' viewBox='0 0 {availableWidth} {availableHeight}'></svg>"
 
-	satellites = sortSatellitesByNetworkThenPrn(satellites)
+	if sortMethod == "networkThenPrn":
+		satellites = sortSatellitesByNetworkThenPrn(satellites)
+	elif sortMethod == "snr":
+		satellites = sortSatellitesBySnr(satellites)
+	elif sortMethod == "elevation":
+		satellites = sortSatellitesByElevation(satellites)
 
 	chartWidth = availableWidth - settings.marginLeft - settings.marginRight
 	chartHeight = availableHeight - settings.marginTop - settings.marginBottom

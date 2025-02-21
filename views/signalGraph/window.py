@@ -27,6 +27,9 @@ class SignalGraphWindow(QMainWindow):
 
 		self.latestData = GnssData()
 
+		self.sortMethods = ["networkThenPrn", "snr", "elevation"]
+		self.sortMethodIndex = 0
+
 		self.svgFont = Font()
 		self.svg = QSvgWidget(parent=self)
 		self.svg.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
@@ -46,6 +49,9 @@ class SignalGraphWindow(QMainWindow):
 	def keyPressEvent(self, event: QKeyEvent):
 		if event.key() == Qt.Key.Key_F:
 			self.setWindowState(self.windowState() ^ Qt.WindowState.WindowFullScreen)
+		if event.key() == Qt.Key.Key_S:
+			self.sortMethodIndex = (self.sortMethodIndex + 1) % len(self.sortMethods)
+			self.updateGraph()
 
 	def onNewData(self, gnssData: GnssData):
 		self.latestData = gnssData
@@ -60,5 +66,6 @@ class SignalGraphWindow(QMainWindow):
 			self.latestData.satellites,
 			self.svg.width(),
 			self.svg.height(),
+			self.sortMethods[self.sortMethodIndex],
 		)
 		self.svg.load(QByteArray(barChartSvg.encode()))
