@@ -1,5 +1,6 @@
 passwd
 node_modules/
+config.json5
 
 web/generated/
 views/map/citiesCache.txt
