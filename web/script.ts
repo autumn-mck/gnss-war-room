@@ -34,6 +34,7 @@ const camera = createCamera();
 const controls = createControls(camera, canvas);
 
 const onClickRaycaster = new THREE.Raycaster();
+let mouseDownEvent: MouseEvent | undefined = undefined;
 
 const scene = new THREE.Scene();
 createEarth(scene, palette);
@@ -50,7 +51,19 @@ function render(timeMs: number) {
 }
 requestAnimationFrame(render);
 
-function onclick(event: MouseEvent) {
+function mouseDown(event: MouseEvent) {
+	mouseDownEvent = event;
+}
+
+function mouseUp(event: MouseEvent) {
+	if (!mouseDownEvent) return;
+
+	// calc distance between mouse down and up
+	const dx = mouseDownEvent.clientX - event.clientX;
+	const dy = mouseDownEvent.clientY - event.clientY;
+	const dist = Math.sqrt(dx * dx + dy * dy);
+	const mouseThreshold = 3;
+
 	// normalised pointer position (-1 to +1)
 	const pointer = new THREE.Vector2(
 		(event.clientX / window.innerWidth) * 2 - 1,
@@ -62,9 +75,11 @@ function onclick(event: MouseEvent) {
 	// calculate objects intersecting the picking ray
 	const intersects = onClickRaycaster.intersectObjects(scene.children);
 
-	if (intersects.length == 0) {
+	if (intersects.length == 0 && dist < mouseThreshold) {
 		selectedSatellite = undefined;
 	}
+
+	if (dist > mouseThreshold) return;
 
 	for (let i = 0; i < intersects.length; i++) {
 		let obj = intersects[i].object;
@@ -124,7 +139,8 @@ comboBox.addEventListener("change", async () => update());
 
 resizeCanvasToDisplaySize(canvas, renderer, camera);
 window.addEventListener("resize", () => resizeCanvasToDisplaySize(canvas, renderer, camera));
-window.addEventListener("click", onclick);
+window.addEventListener("mousedown", mouseDown);
+window.addEventListener("mouseup", mouseUp);
 
 if (!customElements.get("satellite-display"))
 	customElements.define("satellite-display", SatelliteDisplay);
