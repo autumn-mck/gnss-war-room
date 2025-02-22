@@ -120,7 +120,7 @@ async function updateGlobe() {
 
 	let gnssData = await fetch("/api/gnss").then((res) => res.json());
 	latestGnssData = gnssData;
-	// TODO update selected satellite
+	selectedSatellite = findUpdatedSelectedSatellite(gnssData, selectedSatellite);
 	satelliteDisplay.update(selectedSatellite, latestGnssData);
 	satellitesObject.clear();
 
@@ -131,6 +131,18 @@ async function updateGlobe() {
 		satellitesObject.add(genGroundLine(x, y, z, satellite));
 		satellitesObject.add(genSatelliteTrail(satellite));
 	}
+}
+
+function findUpdatedSelectedSatellite(
+	gnssData: GnssData,
+	selectedSatellite: Satellite | undefined
+) {
+	if (selectedSatellite === undefined) return undefined;
+	return gnssData.satellites.find(
+		(satellite) =>
+			selectedSatellite.prnNumber === satellite.prnNumber &&
+			selectedSatellite.network === satellite.network
+	);
 }
 
 update();
