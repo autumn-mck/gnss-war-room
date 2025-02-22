@@ -6,6 +6,12 @@
 		"@types/geojson": "^7946.0.16"
 	},
 	"dependencies": {
+		"mapshaper": "^0.6.102",
+		"rolldown": "^1.0.0-beta.3",
 		"three": "^0.172.0"
+	},
+	"scripts": {
+		"build": "rolldown web/script.ts --file dist/script.js --minify",
+		"merge-map-to-continents": "mapshaper -i views/map/1981_polygons.geojson snap snap-interval=0.1 -dissolve2 -o precision=0.1 web/generated/continents.geojson"
 	}
 }

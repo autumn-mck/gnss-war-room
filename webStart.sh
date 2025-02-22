@@ -1,9 +1,9 @@
 #! /usr/bin/env bash
 
 bun install
-bunx mapshaper -i views/map/1981_polygons.geojson snap snap-interval=0.1 -dissolve2 -o precision=0.1 web/generated/continents.geojson
+bun run merge-map-to-continents
+bun run build
 cp views/map/1981_lines.geojson web/generated/borders.geojson
-bun build ./web/script.ts --outdir dist
 
 python3 -m web.background &
 backgroundPid=$!
