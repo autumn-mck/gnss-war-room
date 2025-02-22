@@ -66,6 +66,7 @@ function onclick(event: MouseEvent) {
 		selectedSatellite = obj.userData as Satellite;
 		obj.material.color.set(0xff0000);
 		obj.material.opacity = 1;
+		break;
 	}
 	satelliteDisplay.update(selectedSatellite, latestGnssData);
 }

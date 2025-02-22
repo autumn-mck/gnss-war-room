@@ -65,7 +65,7 @@ function getGroundLineMaterial(satellite: Satellite) {
 }
 
 export function genSatelliteSelector(x: number, y: number, z: number, satellite: Satellite) {
-	const baseSelectGeometry = new THREE.IcosahedronGeometry(0.15, 0);
+	const baseSelectGeometry = new THREE.IcosahedronGeometry(0.12, 0);
 	const baseSelectMaterial = new THREE.MeshBasicMaterial({
 		color: 0x000000,
 		transparent: true,
