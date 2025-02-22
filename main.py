@@ -55,6 +55,7 @@ def main():
 			window.show()
 
 	app.exec()  # blocks until the app is closed
+	print("How about a nice game of chess?")
 
 
 def startupSequence(app: QApplication, config: Config, palette: Palette):
