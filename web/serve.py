@@ -63,5 +63,10 @@ def bordersRoute():
 	return send_file("generated/borders.geojson")
 
 
+@app.route("/palette.json")
+def paletteRoute():
+	return send_file("generated/palette.json")
+
+
 if __name__ == "__main__":
 	app.run()

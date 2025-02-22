@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { type LineMaterialParameters } from "three/addons/lines/LineMaterial.js";
+import { type Palette } from "./palette.ts";
 import { drawThreeGeo } from "./threeGeoJSON.ts";
 
 export function createCamera() {
@@ -26,9 +27,9 @@ export function createControls(camera: THREE.Camera, canvas: HTMLCanvasElement) 
 	return controls;
 }
 
-export function createEarth(scene: THREE.Scene) {
+export function createEarth(scene: THREE.Scene, palette: Palette) {
 	const baseSphereGeometry = new THREE.SphereGeometry(0.99);
-	const baseSphereMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+	const baseSphereMaterial = new THREE.MeshBasicMaterial({ color: palette.background });
 	const baseSphere = new THREE.Mesh(baseSphereGeometry, baseSphereMaterial);
 	scene.add(baseSphere);
 
@@ -36,8 +37,8 @@ export function createEarth(scene: THREE.Scene) {
 	geojsonContainer.rotateX((-90 * Math.PI) / 180);
 	scene.add(geojsonContainer);
 
-	loadGeojson("/continents.geojson", geojsonContainer, { color: 0x63f68d });
-	// loadGeojson("/borders.geojson", geojsonContainer, { color: 0xffffff });
+	loadGeojson("/continents.geojson", geojsonContainer, { color: palette.continentsBorder });
+	// loadGeojson("/borders.geojson", geojsonContainer, { color: palette.admin0Border });
 }
 
 async function loadGeojson(

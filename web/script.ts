@@ -18,10 +18,16 @@ const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const canvasContainer = document.getElementById("canvasContainer") as HTMLDivElement;
 const satelliteDisplay = document.getElementById("satelliteDisplay") as SatelliteDisplay;
 
+const palette = await fetch("/palette.json").then((res) => res.json());
+
+document.documentElement.style.setProperty("--background", palette.background);
+document.documentElement.style.setProperty("--foreground", palette.foreground);
+
 let selectedSatellite: Satellite | undefined = undefined;
 let latestGnssData: GnssData | undefined = undefined;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, canvas });
+renderer.setClearColor(palette.background);
 renderer.setPixelRatio(window.devicePixelRatio);
 
 const camera = createCamera();
@@ -30,7 +36,7 @@ const controls = createControls(camera, canvas);
 const onClickRaycaster = new THREE.Raycaster();
 
 const scene = new THREE.Scene();
-createEarth(scene);
+createEarth(scene, palette);
 
 let satellitesObject = new THREE.Object3D();
 scene.add(satellitesObject);

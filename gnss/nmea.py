@@ -6,6 +6,7 @@ import h3
 from pynmeagps import NMEAMessage
 
 from gnss.satellite import SatelliteInView, isSameSatellite
+from palettes.palette import Palette
 
 
 @dataclass
@@ -28,7 +29,7 @@ class GnssData:
 	fixQuality: int = 0
 	"""https://receiverhelp.trimble.com/alloy-gnss/en-us/NMEA-0183messages_GGA.html for meanings"""
 
-	def toJSON(self) -> dict[str, Any]:
+	def toJSON(self, palette: Palette) -> dict[str, Any]:
 		return {
 			"latitude": self.latitude,
 			"longitude": self.longitude,
@@ -40,7 +41,8 @@ class GnssData:
 			"vdop": self.vdop,
 			"fixQuality": self.fixQuality,
 			"satellites": [
-				satellite.toJSON(self.latitude, self.longitude) for satellite in self.satellites
+				satellite.toJSON(self.latitude, self.longitude, palette)
+				for satellite in self.satellites
 			],
 		}
 

@@ -16,7 +16,7 @@ class Palette(JSONWizard):
 	satelliteNetworks: dict[str, str]
 
 
-def loadPalette(paletteName="warGames") -> Palette:
+def loadPalette(paletteName: str) -> Palette:
 	"""Load the palette with the given name."""
 	with open(f"palettes/{paletteName}.json", "r", encoding="utf8") as f:
 		palette = Palette.from_json(f.read())

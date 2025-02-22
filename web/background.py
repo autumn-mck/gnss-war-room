@@ -24,7 +24,7 @@ mistStatsConfig = MiscStatsConfig()
 
 load_dotenv()
 CONFIG = loadConfig()
-PALETTE = loadPalette("warGames")
+PALETTE = loadPalette(CONFIG.paletteName)
 FONT = Font()
 
 baseMap = readBaseMap()
@@ -81,7 +81,7 @@ def updateData():
 	if LATEST_DATA is None:
 		return
 	with open("./web/generated/gnssData.json", "w", encoding="utf-8") as f:
-		f.write(json.dumps(LATEST_DATA.toJSON()))
+		f.write(json.dumps(LATEST_DATA.toJSON(PALETTE)))
 
 
 def updateSVGsThread():
@@ -115,6 +115,9 @@ def main():
 
 	if not os.path.exists("./web/generated"):
 		os.makedirs("./web/generated")
+
+	with open("./web/generated/palette.json", "w", encoding="utf-8") as f:
+		f.write(json.dumps(PALETTE.__dict__))
 
 	thread = threading.Thread(target=updateSVGsThread)
 	thread.start()

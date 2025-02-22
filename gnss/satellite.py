@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
-from palettes.palette import Palette, loadPalette
+from palettes.palette import Palette
 
 
 @dataclass
@@ -18,7 +18,9 @@ class SatelliteInView:
 	snr: float = 0
 	lastSeen: datetime = field(default_factory=lambda: datetime.fromtimestamp(0))
 
-	def toJSON(self, measuredFromLat: float, measuredFromLong: float) -> dict[str, Any]:
+	def toJSON(
+		self, measuredFromLat: float, measuredFromLong: float, palette: Palette
+	) -> dict[str, Any]:
 		"""Return data as dictionary to be converted to json"""
 		lat, long = getSatelliteLatLong(
 			self.azimuth, self.elevation, self.network, measuredFromLat, measuredFromLong
@@ -39,14 +41,13 @@ class SatelliteInView:
 			"lastSeen": self.lastSeen.isoformat(),
 			"lat": lat,
 			"long": long,
-			"colour": colourForNetwork(self.network),
+			"colour": colourForNetwork(self.network, palette),
 			"altitude": orbitHeightForNetwork(self.network),
 			"previousPositions": previousPositions,
 		}
 
 
-def colourForNetwork(network: str, palette: Palette | None = None) -> str:
-	palette = palette or loadPalette()
+def colourForNetwork(network: str, palette: Palette) -> str:
 	networkName = networkCodeToName(network)
 	if networkName in palette.satelliteNetworks:
 		return palette.satelliteNetworks[networkName]
