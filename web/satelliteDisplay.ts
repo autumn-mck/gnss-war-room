@@ -1,4 +1,6 @@
 import { latLongToXyz } from "./threeGeoJSON.ts";
+import { type Satellite } from "./satellite.ts";
+import { type GnssData } from "./gnssData.ts";
 
 export class SatelliteDisplay extends HTMLElement {
 	css = /*css*/ `
@@ -29,7 +31,7 @@ pre {
 		shadow.adoptedStyleSheets = [styleSheet];
 	}
 
-	update(satellite: any, gnssData: any) {
+	update(satellite: Satellite | undefined, gnssData: GnssData | undefined) {
 		if (!satellite || !gnssData) {
 			this.shadowRoot!.getElementById("satelliteInfo")!.innerText = "";
 			return;
@@ -55,7 +57,7 @@ SNR: ${satellite.snr}
 Last update: ${satellite.lastSeen}`;
 	}
 
-	calcDistanceToSatellite(satellite: any, lat: number, long: number, altitude: number) {
+	calcDistanceToSatellite(satellite: Satellite, lat: number, long: number, altitude: number) {
 		let [x1, y1, z1] = latLongToXyz([lat, long], 6.371 + altitude / 1000);
 		let [x2, y2, z2] = latLongToXyz([satellite.lat, satellite.long], satellite.altitude);
 		let dist = Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2 + (z1 - z2) ** 2);
