@@ -2,6 +2,7 @@
 	paletteName: "warGames",
 	satelliteTTL: 3000,
 	warRoom: false,
+	startupSequence: false,
 
 	mqtt: {
 		host: "localhost",

@@ -38,7 +38,6 @@ class SignalGraphWindow(QMainWindow):
 		self.satelliteReceivedEvent.connect(self.updateGraph)
 
 		self.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
-		self.show()
 
 	def resizeEvent(self, event: QResizeEvent):
 		newWidth = event.size().width()

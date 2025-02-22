@@ -100,6 +100,7 @@ class Config(JSONWizard):
 	gnss: GnssConfig = field(default_factory=GnssConfig)
 	satelliteTTL: int = 3600
 	warRoom: bool = False
+	startupSequence: bool = False
 	windows: list[
 		MapConfig
 		| PolalGridConfig

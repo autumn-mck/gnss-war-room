@@ -43,7 +43,6 @@ class MapWindow(QMainWindow):
 		self.setWindowTitle("GNSS War Room")
 		self.setGeometry(0, 100, int(self.defaultSize.width), int(self.defaultSize.height))
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
-		self.show()
 
 	def updateMap(self):
 		"""Update the map with newest data"""

@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 
+import contextlib
 import sys
+import threading
 from datetime import datetime, timedelta
 from typing import Callable
 
 from dotenv import load_dotenv
 from PyQt6.QtCore import QUrl
+from PyQt6.QtGui import QScreen
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QApplication, QMainWindow
 
@@ -27,6 +30,8 @@ from views.map.window import MapWindow
 from views.polarGrid.window import PolarGridWindow
 from views.rawMessages.window import RawMessageWindow
 from views.signalGraph.window import SignalGraphWindow
+from views.startup.blankWindow import BlankWindow
+from views.startup.window import StartupWindow
 from views.stats.window import MiscStatsWindow
 
 
@@ -38,14 +43,54 @@ def main():
 	load_dotenv()
 	config = loadConfig()
 	palette = loadPalette(config.paletteName)
-	windows = createWindows(config, palette)
+	if config.startupSequence:
+		windows = startupSequence(app, config, palette)
+	else:
+		windows = createMainWindows(config, palette)
 
 	if config.warRoom:
 		fullscreenWindowsOnAllScreens(app, windows)
+	else:
+		for window in windows:
+			window.show()
+
+	app.exec()  # blocks until the app is closed
+
+
+def startupSequence(app: QApplication, config: Config, palette: Palette):
+	"""Display the startup sequence, then return the main windows"""
+	screens = app.screens()
+	windows = []
+	for index, screen in enumerate(screens):
+		window = StartupWindow(palette, app) if index == 0 else BlankWindow(palette)
+
+		fullscreenWindowOnScreen(window, screen)
+		windows.append(window)
+
+	windows = createMainWindows(config, palette)
+	with contextlib.suppress(Exception):
+		app.exec()
+
+	return windows
+
+
+def fullscreenWindowOnScreen(window: QMainWindow, screen: QScreen):
+	screenGeometry = screen.geometry()
+	window.setScreen(screen)
+	window.move(screenGeometry.topLeft())
+	window.resize(screenGeometry.size())
+	window.showFullScreen()
+
+
+def createMainWindows(config: Config, palette: Palette):
+	"""Create the main windows"""
+	windows = createWindows(config, palette)
 
 	onNewData = updateWindows(windows)
-	createMqttSubscriber(config.mqtt, config.satelliteTTL, onNewData)
-	app.exec()  # blocks until the app is closed
+	threading.Thread(
+		target=createMqttSubscriber, args=(config.mqtt, config.satelliteTTL, onNewData)
+	).start()
+	return windows
 
 
 def fullscreenWindowsOnAllScreens(app: QApplication, windows: list[QMainWindow]):
@@ -53,11 +98,7 @@ def fullscreenWindowsOnAllScreens(app: QApplication, windows: list[QMainWindow])
 	screens = app.screens()
 	for index, window in enumerate(windows):
 		screen = screens[index % len(screens)]
-		screenGeometry = screen.geometry()
-		window.setScreen(screen)
-		window.move(screenGeometry.topLeft())
-		window.resize(screenGeometry.size())
-		window.showFullScreen()
+		fullscreenWindowOnScreen(window, screen)
 
 
 def createWindows(appConfig: Config, palette: Palette):

@@ -40,8 +40,6 @@ class MiscStatsWindow(QMainWindow):
 		self.svg.load(QByteArray(svgStr.encode()))
 		self.svg.setGeometry(0, 0, width, height)
 
-		self.show()
-
 	def keyPressEvent(self, event: QKeyEvent):
 		if event.key() == Qt.Key.Key_F:
 			self.setWindowState(self.windowState() ^ Qt.WindowState.WindowFullScreen)

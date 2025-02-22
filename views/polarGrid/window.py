@@ -32,7 +32,6 @@ class PolarGridWindow(QMainWindow):
 		self.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
 		self.setWindowTitle("Polar Grid")
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
-		self.show()
 
 	def generateNewGrid(self):
 		svgData = readBasePolarGrid()
