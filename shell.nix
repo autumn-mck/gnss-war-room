@@ -21,6 +21,7 @@ pkgs.mkShell {
         flask
         gunicorn
         h3
+        python-dotenv
       ]
     ))
   ];
