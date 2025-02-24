@@ -6,6 +6,9 @@ web/generated/
 views/map/citiesCache.txt
 views/map/gpsJamCache.csv
 
+palettePreview.svg
+120k.tsv
+
 *.nmea
 
 # font files
