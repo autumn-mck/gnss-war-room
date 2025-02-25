@@ -1,4 +1,11 @@
-from gnss.satellite import SatelliteInView, colourForNetwork, getSatelliteLatLong
+from datetime import datetime
+
+from gnss.satellite import (
+	SatelliteInView,
+	colourForNetwork,
+	getSatelliteLatLong,
+	rotateLatLongByTime,
+)
 from misc.config import MapConfig
 from misc.size import Size
 from palettes.palette import Palette
@@ -12,6 +19,7 @@ def genSatelliteMapGroup(
 	satellites: list[SatelliteInView],
 	measuredLatitude: float,
 	measuredLongitude: float,
+	currentTime: datetime,
 ) -> str:
 	"""Generate an SVG group of satellite positions"""
 	mapSize = getMapSize()
@@ -22,7 +30,13 @@ def genSatelliteMapGroup(
 	if not options.hideSatelliteTrails:
 		for satellite in satellites:
 			satelliteStr += generateSatelliteTrails(
-				satellite, mapSize, palette, measuredLatitude, measuredLongitude, radius
+				satellite,
+				mapSize,
+				palette,
+				measuredLatitude,
+				measuredLongitude,
+				radius,
+				currentTime,
 			)
 
 	for satellite in satellites:
@@ -65,6 +79,7 @@ def generateSatelliteTrails(
 	measuredLatitude: float,
 	measuredLongitude: float,
 	baseRadius: float,
+	currentTime: datetime,
 ):
 	"""Generate a trail for the given satellite"""
 	if len(satellite.previousPositions) < 1:
@@ -72,12 +87,16 @@ def generateSatelliteTrails(
 	colour = colourForNetwork(satellite.network, palette)
 
 	previousPositions = satellite.previousPositions.copy()
-	previousPositions.append((satellite.elevation, satellite.azimuth))
+	previousPositions.append((currentTime, satellite.elevation, satellite.azimuth))
 	latLongs = [
-		getSatelliteLatLong(
-			azimuth, elevation, satellite.network, measuredLatitude, measuredLongitude
+		rotateLatLongByTime(
+			getSatelliteLatLong(
+				azimuth, elevation, satellite.network, measuredLatitude, measuredLongitude
+			),
+			measuredTime,
+			currentTime,
 		)
-		for (elevation, azimuth) in previousPositions
+		for (measuredTime, elevation, azimuth) in previousPositions
 	]
 	mapPoints = [latLongToGallStereographic(lat, long, mapSize.width) for lat, long in latLongs]
 

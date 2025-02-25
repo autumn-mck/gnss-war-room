@@ -150,7 +150,7 @@ def updateWindows(windows: list[QMainWindow]) -> Callable[[bytes, GnssData], Non
 		for window in windows:
 			match window:
 				case MapWindow():
-					window.onNewData(gnssData.satellites, gnssData.latitude, gnssData.longitude)
+					window.onNewData(gnssData)
 				case PolarGridWindow():
 					window.onNewData(gnssData.satellites)
 				case MiscStatsWindow():

@@ -3,7 +3,7 @@ from PyQt6.QtGui import QKeyEvent, QResizeEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 from PyQt6.QtWidgets import QMainWindow
 
-from gnss.satellite import SatelliteInView
+from gnss.nmea import GnssData
 from misc.config import MapConfig
 from misc.size import Size
 from palettes.palette import Palette
@@ -22,10 +22,7 @@ class MapWindow(QMainWindow):
 
 		self.windowConfig = windowConfig
 		self.customPalette = palette
-		self.latestSatellites = []
-
-		self.latitude = 0
-		self.longitude = 0
+		self.gnssData = GnssData()
 
 		self.keyXMult = 0
 		self.keyYMult = 1
@@ -49,9 +46,10 @@ class MapWindow(QMainWindow):
 		satelliteGroup = genSatelliteMapGroup(
 			self.windowConfig,
 			self.customPalette,
-			self.latestSatellites,
-			self.latitude,
-			self.longitude,
+			self.gnssData.satellites,
+			self.gnssData.latitude,
+			self.gnssData.longitude,
+			self.gnssData.date,
 		)
 		mapSvg = self.initialMap.replace("<!-- satellites go here -->", satelliteGroup)
 		self.preFocusMap = mapSvg
@@ -175,11 +173,9 @@ class MapWindow(QMainWindow):
 		self.preFocusMap = self.initialMap
 		self.newSatelliteDataEvent()
 
-	def onNewData(self, satellites: list[SatelliteInView], latitude: float, longitude: float):
+	def onNewData(self, gnssData: GnssData):
 		"""Handle new satellite data"""
-		self.latestSatellites = satellites
-		self.latitude = latitude
-		self.longitude = longitude
+		self.gnssData = gnssData
 		self.satelliteReceivedEvent.emit()
 
 	def newSatelliteDataEvent(self):

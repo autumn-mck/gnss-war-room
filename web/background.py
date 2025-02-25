@@ -42,7 +42,12 @@ def updateMap():
 	if LATEST_DATA is None:
 		return
 	satelliteGroup = genSatelliteMapGroup(
-		mapConfig, PALETTE, LATEST_DATA.satellites, LATEST_DATA.latitude, LATEST_DATA.longitude
+		mapConfig,
+		PALETTE,
+		LATEST_DATA.satellites,
+		LATEST_DATA.latitude,
+		LATEST_DATA.longitude,
+		LATEST_DATA.date,
 	)
 	latestMap = baseMap.replace("<!-- satellites go here -->", satelliteGroup)
 	mapSize = getMapSize()

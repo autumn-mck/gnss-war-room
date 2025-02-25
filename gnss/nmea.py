@@ -41,7 +41,7 @@ class GnssData:
 			"vdop": self.vdop,
 			"fixQuality": self.fixQuality,
 			"satellites": [
-				satellite.toJSON(self.latitude, self.longitude, palette)
+				satellite.toJSON(self.latitude, self.longitude, palette, self.date)
 				for satellite in self.satellites
 			],
 		}
@@ -63,6 +63,7 @@ def parseSatelliteInMessage(parsedData: NMEAMessage, updateTime: datetime) -> li
 			lastSeen=updateTime,
 			previousPositions=[
 				(
+					updateTime,
 					tryParseFloat(getattr(parsedData, f"elv_0{satNum + 1}")),
 					tryParseFloat(getattr(parsedData, f"az_0{satNum + 1}")),
 				)
@@ -99,7 +100,9 @@ def updateGnssDataWithMessage(
 
 			if gnssData.date - gnssData.lastRecordedTime > timedelta(seconds=1200):
 				gnssData.lastRecordedTime = gnssData.date
-				gnssData.satellites = updateSaltellitePreviousPositions(gnssData.satellites)
+				gnssData.satellites = updateSaltellitePreviousPositions(
+					gnssData.satellites, gnssData.date
+				)
 		case "GLL":
 			gnssData.latitude = message.lat
 			gnssData.longitude = message.lon
@@ -135,9 +138,11 @@ def updateGnssDataWithMessage(
 	return gnssData
 
 
-def updateSaltellitePreviousPositions(satellites: list[SatelliteInView]) -> list[SatelliteInView]:
+def updateSaltellitePreviousPositions(
+	satellites: list[SatelliteInView], updateTime: datetime
+) -> list[SatelliteInView]:
 	for satellite in satellites:
-		satellite.previousPositions.append((satellite.elevation, satellite.azimuth))
+		satellite.previousPositions.append((updateTime, satellite.elevation, satellite.azimuth))
 	return satellites
 
 

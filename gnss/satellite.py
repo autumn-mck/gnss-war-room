@@ -14,12 +14,16 @@ class SatelliteInView:
 	network: str = "??"
 	elevation: float = 0
 	azimuth: float = 0
-	previousPositions: list[tuple[float, float]] = field(default_factory=list)
+	previousPositions: list[tuple[datetime, float, float]] = field(default_factory=list)
 	snr: float = 0
 	lastSeen: datetime = field(default_factory=lambda: datetime.fromtimestamp(0))
 
 	def toJSON(
-		self, measuredFromLat: float, measuredFromLong: float, palette: Palette
+		self,
+		measuredFromLat: float,
+		measuredFromLong: float,
+		palette: Palette,
+		currentTime: datetime,
 	) -> dict[str, Any]:
 		"""Return data as dictionary to be converted to json"""
 		lat, long = getSatelliteLatLong(
@@ -27,8 +31,14 @@ class SatelliteInView:
 		)
 
 		previousPositions = [
-			getSatelliteLatLong(azimuth, elevation, self.network, measuredFromLat, measuredFromLong)
-			for (elevation, azimuth) in self.previousPositions
+			rotateLatLongByTime(
+				getSatelliteLatLong(
+					azimuth, elevation, self.network, measuredFromLat, measuredFromLong
+				),
+				measuredTime,
+				currentTime,
+			)
+			for (measuredTime, elevation, azimuth) in self.previousPositions
 		]
 		previousPositions.append((lat, long))
 
@@ -45,6 +55,16 @@ class SatelliteInView:
 			"altitude": orbitHeightForNetwork(self.network),
 			"previousPositions": previousPositions,
 		}
+
+
+def rotateLatLongByTime(
+	latLong: tuple[float, float], measuredTime: datetime, currentTime: datetime
+) -> tuple[float, float]:
+	"""Rotates a lat/long coordinate by the time passed since the measurement time."""
+	rotationPerDay = 360.985647
+	rotationPerSecond = rotationPerDay / (24 * 60 * 60)
+	timePassed = (currentTime - measuredTime).total_seconds()
+	return (latLong[0], latLong[1] - timePassed * rotationPerSecond)
 
 
 def colourForNetwork(network: str, palette: Palette) -> str:
