@@ -100,9 +100,7 @@ def updateGnssDataWithMessage(
 
 			if gnssData.date - gnssData.lastRecordedTime > timedelta(seconds=1200):
 				gnssData.lastRecordedTime = gnssData.date
-				gnssData.satellites = updateSaltellitePreviousPositions(
-					gnssData.satellites, gnssData.date
-				)
+				gnssData.satellites = updateSaltellitePreviousPositions(gnssData.satellites)
 		case "GLL":
 			gnssData.latitude = message.lat
 			gnssData.longitude = message.lon
@@ -138,11 +136,11 @@ def updateGnssDataWithMessage(
 	return gnssData
 
 
-def updateSaltellitePreviousPositions(
-	satellites: list[SatelliteInView], updateTime: datetime
-) -> list[SatelliteInView]:
+def updateSaltellitePreviousPositions(satellites: list[SatelliteInView]) -> list[SatelliteInView]:
 	for satellite in satellites:
-		satellite.previousPositions.append((updateTime, satellite.elevation, satellite.azimuth))
+		satellite.previousPositions.append(
+			(satellite.lastSeen, satellite.elevation, satellite.azimuth)
+		)
 	return satellites
 
 

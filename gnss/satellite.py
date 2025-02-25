@@ -29,6 +29,7 @@ class SatelliteInView:
 		lat, long = getSatelliteLatLong(
 			self.azimuth, self.elevation, self.network, measuredFromLat, measuredFromLong
 		)
+		(lat, long) = rotateLatLongByTime((lat, long), self.lastSeen, currentTime)
 
 		previousPositions = [
 			rotateLatLongByTime(

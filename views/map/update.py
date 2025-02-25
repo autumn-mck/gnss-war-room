@@ -87,7 +87,7 @@ def generateSatelliteTrails(
 	colour = colourForNetwork(satellite.network, palette)
 
 	previousPositions = satellite.previousPositions.copy()
-	previousPositions.append((currentTime, satellite.elevation, satellite.azimuth))
+	previousPositions.append((satellite.lastSeen, satellite.elevation, satellite.azimuth))
 	latLongs = [
 		rotateLatLongByTime(
 			getSatelliteLatLong(
