@@ -67,7 +67,7 @@ def generateStats(
 		f"{chr(0x7f)} Stability",
 		f"Interference: {data.interference:.2f}%",
 		f"Fix Quality: {data.fixQuality} ({classifyFixQuality(data.fixQuality)})",
-		f"Avg. SNR: {snrSum / (len(data.satellites) or 1):.2f}",
+		f"Mean SNR: {snrSum / (len(data.satellites) or 1):.2f}",
 	]
 
 	dop = [
