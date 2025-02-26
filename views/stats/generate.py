@@ -62,10 +62,12 @@ def generateStats(
 		f"Date: {data.date.strftime("%Y-%m-%d")}",
 	]
 
+	snrSum = sum(sat.snr for sat in data.satellites if sat.snr > 0)
 	stability = [
 		f"{chr(0x7f)} Stability",
 		f"Interference: {data.interference:.2f}%",
 		f"Fix Quality: {data.fixQuality} ({classifyFixQuality(data.fixQuality)})",
+		f"Avg. SNR: {snrSum / (len(data.satellites) or 1):.2f}",
 	]
 
 	dop = [
