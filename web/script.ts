@@ -90,6 +90,14 @@ function mouseUp(event: MouseEvent) {
 		break;
 	}
 	satelliteDisplay.update(selectedSatellite, latestGnssData);
+
+	if (selectedSatellite) {
+		let [x, y, z] = latLongToXyz(
+			[selectedSatellite.long, selectedSatellite.lat],
+			selectedSatellite.altitude / 6.371
+		);
+		satellitesObject.add(genGroundLine(x, y, z, selectedSatellite));
+	}
 }
 
 async function update() {
@@ -128,8 +136,14 @@ async function updateGlobe() {
 		let [x, y, z] = latLongToXyz([satellite.long, satellite.lat], satellite.altitude / 6.371);
 		satellitesObject.add(genSatellite(x, y, z, satellite));
 		satellitesObject.add(genSatelliteSelector(x, y, z, satellite));
-		satellitesObject.add(genGroundLine(x, y, z, satellite));
 		satellitesObject.add(genSatelliteTrail(satellite));
+
+		if (
+			satellite.prnNumber === selectedSatellite?.prnNumber &&
+			satellite.network === selectedSatellite?.network
+		) {
+			satellitesObject.add(genGroundLine(x, y, z, satellite));
+		}
 	}
 }
 
