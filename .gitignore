@@ -8,7 +8,8 @@ views/map/gpsJamCache.csv
 
 palettePreview.svg
 120k.tsv
-
+3m.tsv
+6m.tsv
 *.nmea
 
 # font files
