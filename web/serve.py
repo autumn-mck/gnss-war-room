@@ -53,6 +53,11 @@ def satellitesRoute():
 	return send_file("generated/gnssData.json")
 
 
+@app.route("/api/wopr")
+def woprRoute():
+	return send_file("generated/wopr.json")
+
+
 @app.route("/continents.geojson")
 def continentsRoute():
 	return send_file("generated/continents.geojson")

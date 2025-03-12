@@ -1,5 +1,6 @@
 import json
 import os
+import statistics
 import threading
 import time
 from datetime import datetime
@@ -89,6 +90,23 @@ def updateData():
 		f.write(json.dumps(LATEST_DATA.toJSON(PALETTE)))
 
 
+def updateWoprData():
+	"""Generate and write data for the WOPR endpoint"""
+	if LATEST_DATA is None:
+		return
+
+	woprData = {
+		"latitude": LATEST_DATA.latitude,
+		"longitude": LATEST_DATA.longitude,
+		"altitude": LATEST_DATA.altitude,
+		"pdop": LATEST_DATA.pdop,
+		"avgSnr": statistics.mean([satellite.snr for satellite in LATEST_DATA.satellites]),
+	}
+
+	with open("./web/generated/wopr.json", "w", encoding="utf-8") as f:
+		f.write(json.dumps(woprData))
+
+
 def updateSVGsThread():
 	"""Update the SVGs in the background once per second"""
 	while True:
@@ -98,6 +116,7 @@ def updateSVGsThread():
 		updateStats()
 		updateChart()
 		updateData()
+		updateWoprData()
 		endTime = datetime.now()
 
 		# sleep for the rest of the second
