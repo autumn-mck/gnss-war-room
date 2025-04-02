@@ -1,5 +1,6 @@
 import json
 import os
+import socket
 import time
 from datetime import datetime, timedelta
 from typing import Any, Callable
@@ -116,6 +117,8 @@ def tryReconnectAfterDisconnect(mqttClient: MqttClient, attemptNum=1):
 		mqttClient.reconnect()
 		print("Reconnected to MQTT broker!")
 	except ConnectionRefusedError:
+		tryReconnectAfterDisconnect(mqttClient, attemptNum + 1)
+	except socket.gaierror:
 		tryReconnectAfterDisconnect(mqttClient, attemptNum + 1)
 
 
