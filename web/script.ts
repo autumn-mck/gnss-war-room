@@ -128,7 +128,7 @@ async function updateGlobe() {
 	satelliteDisplay.style.display = "block";
 	svgContainer.style.display = "none";
 
-	let gnssData = await fetch("/api/gnss").then((res) => res.json());
+	let gnssData = (await fetch("/api/gnss").then((res) => res.json())) as GnssData;
 	latestGnssData = gnssData;
 	selectedSatellite = findUpdatedSelectedSatellite(gnssData, selectedSatellite);
 	satelliteDisplay.update(selectedSatellite, latestGnssData);
