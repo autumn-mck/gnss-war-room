@@ -48,6 +48,8 @@ function render(timeMs: number) {
 	controls.update();
 	renderer.render(scene, camera);
 	requestAnimationFrame(render);
+
+	scene.rotation.y = (-0.12 * timeMs) / 1000;
 }
 requestAnimationFrame(render);
 
