@@ -19,7 +19,7 @@ def parseAndPublishLines(file: TextIOWrapper, mqttClients: list[mqtt.Client]):
 		sleep(timeToSleep / 1)
 		print(nmeaMessage)
 		for mqttClient in mqttClients:
-			mqttClient.publish("gnss/rawMessages", nmeaMessage, qos=2)
+			mqttClient.publish("gnss/rawMessages", nmeaMessage, qos=0)
 
 
 def main():

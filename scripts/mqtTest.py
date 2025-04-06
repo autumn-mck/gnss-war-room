@@ -61,7 +61,7 @@ def createMqttClient(config: MqttConfig) -> MqttClient:
 	mqttClient.on_connect = print
 	mqttClient.on_message = print
 	mqttClient.connect(config.host, config.port)
-	mqttClient.subscribe("gnss/rawMessages", qos=2)
+	mqttClient.subscribe("gnss/rawMessages", qos=0)
 	mqttClient.loop_start()
 	return mqttClient
 
