@@ -44,12 +44,16 @@ scene.add(satellitesObject);
 
 renderer.render(scene, camera);
 
-function render(timeMs: number) {
+let shouldRotate = true;
+let lastTimestamp = 0;
+function render(timestamp: DOMHighResTimeStamp) {
 	controls.update();
 	renderer.render(scene, camera);
 	requestAnimationFrame(render);
 
-	scene.rotation.y = (-0.12 * timeMs) / 1000;
+	const timeMs = timestamp - lastTimestamp;
+	lastTimestamp = timestamp;
+	if (shouldRotate) scene.rotation.y += (-0.12 * timeMs) / 1000;
 }
 requestAnimationFrame(render);
 
@@ -170,6 +174,9 @@ resizeCanvasToDisplaySize(canvas, renderer, camera);
 window.addEventListener("resize", () => resizeCanvasToDisplaySize(canvas, renderer, camera));
 window.addEventListener("mousedown", mouseDown);
 window.addEventListener("mouseup", mouseUp);
+window.addEventListener("keydown", (event) => {
+	if (event.key === "r") shouldRotate = !shouldRotate;
+});
 
 if (!customElements.get("satellite-display"))
 	customElements.define("satellite-display", SatelliteDisplay);
