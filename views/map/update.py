@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from gnss.satellite import (
 	SatelliteInView,
@@ -89,41 +89,75 @@ def generateSatelliteTrails(
 	previousPositions = satellite.previousPositions.copy()
 	previousPositions.append((satellite.lastSeen, satellite.elevation, satellite.azimuth))
 	latLongs = [
-		rotateLatLongByTime(
-			getSatelliteLatLong(
-				azimuth, elevation, satellite.network, measuredLatitude, measuredLongitude
+		(
+			measuredTime - currentTime,
+			rotateLatLongByTime(
+				getSatelliteLatLong(
+					azimuth, elevation, satellite.network, measuredLatitude, measuredLongitude
+				),
+				measuredTime,
+				currentTime,
 			),
-			measuredTime,
-			currentTime,
 		)
 		for (measuredTime, elevation, azimuth) in previousPositions
 	]
-	mapPoints = [latLongToGallStereographic(lat, long, mapSize.width) for lat, long in latLongs]
+	mapPoints = [
+		(timeDiff, latLongToGallStereographic(lat, long, mapSize.width))
+		for (timeDiff, (lat, long)) in latLongs
+	]
 
 	# split into separate polylines when distance too big (e.g. crossing antimeridian)
-	mapPointsSplit: list[list[tuple[float, float]]] = []
+	mapPointsSplit: list[list[tuple[timedelta, tuple[float, float]]]] = []
 	for index, point in enumerate(mapPoints):
 		if (
 			index == 0
-			or abs(point[0] - mapPoints[index - 1][0]) > mapSize.width / 2
-			or abs(point[1] - mapPoints[index - 1][1]) > mapSize.height / 2
+			or abs(point[1][0] - mapPoints[index - 1][1][0]) > mapSize.width / 2
+			or abs(point[1][1] - mapPoints[index - 1][1][1]) > mapSize.height / 2
 		):
 			mapPointsSplit.append([point])
 		else:
 			mapPointsSplit[-1].append(point)
 
-	polylines = ""
+	fadeStartTime = timedelta(hours=0)
+	fadeEndTime = timedelta(hours=1.5)
 
+	fade = True
+
+	polylines = ""
 	for mapPointsSet in mapPointsSplit:
-		polylines += f"""\t\t<polyline
-		points='{" ".join(
-			f"{(x + mapSize.width / 2):.4f},{(y + mapSize.height / 2):.4f}" for x, y in mapPointsSet
-		)}'
-		fill='none'
-		stroke='{colour}'
-		stroke-width='{baseRadius / 3}'
-		stroke-linecap='round'
-		stroke-linejoin='round' />\n"""
+		if fade:
+			for index in range(len(mapPointsSet) - 1):
+				current = mapPointsSet[index]
+				next = mapPointsSet[index + 1]
+
+				opacity = 1 + (current[0] - fadeStartTime) / (fadeEndTime - fadeStartTime)
+				opacity = max(0, opacity)
+				opacity = min(1, opacity)
+
+				x1, y1 = current[1]
+				x2, y2 = next[1]
+				polylines += f"""\t\t<line
+				x1='{x1 + mapSize.width / 2:.4f}'
+				y1='{y1 + mapSize.height / 2:.4f}'
+				x2='{x2 + mapSize.width / 2:.4f}'
+				y2='{y2 + mapSize.height / 2:.4f}'
+				stroke='{colour}'
+				stroke-width='{baseRadius / 3}'
+				stroke-opacity='{opacity:.2f}' />\n"""
+
+		else:
+			points = " ".join(
+				f"{(x + mapSize.width / 2):.4f},{(y + mapSize.height / 2):.4f}"
+				for (_, (x, y)) in mapPointsSet
+			)
+
+			polylines += f"""\t\t<polyline
+			points='{points}'
+			fill='none'
+			stroke='{colour}'
+			stroke-width='{baseRadius / 3}'
+			stroke-linecap='round'
+			stroke-linejoin='round' />\n"""
 	return polylines
 
 
