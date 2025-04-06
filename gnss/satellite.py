@@ -32,16 +32,19 @@ class SatelliteInView:
 		(lat, long) = rotateLatLongByTime((lat, long), self.lastSeen, currentTime)
 
 		previousPositions = [
-			rotateLatLongByTime(
-				getSatelliteLatLong(
-					azimuth, elevation, self.network, measuredFromLat, measuredFromLong
+			(
+				str(measuredTime),
+				rotateLatLongByTime(
+					getSatelliteLatLong(
+						azimuth, elevation, self.network, measuredFromLat, measuredFromLong
+					),
+					measuredTime,
+					currentTime,
 				),
-				measuredTime,
-				currentTime,
 			)
 			for (measuredTime, elevation, azimuth) in self.previousPositions
 		]
-		previousPositions.append((lat, long))
+		previousPositions.append((str(self.lastSeen), (lat, long)))
 
 		return {
 			"prnNumber": self.prnNumber,

@@ -4,7 +4,7 @@ export type GnssData = {
 	satellites: Satellite[];
 	latitude: number;
 	longitude: number;
-	date: Date;
+	date: string;
 	lastRecordedTime: Date;
 	altitude: number;
 	altitudeUnit: string;

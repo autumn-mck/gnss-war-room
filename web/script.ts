@@ -134,11 +134,12 @@ async function updateGlobe() {
 	satelliteDisplay.update(selectedSatellite, latestGnssData);
 	satellitesObject.clear();
 
+	const currentTime = Date.parse(gnssData.date);
 	for (let satellite of gnssData.satellites) {
 		let [x, y, z] = latLongToXyz([satellite.long, satellite.lat], satellite.altitude / 6.371);
 		satellitesObject.add(genSatellite(x, y, z, satellite));
 		satellitesObject.add(genSatelliteSelector(x, y, z, satellite));
-		satellitesObject.add(genSatelliteTrail(satellite));
+		satellitesObject.add(...genSatelliteTrail(satellite, currentTime));
 
 		if (
 			satellite.prnNumber === selectedSatellite?.prnNumber &&

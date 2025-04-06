@@ -9,5 +9,5 @@ export type Satellite = {
 	long: number;
 	colour: string;
 	altitude: number;
-	previousPositions: number[][];
+	previousPositions: [string, number[][]];
 };
