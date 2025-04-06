@@ -77,7 +77,7 @@ def sendReceiveMessage(publisher: MqttClient, subscriber: MqttClient, message: s
 
 	subscriber.on_message = onMessage
 	sentTime = time.time()
-	publisher.publish("gnss/rawMessages", message, qos=2)
+	publisher.publish("gnss/rawMessages", message, qos=0)
 
 	while receivedTime is None:
 		time.sleep(0.001)

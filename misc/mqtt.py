@@ -91,7 +91,7 @@ def retryConnect(mqttClient: MqttClient, config: MqttConfig, attemptsLeft=5):
 def subscribeOnConnect(
 	client: MqttClient, _userdata: Any, _flags: ConnectFlags, _rc: int, _properties: Properties
 ):
-	client.subscribe("gnss/rawMessages", qos=2)
+	client.subscribe("gnss/rawMessages", qos=0)
 	client.loop_start()
 
 
