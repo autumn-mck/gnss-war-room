@@ -170,23 +170,3 @@ def makeSvgString(
 
 	svg.write("  </g>\n</svg>\n")
 	return (svg.getvalue(), width, height)
-
-
-def main():
-	"""Write a test SVG"""
-	font = Font()
-	svg, _, _ = makeSvgString(
-		font,
-		"HP1345A\n\r(and WarGames)\r\ntesting more".encode("ascii"),
-		scale=2,
-		border=4,
-		offset=0,
-		fontThickness=2,
-		fontColour="#ff0000",
-	)
-	with open("fig_wg.svg", "w", encoding="utf8") as f:
-		f.write(svg)
-
-
-if __name__ == "__main__":
-	main()
