@@ -29,7 +29,7 @@ def main():
 	mqttConfig = figureOutPublishingConfig(config)
 	mqttClients = createMqttPublishers(mqttConfig)
 
-	with open("120k.tsv", "r", encoding="utf-8") as file:
+	with open("3m.tsv", "r", encoding="utf-8") as file:
 		parseAndPublishLines(file, mqttClients)
 
 

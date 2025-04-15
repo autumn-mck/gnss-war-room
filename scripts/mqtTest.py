@@ -18,7 +18,7 @@ def main():
 	publisher = createMqttPublishers([config.mqtt])[0]
 	subscriber = createMqttClient(config.mqtt)
 
-	with open("120k.nmea", "r", encoding="utf-8") as f:
+	with open("100k.nmea", "r", encoding="utf-8") as f:
 		lines = f.readlines()
 
 	times: list[float] = []
