@@ -43,6 +43,7 @@ const scene = new THREE.Scene();
 createEarth(scene, palette);
 
 let satellitesObject = new THREE.Object3D();
+satellitesObject.scale.z = -1;
 scene.add(satellitesObject);
 
 renderer.render(scene, camera);
