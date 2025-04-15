@@ -132,23 +132,25 @@ def azimuthToWorldXyz(
 	azimuth: float, elevation: float, satelliteNetwork: str
 ) -> tuple[float, float, float]:
 	"""Projecting from the azimuth and elevation to the world xyz coordinates
-	:param azimuth: azimuth in radians
-	:param elevation: elevation in radians
+	:param azimuth: azimuth in degrees
+	:param elevation: elevation in degrees
 	"""
 	# https://www.desmos.com/3d/jxqcoesfg3 for visualisation of 3d,
 	# https://www.desmos.com/calculator/oskkcd5rdb for 2d
+
+	azimuthRadians = math.radians(azimuth)
 
 	orbit = orbitHeightForNetwork(satelliteNetwork)
 	ground = 6.37
 
 	x1, x2 = calcX(elevation, orbit, ground)
-	x1 *= math.cos(math.radians(azimuth))
-	x2 *= math.cos(math.radians(azimuth))
+	x1 *= math.cos(azimuthRadians)
+	x2 *= math.cos(azimuthRadians)
 
 	y1, y2 = calcY(elevation, orbit, ground)
 
-	z1 = x1 * math.tan(math.radians(azimuth))
-	z2 = x2 * math.tan(math.radians(azimuth))
+	z1 = x1 * math.tan(azimuthRadians)
+	z2 = x2 * math.tan(azimuthRadians)
 
 	# divide by orbit
 	x1 /= orbit
