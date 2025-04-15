@@ -156,6 +156,8 @@ def updateWindows(windows: list[QMainWindow]) -> Callable[[bytes, GnssData], Non
 					window.satelliteReceivedEvent.emit()
 				case SignalGraphWindow():
 					window.onNewData(gnssData)
+				case GlobeWindow():
+					pass  # is managed by whatever server the globe is on
 				case _:
 					print("Unknown window type")
 
