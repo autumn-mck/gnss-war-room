@@ -18,6 +18,9 @@ const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 const canvasContainer = document.getElementById("canvasContainer") as HTMLDivElement;
 const satelliteDisplay = document.getElementById("satelliteDisplay") as SatelliteDisplay;
 
+// hide combo box when embedded
+if (window.navigator.userAgent == "WOPR") comboBox.style.display = "none";
+
 const palette = await fetch("/palette.json").then((res) => res.json());
 
 document.documentElement.style.setProperty("--background", palette.background);
