@@ -1,4 +1,5 @@
-from PyQt6.QtCore import QUrl
+from PyQt6.QtCore import Qt, QUrl
+from PyQt6.QtGui import QKeyEvent
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QMainWindow
 
@@ -25,3 +26,7 @@ class GlobeWindow(QMainWindow):
 		webView.load(QUrl(config.url))
 
 		self.setCentralWidget(webView)
+
+	def keyPressEvent(self, event: QKeyEvent):
+		if event.key() == Qt.Key.Key_F:
+			self.setWindowState(self.windowState() ^ Qt.WindowState.WindowFullScreen)
