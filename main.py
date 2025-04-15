@@ -7,9 +7,7 @@ from datetime import datetime, timedelta
 from typing import Callable
 
 from dotenv import load_dotenv
-from PyQt6.QtCore import QUrl
 from PyQt6.QtGui import QScreen
-from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QApplication, QMainWindow
 
 from font.fetch import fetchFontRomsIfNeeded
@@ -26,6 +24,7 @@ from misc.config import (
 )
 from misc.mqtt import createMqttSubscriber
 from palettes.palette import Palette, loadPalette
+from views.globe.window import GlobeWindow
 from views.map.window import MapWindow
 from views.polarGrid.window import PolarGridWindow
 from views.rawMessages.window import RawMessageWindow
@@ -118,9 +117,7 @@ def createWindows(appConfig: Config, palette: Palette):
 			case SignalChartConfig():
 				window = SignalGraphWindow(palette, windowConfig)
 			case GlobeConfig():
-				window = QWebEngineView()
-				window.load(QUrl("http://0.0.0.0:2024/"))
-				window.show()
+				window = GlobeWindow(palette, windowConfig)
 			case _:
 				msg = f"Unknown window type: {windowConfig.type}"
 				raise ValueError(msg)

@@ -71,6 +71,8 @@ class SignalChartConfig(JSONWizard):
 
 @dataclass
 class GlobeConfig(JSONWizard):
+	url: str = "https://gnss.mck.is/"
+
 	class _(JSONWizard.Meta):
 		tag = "globe"
 
