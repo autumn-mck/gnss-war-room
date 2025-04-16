@@ -16,6 +16,7 @@ export function genSatelliteTrail(satellite: Satellite, currentTime: number) {
 
 		let latLong = position[1] as [number, number];
 		let [x, y, z] = latLongToXyz([latLong[1], latLong[0]], satellite.altitude / 6.371);
+		y = -y;
 
 		let fadeStartTime = 0;
 		let fadeEndTime = 1.2;
