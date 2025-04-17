@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import contextlib
+import signal
 import sys
 import threading
 from datetime import datetime, timedelta
@@ -36,6 +37,8 @@ from views.stats.window import MiscStatsWindow
 
 def main():
 	"""Main function"""
+	signal.signal(signal.SIGINT, exitOnInterrupt)
+
 	fetchFontRomsIfNeeded()
 
 	app = QApplication(sys.argv)
@@ -53,8 +56,17 @@ def main():
 		for window in windows:
 			window.show()
 
-	app.exec()  # blocks until the app is closed
+	try:
+		app.exec()  # blocks until the app is closed
+	except KeyboardInterrupt:
+		print("KeyboardInterrupt: Exiting...")
 	print("How about a nice game of chess?")
+
+
+def exitOnInterrupt(signalId: int, _):
+	"""Exit the program on a KeyboardInterrupt"""
+	print(f"{signalId} KeyboardInterrupt: Exiting...")
+	sys.exit(0)
 
 
 def startupSequence(app: QApplication, config: Config, palette: Palette):
