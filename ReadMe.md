@@ -11,19 +11,23 @@ _Running at the Cyber Physical Systems Lab, Queen's University Belfast_
 
 ## Setup
 
-Create a virtual environment: `python -m venv .venv` and activate it: `source .venv/bin/activate`
+Create a virtual environment: `python -m venv .venv` and activate it.
+
+On Linux: `source .venv/bin/activate`
+On Windows: `.venv\Scripts\Activate.ps1`
 
 Install dependencies: `pip install -r requirements.txt`
 
-### If running MQTT locally
+Copy `config.example.json5` to `config.json5`, then edit as needed.
 
+### If running MQTT broker locally
+
+TODO: Windows?
 Start up the container for the MQTT broker: `podman compose up`
 
-Now, while the container is running, set a password for publishing to the broker: `podman exec mosquitto mosquitto_passwd -b /etc/mosquitto/passwd gnssreceiver <password>`, replacing `<password>` with a password of your choosing, e.g. "Joshua". Create a file called `.env`, with the contents `GNSS_PUBLISHER_PASSWORD=<password>`.
+Now, while the container is running, set a password for publishing to the broker: `podman exec mosquitto mosquitto_passwd -b /etc/mosquitto/passwd gnssreceiver <password>`, replacing `<password>` with a password of your choosing (e.g. "Joshua"). Create a file called `.env`, with the contents `GNSS_PUBLISHER_PASSWORD=<password>`.
 
 Finally, restart the broker container for it to read the new password.
-
-Note: The above steps should also work using docker, although this has not yet been tested.
 
 ### If running MQTT on a remote server
 
@@ -31,18 +35,30 @@ Edit `config.json5` and set `mqttHost` to the hostname of the remote server. You
 
 ## Running
 
-Edit `config.pyjson5` as needed. To display the main PyQt GUI: `python main.py`
+### Desktop UI
+
+To display the main PyQt GUI, run `python main.py`. To stop it, either close all windows manually, or press <key>Ctrl+c</key> on the terminal you ran it from.
+
+On all windows, <key>F</key> toggles fullscreen.
 
 Map controls:
 
-- WASD: move map
+- WASD: move map (hold shift to move faster)
 - Q: zoom in
 - E: zoom out
+- T: Toggle satellite trails (may not be visible if application just started)
 - Z: rotate between scale methods (constant scale, scale to fit width, scale to fit height, fit to window)
 - X: toggle country borders
 - C: toggle cities
-- Arrow keys: move key
-- K: toggle key
+- Arrow keys: move network key
+- K: toggle network key key
+
+SNR Chart:
+
+- S: toggle sorting between by network, by signal to noise ratio, and by angle of elevation
+- U: toggle displaying untracked satellites (those not used to obtain positioning data)
+
+### Web UI
 
 To run the web frontend: `sh webStart.sh` (will default to port 2024)
 
