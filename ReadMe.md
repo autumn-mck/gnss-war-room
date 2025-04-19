@@ -6,8 +6,10 @@ A project for displaying Global Navigation Satellite System (GNSS) and precision
 
 The whole system will be covered in further detail in the dissertation.
 
-![](./docs/readme-imgs/cpsl.jpg)
+![](./docs/readme-imgs/cpsl.png)
 _Running at the Cyber Physical Systems Lab, Queen's University Belfast_
+
+Video of it in action: <https://www.youtube.com/watch?v=4Qw9tWjHihw>
 
 ## Setup
 
