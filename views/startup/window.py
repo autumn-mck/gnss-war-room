@@ -92,16 +92,21 @@ class StartupWindow(QMainWindow):
 
 	def backgroundThread(self):
 		while self.stage >= 0:
-			self.refreshSignal.emit()
-			self.counter += 1
-			if (
-				self.counter < len(self.currentText) - 1
-				and self.currentText[self.counter] in self.internalSignalChars
-			):
-				self.runCommand(self.currentText[self.counter])
+			self.tick()
 			time.sleep(0.02)
 
+	def tick(self):
+		"""Update the text on the window to the next character/stage"""
+		self.refreshSignal.emit()
+		self.counter += 1
+		if (
+			self.counter < len(self.currentText) - 1
+			and self.currentText[self.counter] in self.internalSignalChars
+		):
+			self.runCommand(self.currentText[self.counter])
+
 	def runCommand(self, command: str):
+		"""Attempt to interpret the given character as a command"""
 		if command == chr(0x08):
 			for _ in range(50):
 				self.refreshSignal.emit()

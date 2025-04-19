@@ -9,6 +9,8 @@ from palettes.palette import Palette
 
 
 class GlobeWindow(QMainWindow):
+	"""Globe window using a webview"""
+
 	defaultSize = Size(500, 500)
 
 	def __init__(self, palette: Palette, config: GlobeConfig):

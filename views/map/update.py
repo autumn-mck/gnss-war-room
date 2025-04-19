@@ -84,7 +84,6 @@ def generateSatelliteTrails(
 	"""Generate a trail for the given satellite"""
 	if len(satellite.previousPositions) < 1:
 		return ""
-	colour = colourForNetwork(satellite.network, palette)
 
 	previousPositions = satellite.previousPositions.copy()
 	previousPositions.append((satellite.lastSeen, satellite.elevation, satellite.azimuth))
@@ -118,46 +117,69 @@ def generateSatelliteTrails(
 		else:
 			mapPointsSplit[-1].append(point)
 
-	fadeStartTime = timedelta(hours=0)
-	fadeEndTime = timedelta(hours=1.5)
-
 	fade = True
 
+	colour = colourForNetwork(satellite.network, palette)
 	polylines = ""
 	for mapPointsSet in mapPointsSplit:
 		if fade:
-			for index in range(len(mapPointsSet) - 1):
-				current = mapPointsSet[index]
-				next = mapPointsSet[index + 1]
-
-				opacity = 1 + (current[0] - fadeStartTime) / (fadeEndTime - fadeStartTime)
-				opacity = max(0, opacity)
-				opacity = min(1, opacity)
-
-				x1, y1 = current[1]
-				x2, y2 = next[1]
-				polylines += f"""\t\t<line
-				x1='{x1 + mapSize.width / 2:.4f}'
-				y1='{y1 + mapSize.height / 2:.4f}'
-				x2='{x2 + mapSize.width / 2:.4f}'
-				y2='{y2 + mapSize.height / 2:.4f}'
-				stroke='{colour}'
-				stroke-width='{baseRadius / 3}'
-				stroke-opacity='{opacity:.2f}' />\n"""
-
+			polylines += genFadedTrail(mapPointsSet, mapSize, baseRadius, colour)
 		else:
-			points = " ".join(
-				f"{(x + mapSize.width / 2):.4f},{(y + mapSize.height / 2):.4f}"
-				for (_, (x, y)) in mapPointsSet
-			)
+			polylines += genTrail(mapPointsSet, mapSize, baseRadius, colour)
+	return polylines
 
-			polylines += f"""\t\t<polyline
-			points='{points}'
-			fill='none'
-			stroke='{colour}'
-			stroke-width='{baseRadius / 3}'
-			stroke-linecap='round'
-			stroke-linejoin='round' />\n"""
+
+def genTrail(
+	mapPointsSet: list[tuple[timedelta, tuple[float, float]]],
+	mapSize: Size,
+	baseRadius: float,
+	colour: str,
+) -> str:
+	"""Generate a trail of previous positions"""
+	points = " ".join(
+		f"{(x + mapSize.width / 2):.4f},{(y + mapSize.height / 2):.4f}"
+		for (_, (x, y)) in mapPointsSet
+	)
+
+	return f"""\t\t<polyline
+	points='{points}'
+	fill='none'
+	stroke='{colour}'
+	stroke-width='{baseRadius / 3}'
+	stroke-linecap='round'
+	stroke-linejoin='round' />\n"""
+
+
+def genFadedTrail(
+	mapPointsSet: list[tuple[timedelta, tuple[float, float]]],
+	mapSize: Size,
+	baseRadius: float,
+	colour: str,
+) -> str:
+	"""Generate a faded trail of previous positions"""
+	fadeStartTime = timedelta(hours=0)
+	fadeEndTime = timedelta(hours=1.5)
+
+	polylines = ""
+	for index in range(len(mapPointsSet) - 1):
+		currentPoints = mapPointsSet[index]
+		nextPoints = mapPointsSet[index + 1]
+
+		opacity = 1 + (currentPoints[0] - fadeStartTime) / (fadeEndTime - fadeStartTime)
+		opacity = max(0, opacity)
+		opacity = min(1, opacity)
+
+		x1, y1 = currentPoints[1]
+		x2, y2 = nextPoints[1]
+		polylines += f"""\t\t<line
+		x1='{x1 + mapSize.width / 2:.4f}'
+		y1='{y1 + mapSize.height / 2:.4f}'
+		x2='{x2 + mapSize.width / 2:.4f}'
+		y2='{y2 + mapSize.height / 2:.4f}'
+		stroke='{colour}'
+		stroke-width='{baseRadius / 3}'
+		stroke-opacity='{opacity:.2f}' />\n"""
+
 	return polylines
 
 
