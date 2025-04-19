@@ -1,21 +1,41 @@
 {
+	// see available palettes in ./palettes
 	paletteName: "warGames",
-	satelliteTTL: 3000,
+
+	// should be true if you're running it as a display piece (will fullscreen windows on each display)
 	warRoom: false,
+
+	// should the fancy startup sequence be shown
 	startupSequence: false,
 
+	// how long a satellite can still be displayed for since it was last seen (in seconds)
+	satelliteTTL: 3000,
+
+	// config for the MQTT broker (both for publishing and subscribing)
 	mqtt: {
 		host: "localhost",
 		port: 1883,
 	},
 
+	// config for the GNSS receiver (only used on publishing device)
 	gnss: {
-		// On linux it's likely /dev/ttyACM0 or /dev/ttyUSB0
-		// while Windows will be COM[number]
+		// On linux it's likely /dev/ttyACM0 or /dev/ttyUSB0 (depends on which receiver you're using)
+		// while Windows will be COM[number] (will show up in device manager)
 		serialPort: "/dev/ttyACM0",
 		baudRate: 38400,
 	},
 
+	// if you're wanting to publish to multiple MQTT brokers at once, uncomment the following (overrides mqtt)
+	// multiTrackBroadcasting: [
+	// 	{
+	// 		host: "localhost",
+	// 	},
+	// 	{
+	// 		host: "gnss-mqtt.mck.is",
+	// 	},
+	// ],
+
+	// the order of the windows matters if you're using the warRoom option
 	windows: [
 		{
 			// map of the whole world at once
@@ -35,6 +55,9 @@
 		},
 		{
 			type: "signalGraph",
+			countUntrackedSatellites: false,
+
+			// display config for the chart , you probably don't need to change these
 			marginLeft: 45,
 			marginRight: 10,
 			marginTop: 20,
@@ -46,7 +69,6 @@
 			minValue: 0,
 			maxValue: 60,
 			markerStep: 5,
-			countUntrackedSatellites: false,
 		},
 		{
 			type: "polarGrid",
