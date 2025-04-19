@@ -3,7 +3,6 @@ from PyQt6.QtGui import QResizeEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
 
 from gnss.satellite import SatelliteInView
-from misc.size import Size
 from palettes.palette import Palette
 from views.baseWindow import BaseWindow
 from views.polarGrid.generate import prepareIntialPolarGrid, readBasePolarGrid

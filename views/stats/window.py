@@ -6,7 +6,6 @@ from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
 from gnss.nmea import GnssData
 from misc.config import MiscStatsConfig
-from misc.size import Size
 from palettes.palette import Palette
 from views.baseWindow import BaseWindow
 from views.stats.generate import generateStats

@@ -2,7 +2,6 @@ from PyQt6.QtCore import QUrl
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
 from misc.config import GlobeConfig
-from misc.size import Size
 from palettes.palette import Palette
 from views.baseWindow import BaseWindow
 
