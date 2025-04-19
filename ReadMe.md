@@ -71,3 +71,9 @@ To send live data to the system, modify `config.json5` to set `gnssSerialPort` t
 For prerecorded samples that can be replayed to test the system at any time using `python -m receiver.publishLog`, see https://github.com/autumn-mck/gnss-nmea-samples
 
 ![](./docs/readme-imgs/dataflow.svg)
+
+This project is licensed under GPLv3, with some exceptions:
+
+- the files in the `font` directory are licenced under the beer-ware licence
+- the "1981" map from Project Linework by Daniel Huffman is public domain
+- the "polar grid" is based on https://commons.wikimedia.org/wiki/File:Circle_r%3D1.svg by Pbrks, licensed under CC BY-SA 3.0
