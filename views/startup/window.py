@@ -6,14 +6,15 @@ from typing import ClassVar
 
 from PyQt6.QtCore import QByteArray, pyqtSignal
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QApplication, QMainWindow
+from PyQt6.QtWidgets import QApplication
 
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
 from palettes.palette import Palette
+from views.baseWindow import BaseWindow
 
 
-class StartupWindow(QMainWindow):
+class StartupWindow(BaseWindow):
 	"""Window for displaying the startup sequence"""
 
 	refreshSignal = pyqtSignal()
@@ -21,12 +22,9 @@ class StartupWindow(QMainWindow):
 	internalSignalChars: ClassVar[list] = [chr(0x08), chr(0x0C)]
 
 	def __init__(self, palette: Palette, app: QApplication):
-		super().__init__()
-		self.setWindowTitle("...")
-		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
+		super().__init__(palette)
 
 		self.app = app
-		self.customPalette = palette
 
 		self.svgFont = Font()
 		self.svg = QSvgWidget(parent=self)

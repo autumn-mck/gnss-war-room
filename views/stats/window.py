@@ -1,7 +1,6 @@
-from PyQt6.QtCore import QByteArray, QSize, Qt, pyqtSignal
-from PyQt6.QtGui import QKeyEvent, QResizeEvent
+from PyQt6.QtCore import QByteArray, QSize, pyqtSignal
+from PyQt6.QtGui import QResizeEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QMainWindow
 
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString
@@ -9,21 +8,18 @@ from gnss.nmea import GnssData
 from misc.config import MiscStatsConfig
 from misc.size import Size
 from palettes.palette import Palette
+from views.baseWindow import BaseWindow
 from views.stats.generate import generateStats
 
 
-class MiscStatsWindow(QMainWindow):
+class MiscStatsWindow(BaseWindow):
 	"""Window for displaying miscellaneous statistics"""
 
 	satelliteReceivedEvent = pyqtSignal()
-	defaultSize = Size(500, 500)
 
 	def __init__(self, palette: Palette, config: MiscStatsConfig):
-		super().__init__()
+		super().__init__(palette)
 		self.setWindowTitle("Misc Stats")
-		self.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
-		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
-		self.customPalette = palette
 		self.config = config
 
 		self.satelliteReceivedEvent.connect(self.updateWithNewData)
@@ -39,10 +35,6 @@ class MiscStatsWindow(QMainWindow):
 		self.svg = QSvgWidget(parent=self)
 		self.svg.load(QByteArray(svgStr.encode()))
 		self.svg.setGeometry(0, 0, width, height)
-
-	def keyPressEvent(self, event: QKeyEvent):
-		if event.key() == Qt.Key.Key_F:
-			self.setWindowState(self.windowState() ^ Qt.WindowState.WindowFullScreen)
 
 	def resizeEvent(self, event: QResizeEvent):
 		"""Resize the text to always fit the window"""

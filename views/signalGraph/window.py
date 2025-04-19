@@ -1,17 +1,17 @@
 from PyQt6.QtCore import QByteArray, Qt, pyqtSignal
 from PyQt6.QtGui import QKeyEvent, QResizeEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QMainWindow
 
 from font.hp1345Font import Font
 from gnss.nmea import GnssData
 from misc.config import SignalChartConfig
 from misc.size import Size
 from palettes.palette import Palette
+from views.baseWindow import BaseWindow
 from views.signalGraph.generate import generateBarChart
 
 
-class SignalGraphWindow(QMainWindow):
+class SignalGraphWindow(BaseWindow):
 	"""Window for displaying signal graph"""
 
 	satelliteReceivedEvent = pyqtSignal()
@@ -19,10 +19,8 @@ class SignalGraphWindow(QMainWindow):
 	defaultSize = Size(500, 500)
 
 	def __init__(self, palette: Palette, config: SignalChartConfig):
-		super().__init__()
+		super().__init__(palette)
 		self.setWindowTitle("Signal Graph")
-		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
-		self.customPalette = palette
 		self.config = config
 
 		self.latestData = GnssData()
@@ -47,8 +45,7 @@ class SignalGraphWindow(QMainWindow):
 
 	def keyPressEvent(self, event: QKeyEvent):
 		"""Handle key presses"""
-		if event.key() == Qt.Key.Key_F:
-			self.setWindowState(self.windowState() ^ Qt.WindowState.WindowFullScreen)
+		super().keyPressEvent(event)
 		if event.key() == Qt.Key.Key_S:
 			self.sortMethodIndex = (self.sortMethodIndex + 1) % len(self.sortMethods)
 			self.updateGraph()

@@ -1,16 +1,16 @@
-from PyQt6.QtCore import QByteArray, Qt, pyqtSignal
-from PyQt6.QtGui import QKeyEvent, QResizeEvent
+from PyQt6.QtCore import QByteArray, pyqtSignal
+from PyQt6.QtGui import QResizeEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QMainWindow
 
 from font.hp1345Font import Font
 from font.mksvgs import makeSvgString, makeTextGroup
 from misc.config import RawMessageConfig
 from misc.size import Size
 from palettes.palette import Palette
+from views.baseWindow import BaseWindow
 
 
-class RawMessageWindow(QMainWindow):
+class RawMessageWindow(BaseWindow):
 	"""Window for displaying raw messages"""
 
 	textScale = 1.0
@@ -18,10 +18,8 @@ class RawMessageWindow(QMainWindow):
 	defaultSize = Size(700, 500)
 
 	def __init__(self, palette: Palette, config: RawMessageConfig):
-		super().__init__()
+		super().__init__(palette)
 		self.setWindowTitle("Raw Messages")
-		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
-		self.customPalette = palette
 		self.config = config
 
 		self.satelliteReceivedEvent.connect(self.updateMessageLog)
@@ -58,10 +56,6 @@ class RawMessageWindow(QMainWindow):
 		oldHeight = self.svg.height()
 		newHeight = oldHeight * newWidth / oldWidth
 		self.svg.setGeometry(0, 0, newWidth, int(newHeight))
-
-	def keyPressEvent(self, event: QKeyEvent):
-		if event.key() == Qt.Key.Key_F:
-			self.setWindowState(self.windowState() ^ Qt.WindowState.WindowFullScreen)
 
 	def onNewData(self, message: bytes):
 		"""Update the raw message window with new data"""

@@ -21,82 +21,81 @@ from misc.config import (
 	PolalGridConfig,
 	RawMessageConfig,
 	SignalChartConfig,
+	WindowConfig,
 	loadConfig,
 )
 from misc.mqtt import createMqttSubscriber
 from palettes.palette import Palette, loadPalette
+from views.baseWindow import BaseWindow
 from views.globe.window import GlobeWindow
 from views.map.window import MapWindow
 from views.polarGrid.window import PolarGridWindow
 from views.rawMessages.window import RawMessageWindow
 from views.signalGraph.window import SignalGraphWindow
-from views.startup.blankWindow import BlankWindow
 from views.startup.window import StartupWindow
 from views.stats.window import MiscStatsWindow
 
 
 def main():
-	"""Main function"""
-	signal.signal(signal.SIGINT, exitOnInterrupt)
+	"""Desktop UI main function"""
+	signal.signal(signal.SIGINT, exitCleanlyOnInterrupt)
 
 	fetchFontRomsIfNeeded()
 
-	app = QApplication(sys.argv)
 	load_dotenv()
 	config = loadConfig()
 	palette = loadPalette(config.paletteName)
+
+	app = QApplication(sys.argv)
 	if config.startupSequence:
-		windows = startupSequence(app, config, palette)
+		windows = startupSequenceThenMainWindows(app, config, palette)
 	else:
 		windows = createMainWindows(config, palette)
 
 	if config.warRoom:
-		fullscreenWindowsOnAllScreens(app, windows)
+		fullscreenWindowsOnAllDisplays(app, windows)
 	else:
-		for window in windows:
-			window.show()
+		showAllWindows(windows)
 
-	try:
-		app.exec()  # blocks until the app is closed
-	except KeyboardInterrupt:
-		print("KeyboardInterrupt: Exiting...")
+	app.exec()  # blocks until the app is closed
 	print("How about a nice game of chess?")
 
 
-def exitOnInterrupt(signalId: int, _):
+def exitCleanlyOnInterrupt(signalId: int, _):
 	"""Exit the program on a KeyboardInterrupt"""
 	print(f"{signalId} KeyboardInterrupt: Exiting...")
 	sys.exit(0)
 
 
-def startupSequence(app: QApplication, config: Config, palette: Palette):
-	"""Display the startup sequence, then return the main windows"""
+def startupSequenceThenMainWindows(app: QApplication, config: Config, palette: Palette):
+	"""Display the optional startup sequence, then return the main windows"""
 	screens = app.screens()
 	windows = []
 	for index, screen in enumerate(screens):
-		window = StartupWindow(palette, app) if index == 0 else BlankWindow(palette)
+		window = StartupWindow(palette, app) if index == 0 else BaseWindow(palette)
 
-		fullscreenWindowOnScreen(window, screen)
+		fullscreenWindowOnDisplay(window, screen)
 		windows.append(window)
 
 	windows = createMainWindows(config, palette)
+	# if anything goes wrong, just continue to the main visualisation anyway
 	with contextlib.suppress(Exception):
 		app.exec()
 
 	return windows
 
 
-def fullscreenWindowOnScreen(window: QMainWindow, screen: QScreen):
-	screenGeometry = screen.geometry()
-	window.setScreen(screen)
-	window.move(screenGeometry.topLeft())
-	window.resize(screenGeometry.size())
+def fullscreenWindowOnDisplay(window: QMainWindow, display: QScreen):
+	displayGeometry = display.geometry()
+	window.setScreen(display)
+	window.move(displayGeometry.topLeft())
+	window.resize(displayGeometry.size())
 	window.showFullScreen()
 
 
 def createMainWindows(config: Config, palette: Palette):
 	"""Create the main windows"""
-	windows = createWindows(config, palette)
+	windows = [windowConfigToWindow(windowConfig, palette) for windowConfig in config.windows]
 
 	onNewData = updateWindows(windows)
 	threading.Thread(
@@ -105,40 +104,40 @@ def createMainWindows(config: Config, palette: Palette):
 	return windows
 
 
-def fullscreenWindowsOnAllScreens(app: QApplication, windows: list[QMainWindow]):
+def fullscreenWindowsOnAllDisplays(app: QApplication, windows: list[BaseWindow]):
 	"""Make all the windows fullscreen on all available screens"""
-	screens = app.screens()
+	displays = app.screens()
 	for index, window in enumerate(windows):
-		screen = screens[index % len(screens)]
-		fullscreenWindowOnScreen(window, screen)
+		display = displays[index % len(displays)]
+		fullscreenWindowOnDisplay(window, display)
 
 
-def createWindows(appConfig: Config, palette: Palette):
-	"""Create the windows from the given config"""
-	windows: list[QMainWindow] = []
-	for windowConfig in appConfig.windows:
-		match windowConfig:
-			case MapConfig():
-				window = MapWindow(palette, windowConfig)
-			case PolalGridConfig():
-				window = PolarGridWindow(palette)
-			case MiscStatsConfig():
-				window = MiscStatsWindow(palette, windowConfig)
-			case RawMessageConfig():
-				window = RawMessageWindow(palette, windowConfig)
-			case SignalChartConfig():
-				window = SignalGraphWindow(palette, windowConfig)
-			case GlobeConfig():
-				window = GlobeWindow(palette, windowConfig)
-			case _:
-				msg = f"Unknown window type: {windowConfig.type}"
-				raise ValueError(msg)
-
-		windows.append(window)
-	return windows
+def showAllWindows(windows: list[BaseWindow]):
+	for window in windows:
+		window.show()
 
 
-def updateWindows(windows: list[QMainWindow]) -> Callable[[bytes, GnssData], None]:
+def windowConfigToWindow(windowConfig: WindowConfig, palette: Palette) -> BaseWindow:
+	"""Map the window config to a window and return it"""
+	match windowConfig:
+		case MapConfig():
+			return MapWindow(palette, windowConfig)
+		case PolalGridConfig():
+			return PolarGridWindow(palette)
+		case MiscStatsConfig():
+			return MiscStatsWindow(palette, windowConfig)
+		case RawMessageConfig():
+			return RawMessageWindow(palette, windowConfig)
+		case SignalChartConfig():
+			return SignalGraphWindow(palette, windowConfig)
+		case GlobeConfig():
+			return GlobeWindow(palette, windowConfig)
+		case _:
+			msg = f"Unknown window type: {windowConfig.type}"
+			raise ValueError(msg)
+
+
+def updateWindows(windows: list[BaseWindow]) -> Callable[[bytes, GnssData], None]:
 	"""Generate a callback for the windows to handle new data"""
 	lastUpdatedAt = datetime.now()
 
@@ -157,23 +156,29 @@ def updateWindows(windows: list[QMainWindow]) -> Callable[[bytes, GnssData], Non
 		lastUpdatedAt = datetime.now()
 
 		for window in windows:
-			match window:
-				case MapWindow():
-					window.onNewData(gnssData)
-				case PolarGridWindow():
-					window.onNewData(gnssData.satellites)
-				case MiscStatsWindow():
-					window.onNewData(gnssData)
-				case RawMessageWindow():
-					window.satelliteReceivedEvent.emit()
-				case SignalGraphWindow():
-					window.onNewData(gnssData)
-				case GlobeWindow():
-					pass  # is managed by whatever server the globe is on
-				case _:
-					print("Unknown window type")
+			updateWindow(window, gnssData)
 
 	return updateWindowsOnNewData
+
+
+def updateWindow(window: BaseWindow, gnssData: GnssData):
+	"""Update the given window with the given data"""
+	match window:
+		case MapWindow():
+			window.onNewData(gnssData)
+		case PolarGridWindow():
+			window.onNewData(gnssData.satellites)
+		case MiscStatsWindow():
+			window.onNewData(gnssData)
+		case RawMessageWindow():
+			window.satelliteReceivedEvent.emit()
+		case SignalGraphWindow():
+			window.onNewData(gnssData)
+		case GlobeWindow():
+			pass  # is managed by whatever server the globe is on
+		case _:
+			msg = f"Unknown window type: {window}"
+			raise ValueError(msg)
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@ from palettes.palette import Palette
 
 @dataclass
 class SatelliteInView:
-	"""Data about a GNSS satellite"""
+	"""Satellite data"""
 
 	prnNumber: int = 0
 	network: str = "??"
@@ -79,6 +79,7 @@ def colourForNetwork(network: str, palette: Palette) -> str:
 
 
 def networkCodeToName(networkCode: str) -> str:
+	"""Map a talker ID/network code to a network name"""
 	match networkCode:
 		case "GA":
 			return "Galileo"
@@ -95,6 +96,7 @@ def networkCodeToName(networkCode: str) -> str:
 
 
 def nameToNetworkCode(name: str) -> str:
+	"""Map a network name to a talker ID/network code"""
 	match name:
 		case "Galileo":
 			return "GA"
@@ -111,6 +113,7 @@ def nameToNetworkCode(name: str) -> str:
 
 
 def orbitHeightForNetwork(network: str) -> float:
+	"""Map a network ID to its orbit height"""
 	match network:
 		case "GA":  # Galileo
 			return 23.222
@@ -119,7 +122,7 @@ def orbitHeightForNetwork(network: str) -> float:
 		case "GL":  # GLONASS
 			return 19.13
 		case "BD" | "GB":
-			# BeiDou (todo: there appears to be satellites at a few different orbit heights)
+			# BeiDou
 			return 21.528
 		case "GQ":
 			return 42.164
@@ -131,9 +134,9 @@ def orbitHeightForNetwork(network: str) -> float:
 def azimuthToWorldXyz(
 	azimuth: float, elevation: float, satelliteNetwork: str
 ) -> tuple[float, float, float]:
-	"""Projecting from the azimuth and elevation to the world xyz coordinates
-	:param azimuth: azimuth in degrees
-	:param elevation: elevation in degrees
+	"""Projecting from the azimuth and elevation to world xyz coordinates
+	:param azimuth: in degrees
+	:param elevation: in degrees
 	"""
 	# https://www.desmos.com/3d/jxqcoesfg3 for visualisation of 3d,
 	# https://www.desmos.com/calculator/oskkcd5rdb for 2d
@@ -222,7 +225,7 @@ def getSatelliteLatLong(
 	measuredFromLat: float,
 	measuredFromLong: float,
 ) -> tuple[float, float]:
-	"""Get the lat long coordinates of a satellite"""
+	"""Get the lat/long of a satellite"""
 	x, y, z = azimuthToWorldXyz(azimuth, elevation, satelliteNetwork)
 	x, y, z = rotateXyzByLatitude(x, y, z, measuredFromLat)
 	lat, long = xyzToLatLong(x, y, z)

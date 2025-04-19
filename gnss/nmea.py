@@ -11,7 +11,7 @@ from palettes.palette import Palette
 
 @dataclass
 class GnssData:
-	"""Data from GNSS receiver"""
+	"""GNSS data"""
 
 	satellites: list[SatelliteInView] = field(default_factory=list)
 	latitude: float = 0
@@ -55,22 +55,22 @@ def parseSatelliteInMessage(parsedData: NMEAMessage, updateTime: datetime) -> li
 
 	return [
 		SatelliteInView(
-			prnNumber=getattr(parsedData, f"svid_0{satNum + 1}") or 0,
+			prnNumber=getattr(parsedData, f"svid_0{satNum}") or 0,
 			network=parsedData.talker,
-			elevation=tryParseFloat(getattr(parsedData, f"elv_0{satNum + 1}")),
-			azimuth=tryParseFloat(getattr(parsedData, f"az_0{satNum + 1}")),
-			snr=tryParseFloat(getattr(parsedData, f"cno_0{satNum + 1}")),
+			elevation=tryParseFloat(getattr(parsedData, f"elv_0{satNum}")),
+			azimuth=tryParseFloat(getattr(parsedData, f"az_0{satNum}")),
+			snr=tryParseFloat(getattr(parsedData, f"cno_0{satNum}")),
 			lastSeen=updateTime,
 			previousPositions=[
 				(
 					updateTime,
-					tryParseFloat(getattr(parsedData, f"elv_0{satNum + 1}")),
-					tryParseFloat(getattr(parsedData, f"az_0{satNum + 1}")),
+					tryParseFloat(getattr(parsedData, f"elv_0{satNum}")),
+					tryParseFloat(getattr(parsedData, f"az_0{satNum}")),
 				)
 			],
 		)
-		for satNum in range(3)
-		if hasattr(parsedData, f"svid_0{satNum + 1}")
+		for satNum in range(1, 4)
+		if hasattr(parsedData, f"svid_0{satNum}")
 	]
 
 
@@ -100,7 +100,7 @@ def updateGnssDataWithMessage(
 
 			if gnssData.date - gnssData.lastRecordedTime > timedelta(seconds=1200):
 				gnssData.lastRecordedTime = gnssData.date
-				gnssData.satellites = updateSaltellitePreviousPositions(gnssData.satellites)
+				updateSaltellitePreviousPositions(gnssData.satellites)
 		case "GLL":
 			gnssData.latitude = message.lat
 			gnssData.longitude = message.lon
@@ -136,12 +136,11 @@ def updateGnssDataWithMessage(
 	return gnssData
 
 
-def updateSaltellitePreviousPositions(satellites: list[SatelliteInView]) -> list[SatelliteInView]:
+def updateSaltellitePreviousPositions(satellites: list[SatelliteInView]):
 	for satellite in satellites:
 		satellite.previousPositions.append(
 			(satellite.lastSeen, satellite.elevation, satellite.azimuth)
 		)
-	return satellites
 
 
 def updateSatellitePositions(
@@ -150,7 +149,7 @@ def updateSatellitePositions(
 	updateTime: datetime,
 	satelliteTTL: timedelta,
 ) -> list[SatelliteInView]:
-	"""Update the satellite positions in the windows"""
+	"""Update satellites (current positions, adding new satellites, and removing old satellites)"""
 	newSatelliteData = parseSatelliteInMessage(nmeaSentence, updateTime)
 	# update existing satellites
 	for i, oldData in enumerate(satellites):

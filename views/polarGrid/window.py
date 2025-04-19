@@ -1,25 +1,23 @@
-from PyQt6.QtCore import QByteArray, Qt, pyqtSignal
-from PyQt6.QtGui import QKeyEvent, QResizeEvent
+from PyQt6.QtCore import QByteArray, pyqtSignal
+from PyQt6.QtGui import QResizeEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QMainWindow
 
 from gnss.satellite import SatelliteInView
 from misc.size import Size
 from palettes.palette import Palette
+from views.baseWindow import BaseWindow
 from views.polarGrid.generate import prepareIntialPolarGrid, readBasePolarGrid
 from views.polarGrid.update import addSatellitesToPolarGrid
 
 
-class PolarGridWindow(QMainWindow):
+class PolarGridWindow(BaseWindow):
 	"""Window for displaying the positions of satellites"""
 
 	satelliteReceivedEvent = pyqtSignal()
-	defaultSize = Size(500, 500)
 
 	def __init__(self, palette: Palette):
-		super().__init__()
+		super().__init__(palette)
 
-		self.customPalette = palette
 		self.latestSatellites = []
 
 		self.svgFile = self.generateNewGrid()
@@ -29,9 +27,7 @@ class PolarGridWindow(QMainWindow):
 
 		self.satelliteReceivedEvent.connect(self.newSatelliteDataEvent)
 
-		self.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
 		self.setWindowTitle("Polar Grid")
-		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
 
 	def generateNewGrid(self):
 		svgData = readBasePolarGrid()
@@ -52,10 +48,6 @@ class PolarGridWindow(QMainWindow):
 		self.polarGrid.setGeometry(
 			int((newX - minSize) / 2), int((newY - minSize) / 2), minSize, minSize
 		)
-
-	def keyPressEvent(self, event: QKeyEvent):
-		if event.key() == Qt.Key.Key_F:
-			self.setWindowState(self.windowState() ^ Qt.WindowState.WindowFullScreen)
 
 	def onNewData(self, satellites: list[SatelliteInView]):
 		self.latestSatellites = satellites

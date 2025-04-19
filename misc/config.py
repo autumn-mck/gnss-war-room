@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass, field
+from typing import Union
 
 import pyjson5
 from dataclass_wizard import JSONWizard
@@ -71,7 +72,7 @@ class SignalChartConfig(JSONWizard):
 
 @dataclass
 class GlobeConfig(JSONWizard):
-	url: str = "https://gnss.mck.is/"
+	url: str = "http://localhost:2024"
 
 	class _(JSONWizard.Meta):
 		tag = "globe"
@@ -89,6 +90,11 @@ class GnssConfig(JSONWizard):
 	baudRate: int = 38400
 
 
+WindowConfig = Union[
+	MapConfig, PolalGridConfig, MiscStatsConfig, RawMessageConfig, SignalChartConfig, GlobeConfig
+]
+
+
 @dataclass
 class Config(JSONWizard):
 	"""Configuration for the app"""
@@ -103,19 +109,11 @@ class Config(JSONWizard):
 	satelliteTTL: int = 3600
 	warRoom: bool = False
 	startupSequence: bool = False
-	windows: list[
-		MapConfig
-		| PolalGridConfig
-		| MiscStatsConfig
-		| RawMessageConfig
-		| SignalChartConfig
-		| GlobeConfig
-	] = field(
+	windows: list[WindowConfig] = field(
 		default_factory=lambda: [
 			MapConfig(),
 			PolalGridConfig(),
 			MiscStatsConfig(),
-			RawMessageConfig(),
 			SignalChartConfig(),
 		]
 	)

@@ -1,24 +1,24 @@
 from PyQt6.QtCore import QByteArray, Qt, pyqtSignal
 from PyQt6.QtGui import QKeyEvent, QResizeEvent
 from PyQt6.QtSvgWidgets import QSvgWidget
-from PyQt6.QtWidgets import QMainWindow
 
 from gnss.nmea import GnssData
 from misc.config import MapConfig
 from misc.size import Size
 from palettes.palette import Palette
+from views.baseWindow import BaseWindow
 from views.map.generate import prepareInitialMap, readBaseMap
 from views.map.update import focusOnPoint, genSatelliteMapGroup
 
 
-class MapWindow(QMainWindow):
+class MapWindow(BaseWindow):
 	"""Configurable map window"""
 
 	satelliteReceivedEvent = pyqtSignal()
 	defaultSize = Size(700, 500)
 
 	def __init__(self, palette: Palette, windowConfig: MapConfig):
-		super().__init__()
+		super().__init__(palette)
 
 		self.windowConfig = windowConfig
 		self.customPalette = palette
@@ -38,8 +38,7 @@ class MapWindow(QMainWindow):
 		self.satelliteReceivedEvent.connect(self.newSatelliteDataEvent)
 
 		self.setWindowTitle("GNSS War Room")
-		self.setGeometry(0, 100, int(self.defaultSize.width), int(self.defaultSize.height))
-		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
+		self.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
 
 	def updateMap(self):
 		"""Update the map with newest data"""
@@ -86,6 +85,7 @@ class MapWindow(QMainWindow):
 
 	def keyPressEvent(self, event: QKeyEvent):
 		"""Handle keybinds"""
+		super().keyPressEvent(event)
 		self.handleMoveMapKeys(event)
 		self.handleMoveKeyKeys(event)
 		self.handleScaleKeys(event)
@@ -104,9 +104,6 @@ class MapWindow(QMainWindow):
 		if event.key() == Qt.Key.Key_C:
 			self.windowConfig.hideCities = not self.windowConfig.hideCities
 			self.resetMapOnScale()
-
-		if event.key() == Qt.Key.Key_F:
-			self.setWindowState(self.windowState() ^ Qt.WindowState.WindowFullScreen)
 
 		mapSvg = focusOnPoint(
 			self.preFocusMap,

@@ -91,6 +91,16 @@ def addLineToBoundingBox(line: list[tuple[int, int]], boundingBox: list[int], x:
 	return (boundingBox, x, y)
 
 
+def textToSvg(svg: TextIOWrapper, font: Font, text: bytes, fontColour: str, fontThickness: float):
+	"""Add the text to the SVG using the given font"""
+	x, y = 0, 0
+	for char in text:
+		charLines = font.charVectorsList[char]
+		x, y = charToPolylines(svg, 6, charLines, x, y, fontColour, fontThickness)
+		if chr(char) == "\r":
+			x = 0
+
+
 def makeTextGroup(
 	font: Font,
 	text: bytes,
@@ -121,12 +131,7 @@ def makeTextGroup(
    {scale * (border + yOffset + boundingBox[3])})"
     fill="none">\n""")
 
-	x, y = 0, 0
-	for char in text:
-		charLines = font.charVectorsList[char]
-		x, y = charToPolylines(svg, 6, charLines, x, y, fontColour, fontThickness)
-		if chr(char) == "\r":
-			x = 0
+	textToSvg(svg, font, text, fontColour, fontThickness)
 	svg.write("	</g>\n")
 
 	return (svg.getvalue(), width, height)
@@ -160,12 +165,7 @@ def makeSvgString(
     <g stroke-width="{fontThickness}" stroke="{fontColour}">
 """)
 
-	x, y = 0, 0
-	for char in text:
-		charLines = font.charVectorsList[char]
-		x, y = charToPolylines(svg, 6, charLines, x, y, fontColour, fontThickness)
-		if chr(char) == "\r":
-			x = 0
+	textToSvg(svg, font, text, fontColour, fontThickness)
 	svg.write("    </g>\n")
 
 	svg.write("  </g>\n</svg>\n")

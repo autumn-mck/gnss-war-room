@@ -2,20 +2,6 @@ import gzip
 import urllib.request
 from datetime import datetime, timedelta
 
-import h3
-
-
-def main():
-	"""Fetch the latest gpsJam data and print the data for Belfast-ish"""
-	date = datetime.now()
-	csv = tryLoadCachedGpsJam(date)
-	h3dict = gpsCsvToDict(csv)
-
-	resolution = 4
-	lat, long = 54.6, -6.0
-	hexagon = h3.latlng_to_cell(lat, long, resolution)
-	print(h3dict[hexagon])
-
 
 def scrapeFile(url):
 	print(f"Fetching {url}")
@@ -57,7 +43,3 @@ def tryLoadCachedGpsJam(date: datetime):
 			return fetchAndSaveLatestData(date)
 	except FileNotFoundError:
 		return fetchAndSaveLatestData(date)
-
-
-if __name__ == "__main__":
-	main()
