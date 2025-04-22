@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/Addons.js";
 import { type LineMaterialParameters } from "three/addons/lines/LineMaterial.js";
 import { type Palette } from "./palette.ts";
-import { drawThreeGeo } from "./threeGeoJSON.ts";
+import { drawGeoJSON } from "./geoJSON.ts";
 
 export function createCamera() {
 	const fov = 30;
@@ -48,5 +48,5 @@ async function loadGeojson(
 ) {
 	const response = await fetch(from);
 	const json = await response.json();
-	drawThreeGeo(json, 1, materialOptions, to);
+	drawGeoJSON(json, 1, materialOptions, to);
 }

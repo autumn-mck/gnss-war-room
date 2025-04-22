@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { latLongToXyz } from "./threeGeoJSON.ts";
+import { latLongToXyz } from "./geoJSON.ts";
 import { SatelliteDisplay } from "./satelliteDisplay.ts";
 import { createCamera, createControls, createEarth } from "./init.ts";
 import {

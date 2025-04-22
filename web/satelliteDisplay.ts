@@ -1,4 +1,4 @@
-import { latLongToXyz } from "./threeGeoJSON.ts";
+import { latLongToXyz } from "./geoJSON.ts";
 import { type Satellite } from "./satellite.ts";
 import { type GnssData } from "./gnssData.ts";
 

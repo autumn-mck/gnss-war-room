@@ -4,7 +4,7 @@ import { Line2 } from "three/addons/lines/Line2.js";
 import { LineGeometry } from "three/addons/lines/LineGeometry.js";
 import { LineMaterial, type LineMaterialParameters } from "three/addons/lines/LineMaterial.js";
 
-export function drawThreeGeo(
+export function drawGeoJSON(
 	json: GeoJSON,
 	sphereRadius: number,
 	lineOptions: LineMaterialParameters,
