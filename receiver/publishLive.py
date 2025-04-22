@@ -19,7 +19,7 @@ def createPublishCallback(mqttClients: list[MqttClient]):
 
 
 def main():
-	"""Publish the live data"""
+	"""Publish the live GNSS data"""
 	load_dotenv()
 	config = loadConfig()
 	mqttConfig = figureOutPublishingConfig(config)

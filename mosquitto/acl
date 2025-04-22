@@ -2,3 +2,6 @@ topic read gnss/#
 
 user gnssreceiver
 topic write gnss/#
+
+user adsbreceiver
+topic write adsb/#
