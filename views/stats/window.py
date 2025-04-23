@@ -22,7 +22,7 @@ class MiscStatsWindow(BaseWindow):
 		self.config = config
 
 		self.satelliteReceivedEvent.connect(self.updateWithNewData)
-		self.latestData = None
+		self.latestData = GnssData()
 
 		self.svgFont = Font()
 		(svgStr, width, height) = makeSvgString(
@@ -35,8 +35,11 @@ class MiscStatsWindow(BaseWindow):
 		self.svg.load(QByteArray(svgStr.encode()))
 		self.svg.setGeometry(0, 0, width, height)
 
-	def resizeEvent(self, event: QResizeEvent):
+	def resizeEvent(self, event: QResizeEvent | None):
 		"""Resize the text to always fit the window"""
+		super().resizeEvent(event)
+		if event is None:
+			return
 		self.resizeSvg(event.size())
 
 	def resizeSvg(self, size: QSize):

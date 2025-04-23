@@ -20,6 +20,10 @@ class BaseWindow(QMainWindow):
 		self.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
 		self.setStyleSheet(f"background-color: {palette.background}; color: {palette.foreground};")
 
-	def keyPressEvent(self, event: QKeyEvent):
+	def keyPressEvent(self, event: QKeyEvent | None):
+		"""Handle keybinds"""
+		super().keyPressEvent(event)
+		if event is None:
+			return
 		if event.key() == Qt.Key.Key_F:
 			self.setWindowState(self.windowState() ^ Qt.WindowState.WindowFullScreen)

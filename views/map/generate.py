@@ -97,8 +97,8 @@ def genKey(palette: Palette) -> tuple[str, Size]:
 
 	group = ""
 
-	maxWidth = 0
-	heightSoFar = 0
+	maxWidth = 0.0
+	heightSoFar = 0.0
 
 	satelliteNetworks = list(palette.satelliteNetworks.items())
 	satelliteNetworks.sort(key=lambda network: nameToNetworkCode(network[0]))
@@ -114,7 +114,7 @@ def genKey(palette: Palette) -> tuple[str, Size]:
 			yOffset=int(heightSoFar / networkScale),
 			fontColour=colour,
 		)
-		heightSoFar = height - 20
+		heightSoFar = height - 20.0
 		maxWidth = max(maxWidth, width)
 		group += "\n" + network
 

@@ -11,13 +11,13 @@
 
 
 import io
-from io import TextIOWrapper
+from io import StringIO
 
 from font.hp1345Font import Font
 
 
 def charToPolylines(
-	svg: TextIOWrapper,
+	svg: StringIO,
 	indent: int,
 	charLines: list[list[tuple[int, int]]],
 	x=0,
@@ -38,7 +38,7 @@ def charToPolylines(
 
 
 def lineToPolyline(
-	svg: TextIOWrapper,
+	svg: StringIO,
 	indent: int,
 	line: list[tuple[int, int]],
 	x: int,
@@ -91,7 +91,7 @@ def addLineToBoundingBox(line: list[tuple[int, int]], boundingBox: list[int], x:
 	return (boundingBox, x, y)
 
 
-def textToSvg(svg: TextIOWrapper, font: Font, text: bytes, fontColour: str, fontThickness: float):
+def textToSvg(svg: StringIO, font: Font, text: bytes, fontColour: str, fontThickness: float):
 	"""Add the text to the SVG using the given font"""
 	x, y = 0, 0
 	for char in text:

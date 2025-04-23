@@ -17,7 +17,7 @@ class PolarGridWindow(BaseWindow):
 	def __init__(self, palette: Palette):
 		super().__init__(palette)
 
-		self.latestSatellites = []
+		self.latestSatellites: list[SatelliteInView] = []
 
 		self.svgFile = self.generateNewGrid()
 		self.polarGrid = QSvgWidget(parent=self)
@@ -40,9 +40,14 @@ class PolarGridWindow(BaseWindow):
 		)
 		return QByteArray(svgData.encode())
 
-	def resizeEvent(self, event: QResizeEvent):
-		newX = event.size().width()
+	def resizeEvent(self, event: QResizeEvent | None):
+		"""Resize the window, and the polar grid to fit"""
+		super().resizeEvent(event)
+		if event is None:
+			return
+
 		newY = event.size().height()
+		newX = event.size().width()
 		minSize = min(newX, newY)
 		self.polarGrid.setGeometry(
 			int((newX - minSize) / 2), int((newY - minSize) / 2), minSize, minSize

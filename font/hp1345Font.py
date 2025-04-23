@@ -14,7 +14,7 @@
 
 
 class Font:
-	def __init__(self, romfile="./font/01347-80012.bin"):
+	def __init__(self, romfile="./font/01347-80012.bin") -> None:
 		self.charVectorsList: list[list[list[tuple[int, int]]]] = [[]] * 256
 
 		with open(romfile, "rb") as f:
@@ -36,7 +36,7 @@ class Font:
 			if not strokeRom[sa] and not strokeRom[sa + 1]:
 				return
 
-			lines = []
+			lines: list[list[tuple[int, int]]] = []
 			while True:
 				if used[sa]:
 					return

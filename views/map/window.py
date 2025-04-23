@@ -24,8 +24,8 @@ class MapWindow(BaseWindow):
 		self.customPalette = palette
 		self.gnssData = GnssData()
 
-		self.keyXMult = 0
-		self.keyYMult = 1
+		self.keyXMult = 0.0
+		self.keyYMult = 1.0
 
 		baseSvg = readBaseMap()
 
@@ -61,8 +61,12 @@ class MapWindow(BaseWindow):
 			self.keyYMult,
 		)
 
-	def resizeEvent(self, event: QResizeEvent):
+	def resizeEvent(self, event: QResizeEvent | None):
 		"""Resize map when window is resized"""
+		super().resizeEvent(event)
+		if event is None:
+			return
+
 		newX = event.size().width()
 		newY = event.size().height()
 
@@ -83,9 +87,12 @@ class MapWindow(BaseWindow):
 		self.windowConfig.focusLat += lat
 		self.windowConfig.focusLong += long
 
-	def keyPressEvent(self, event: QKeyEvent):
+	def keyPressEvent(self, event: QKeyEvent | None):
 		"""Handle keybinds"""
 		super().keyPressEvent(event)
+		if event is None:
+			return
+
 		self.handleMoveMapKeys(event)
 		self.handleMoveKeyKeys(event)
 		self.handleScaleKeys(event)

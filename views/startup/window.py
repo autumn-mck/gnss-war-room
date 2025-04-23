@@ -114,7 +114,7 @@ class StartupWindow(BaseWindow):
 				self.refreshSignal.emit()
 				time.sleep(0.02)
 		else:
-			print(f"Unknown command: {command.encode()}")
+			print(f"Unknown command: {command.encode()!r}")
 
 	def refresh(self):
 		"""Update the text on the window to the next character/stage"""

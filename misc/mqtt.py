@@ -7,9 +7,7 @@ from typing import Any, Callable
 
 import paho.mqtt.enums as mqttEnums
 from paho.mqtt.client import Client as MqttClient
-from paho.mqtt.client import ConnectFlags, DisconnectFlags, MQTTMessage
-from paho.mqtt.properties import Properties
-from paho.mqtt.reasoncodes import ReasonCode
+from paho.mqtt.client import MQTTMessage
 from pynmeagps import NMEAMessage, NMEAReader
 
 from gnss.nmea import GnssData, updateGnssDataWithMessage
@@ -51,7 +49,7 @@ def createMqttPublishers(configs: list[MqttConfig]) -> list[MqttClient]:
 		passwords = [os.environ.get("GNSS_PUBLISHER_PASSWORD") or ""]
 
 	publishers = []
-	for config, password in zip(configs, passwords):
+	for config, password in zip(configs, passwords, strict=False):
 		publishers.append(createMqttPublisher(config, password))
 
 	return publishers
@@ -88,20 +86,12 @@ def retryConnect(mqttClient: MqttClient, config: MqttConfig, attemptsLeft=5):
 		retryConnect(mqttClient, config, attemptsLeft - 1)
 
 
-def subscribeOnConnect(
-	client: MqttClient, _userdata: Any, _flags: ConnectFlags, _rc: int, _properties: Properties
-):
+def subscribeOnConnect(client: MqttClient, *_args: Any, **_kwargs: Any):
 	client.subscribe("gnss/rawMessages", qos=0)
 	client.loop_start()
 
 
-def reconnectOnDisconnect(
-	client: MqttClient,
-	_userdata: Any,
-	_disconnectFlags: DisconnectFlags,
-	_reasonCode: ReasonCode,
-	_properties: Properties,
-):
+def reconnectOnDisconnect(client: MqttClient, *_args: Any, **_kwargs: Any):
 	"""Exit the program if the MQTT broker disconnects, as attempting to reconnect does not seem to
 	work
 	"""

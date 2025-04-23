@@ -37,15 +37,23 @@ class SignalGraphWindow(BaseWindow):
 
 		self.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
 
-	def resizeEvent(self, event: QResizeEvent):
-		newWidth = event.size().width()
+	def resizeEvent(self, event: QResizeEvent | None):
+		"""Resize the window, and the SNR chart to fit"""
+		super().resizeEvent(event)
+		if event is None:
+			return
+
 		newHeight = event.size().height()
+		newWidth = event.size().width()
 		self.updateGraph()
 		self.svg.setGeometry(0, 0, newWidth, newHeight)
 
-	def keyPressEvent(self, event: QKeyEvent):
-		"""Handle key presses"""
+	def keyPressEvent(self, event: QKeyEvent | None):
+		"""Handle key presses for the SNR chart window"""
 		super().keyPressEvent(event)
+		if event is None:
+			return
+
 		if event.key() == Qt.Key.Key_S:
 			self.sortMethodIndex = (self.sortMethodIndex + 1) % len(self.sortMethods)
 			self.updateGraph()

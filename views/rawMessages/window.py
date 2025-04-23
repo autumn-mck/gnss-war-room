@@ -49,8 +49,12 @@ class RawMessageWindow(BaseWindow):
 
 		self.setGeometry(0, 0, int(self.defaultSize.width), int(self.defaultSize.height))
 
-	def resizeEvent(self, event: QResizeEvent):
-		"""Resize the window"""
+	def resizeEvent(self, event: QResizeEvent | None):
+		"""Resize the window, and the messages to fit"""
+		super().resizeEvent(event)
+		if event is None:
+			return
+
 		newWidth = event.size().width()
 		oldWidth = self.svg.width()
 		oldHeight = self.svg.height()
