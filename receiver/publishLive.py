@@ -24,7 +24,7 @@ def main():
 	config = loadConfig()
 	mqttConfig = figureOutPublishingConfig(config)
 
-	clients = createMqttPublishers(mqttConfig)
+	clients = createMqttPublishers(mqttConfig, "gnssreceiver")
 	onMessage = createPublishCallback(clients)
 	monitorSerial(onMessage, config.gnss)
 

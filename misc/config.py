@@ -107,6 +107,7 @@ class Config(JSONWizard):
 	multiTrackBroadcasting: list[MqttConfig] = field(default_factory=list)
 	gnss: GnssConfig = field(default_factory=GnssConfig)
 	satelliteTTL: int = 3600
+	flightTTL: int = 30
 	warRoom: bool = False
 	startupSequence: bool = False
 	windows: list[WindowConfig] = field(

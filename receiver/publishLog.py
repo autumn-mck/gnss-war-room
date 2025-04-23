@@ -30,7 +30,7 @@ def main():
 	load_dotenv()
 	config = loadConfig()
 	mqttConfig = figureOutPublishingConfig(config)
-	mqttClients = createMqttPublishers(mqttConfig)
+	mqttClients = createMqttPublishers(mqttConfig, "gnssreceiver")
 
 	with open("3m.tsv", "r", encoding="utf-8") as file:
 		parseAndPublishLines(file, mqttClients)

@@ -47,6 +47,22 @@ class GnssData:
 		}
 
 
+@dataclass
+class Flight:
+	"""Plane data"""
+
+	flightId: str = ""
+	latitude: float = 0
+	longitude: float = 0
+	altitude: float = 0
+	lastUpdate: datetime = field(default_factory=lambda: datetime.fromtimestamp(0))
+
+
+@dataclass
+class ADSBData:
+	flights: dict[str, Flight] = field(default_factory=dict)
+
+
 def parseSatelliteInMessage(parsedData: NMEAMessage, updateTime: datetime) -> list[SatelliteInView]:
 	"""Parse a GSV message into a list of SatelliteInView objects"""
 	if parsedData.msgID != "GSV":
@@ -82,6 +98,34 @@ def tryParseFloat(string: str):
 		return float(string)
 	except ValueError:
 		return 0
+
+
+def updateADSBDataWithMessage(adsbData: ADSBData, message: dict[str, Any], flightTTL: timedelta):
+	"""Update the ADS-B data with the new data from a message"""
+	if "flight" not in message or "lat" not in message or "lon" not in message:
+		# not sure what the shorter messages are
+		return
+
+	flightId = message["flight"]
+	lat = message["lat"]
+	long = message["lon"]
+	time = datetime.strptime(message["0"], "%Y-%m-%dT%H:%M:%S.%fZ")
+
+	if flightId in adsbData.flights:
+		adsbData.flights[flightId].latitude = lat
+		adsbData.flights[flightId].longitude = long
+		adsbData.flights[flightId].lastUpdate = time
+	else:
+		adsbData.flights[flightId] = Flight(
+			flightId=flightId, latitude=lat, longitude=long, lastUpdate=time
+		)
+
+	flightsToRemove = []
+	for flightId, flight in adsbData.flights.items():
+		if flight.lastUpdate + flightTTL < time:
+			flightsToRemove.append(flightId)
+	for flightId in flightsToRemove:
+		del adsbData.flights[flightId]
 
 
 def updateGnssDataWithMessage(

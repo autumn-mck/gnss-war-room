@@ -15,7 +15,7 @@ def main():
 	"""Send numerous messages to the MQTT broker and measure how long each of these 'ping's takes"""
 	load_dotenv()
 	config = loadConfig()
-	publisher = createMqttPublishers([config.mqtt])[0]
+	publisher = createMqttPublishers([config.mqtt], "gnssreceiver")[0]
 	subscriber = createMqttClient(config.mqtt)
 
 	with open("100k.nmea", "r", encoding="utf-8") as f:

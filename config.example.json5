@@ -10,6 +10,8 @@
 
 	// how long a satellite can still be displayed for since it was last seen (in seconds)
 	satelliteTTL: 3000,
+	// same for flights
+	flightTTL: 30,
 
 	// config for the MQTT broker (both for publishing and subscribing)
 	mqtt: {

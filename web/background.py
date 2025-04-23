@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 from font.fetch import fetchFontRomsIfNeeded
 from font.hp1345Font import Font
+from gnss.nmea import ADSBData
 from misc.config import MapConfig, MiscStatsConfig, SignalChartConfig, loadConfig
 from misc.mqtt import GnssData, createMqttSubscriber
 from palettes.palette import loadPalette
@@ -35,20 +36,20 @@ basePolarGrid = readBasePolarGrid()
 basePolarGrid = prepareIntialPolarGrid(basePolarGrid, PALETTE)
 
 # ruff: noqa: PLW0603
-LATEST_DATA = None
+GNSS_DATA = GnssData()
+ADSB_DATA = ADSBData()
 
 
 def updateMap():
 	"""Generate and write the latest map"""
-	if LATEST_DATA is None:
-		return
 	satelliteGroup = genSatelliteMapGroup(
 		mapConfig,
 		PALETTE,
-		LATEST_DATA.satellites,
-		LATEST_DATA.latitude,
-		LATEST_DATA.longitude,
-		LATEST_DATA.date,
+		GNSS_DATA.satellites,
+		ADSB_DATA.flights,
+		GNSS_DATA.latitude,
+		GNSS_DATA.longitude,
+		GNSS_DATA.date,
 	)
 	latestMap = baseMap.replace("<!-- satellites go here -->", satelliteGroup)
 	mapSize = getMapSize()
@@ -58,49 +59,36 @@ def updateMap():
 
 
 def updatePolarGrid():
-	"""Generate and write the latest polar grid"""
-	if LATEST_DATA is None:
-		return
-	polarGrid = addSatellitesToPolarGrid(basePolarGrid, PALETTE, LATEST_DATA.satellites)
+	polarGrid = addSatellitesToPolarGrid(basePolarGrid, PALETTE, GNSS_DATA.satellites)
 	with open("./web/generated/polarGrid.svg", "w", encoding="utf-8") as f:
 		f.write(polarGrid)
 
 
 def updateStats():
-	"""Generate and write the latest stats"""
-	if LATEST_DATA is None:
-		return
-	(statsSvg, _, _) = generateStats(LATEST_DATA, PALETTE, FONT, mistStatsConfig)
+	(statsSvg, _, _) = generateStats(GNSS_DATA, PALETTE, FONT, mistStatsConfig)
 	with open("./web/generated/stats.svg", "w", encoding="utf-8") as f:
 		f.write(statsSvg)
 
 
 def updateChart():
-	if LATEST_DATA is None:
-		return
-	snrChart = generateBarChart(chartConfig, PALETTE, FONT, LATEST_DATA.satellites, 854, 480)
+	snrChart = generateBarChart(chartConfig, PALETTE, FONT, GNSS_DATA.satellites, 854, 480)
 	with open("./web/generated/snrChart.svg", "w", encoding="utf-8") as f:
 		f.write(snrChart)
 
 
 def updateData():
-	if LATEST_DATA is None:
-		return
 	with open("./web/generated/gnssData.json", "w", encoding="utf-8") as f:
-		f.write(json.dumps(LATEST_DATA.toJSON(PALETTE)))
+		f.write(json.dumps(GNSS_DATA.toJSON(PALETTE)))
 
 
 def updateWoprData():
 	"""Generate and write data for the WOPR endpoint"""
-	if LATEST_DATA is None:
-		return
-
 	woprData = {
-		"latitude": LATEST_DATA.latitude,
-		"longitude": LATEST_DATA.longitude,
-		"altitude": LATEST_DATA.altitude,
-		"pdop": LATEST_DATA.pdop,
-		"avgSnr": statistics.mean([satellite.snr for satellite in LATEST_DATA.satellites]),
+		"latitude": GNSS_DATA.latitude,
+		"longitude": GNSS_DATA.longitude,
+		"altitude": GNSS_DATA.altitude,
+		"pdop": GNSS_DATA.pdop,
+		"avgSnr": statistics.mean([satellite.snr for satellite in GNSS_DATA.satellites]),
 	}
 
 	with open("./web/generated/wopr.json", "w", encoding="utf-8") as f:
@@ -125,9 +113,13 @@ def updateSVGsThread():
 
 
 def genOnNewDataCallback():
-	def onNewData(_: bytes, gnssData: GnssData):
-		global LATEST_DATA  # pylint: disable=global-statement
-		LATEST_DATA = gnssData
+	"""Generate a function to update the global GNSS and ADS-B data"""
+
+	def onNewData(_: bytes, gnssData: GnssData, adsbData: ADSBData):
+		global GNSS_DATA  # pylint: disable=global-statement
+		global ADSB_DATA  # pylint: disable=global-statement
+		ADSB_DATA = adsbData
+		GNSS_DATA = gnssData
 
 	return onNewData
 
@@ -135,7 +127,7 @@ def genOnNewDataCallback():
 def main():
 	"""Update the generated SVGs/JSON files for the web app"""
 	fetchFontRomsIfNeeded()
-	createMqttSubscriber(CONFIG.mqtt, CONFIG.satelliteTTL, genOnNewDataCallback())
+	createMqttSubscriber(CONFIG, genOnNewDataCallback())
 
 	if not os.path.exists("./web/generated"):
 		os.makedirs("./web/generated")

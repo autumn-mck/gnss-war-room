@@ -12,7 +12,7 @@ from PyQt6.QtGui import QScreen
 from PyQt6.QtWidgets import QApplication, QMainWindow
 
 from font.fetch import fetchFontRomsIfNeeded
-from gnss.nmea import GnssData
+from gnss.nmea import ADSBData, GnssData
 from misc.config import (
 	Config,
 	GlobeConfig,
@@ -98,9 +98,7 @@ def createMainWindows(config: Config, palette: Palette):
 	windows = [windowConfigToWindow(windowConfig, palette) for windowConfig in config.windows]
 
 	onNewData = updateWindows(windows)
-	threading.Thread(
-		target=createMqttSubscriber, args=(config.mqtt, config.satelliteTTL, onNewData)
-	).start()
+	threading.Thread(target=createMqttSubscriber, args=(config, onNewData)).start()
 	return windows
 
 
@@ -137,11 +135,11 @@ def windowConfigToWindow(windowConfig: WindowConfig, palette: Palette) -> BaseWi
 			raise ValueError(msg)
 
 
-def updateWindows(windows: list[BaseWindow]) -> Callable[[bytes, GnssData], None]:
+def updateWindows(windows: list[BaseWindow]) -> Callable[[bytes, GnssData, ADSBData], None]:
 	"""Generate a callback for the windows to handle new data"""
 	lastUpdatedAt = datetime.now()
 
-	def updateWindowsOnNewData(rawMessage: bytes, gnssData: GnssData):
+	def updateWindowsOnNewData(rawMessage: bytes, gnssData: GnssData, adsbData: ADSBData):
 		nonlocal windows
 		nonlocal lastUpdatedAt
 
@@ -156,16 +154,16 @@ def updateWindows(windows: list[BaseWindow]) -> Callable[[bytes, GnssData], None
 		lastUpdatedAt = datetime.now()
 
 		for window in windows:
-			updateWindow(window, gnssData)
+			updateWindow(window, gnssData, adsbData)
 
 	return updateWindowsOnNewData
 
 
-def updateWindow(window: BaseWindow, gnssData: GnssData):
+def updateWindow(window: BaseWindow, gnssData: GnssData, adsbData: ADSBData):
 	"""Update the given window with the given data"""
 	match window:
 		case MapWindow():
-			window.onNewData(gnssData)
+			window.onNewData(gnssData, adsbData)
 		case PolarGridWindow():
 			window.onNewData(gnssData.satellites)
 		case MiscStatsWindow():

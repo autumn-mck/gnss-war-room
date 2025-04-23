@@ -1,4 +1,5 @@
 topic read gnss/#
+topic read adsb/#
 
 user gnssreceiver
 topic write gnss/#

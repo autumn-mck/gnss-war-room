@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from gnss.nmea import Flight
 from gnss.satellite import (
 	SatelliteInView,
 	colourForNetwork,
@@ -17,6 +18,7 @@ def genSatelliteMapGroup(
 	options: MapConfig,
 	palette: Palette,
 	satellites: list[SatelliteInView],
+	flights: dict[str, Flight],
 	measuredLatitude: float,
 	measuredLongitude: float,
 	currentTime: datetime,
@@ -43,8 +45,24 @@ def genSatelliteMapGroup(
 		satelliteStr += generateSatellitePoint(
 			satellite, mapSize, palette, measuredLatitude, measuredLongitude, radius
 		)
+
+	for flight in flights.values():
+		satelliteStr += generateFlightPoint(flight, mapSize, palette, radius)
+
 	satelliteStr += "\t</g>"
 	return satelliteStr
+
+
+def generateFlightPoint(flight: Flight, mapSize: Size, palette: Palette, radius: float):
+	"""Generate a point for the given flight"""
+	colour = palette.cities
+	lat, long = flight.latitude, flight.longitude
+
+	[x, y] = latLongToGallStereographic(lat, long, mapSize.width)
+	x += mapSize.width / 2
+	y += mapSize.height / 2
+
+	return f'\t\t<circle cx="{x:.4f}" cy="{y:.4f}" fill="{colour}" r="{radius}" />\n'
 
 
 def generateSatellitePoint(
