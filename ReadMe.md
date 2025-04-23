@@ -60,6 +60,13 @@ SNR Chart:
 - S: toggle sorting between by network, by signal to noise ratio, and by angle of elevation
 - U: toggle displaying untracked satellites (those not used to obtain positioning data)
 
+Globe:
+
+- R: toggle rotation
+- Scroll: zoom in/out
+- Click: pan camera
+-
+
 ### Web UI
 
 To run the web frontend: `sh webStart.sh` (will default to port 2024)
