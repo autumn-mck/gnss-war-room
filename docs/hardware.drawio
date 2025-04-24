@@ -1,0 +1,81 @@
+<mxfile host="65bd71144e">
+    <diagram id="SwQnoXymAf-Nfqckosw9" name="Page-1">
+        <mxGraphModel dx="1923" dy="910" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="10" value="Subscribed to by" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="11" target="37">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="Raspberry Pi&lt;br&gt;(MQTT Broker)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="489" y="251" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="Serial over USB" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="15" target="17">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="Sends PPS to" style="edgeStyle=none;html=1;entryX=0;entryY=1;entryDx=0;entryDy=0;endArrow=classic;endFill=1;" edge="1" parent="1" source="15" target="26">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="Sends PPS to" style="edgeStyle=none;html=1;entryX=0.534;entryY=1.004;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.53;exitY=-0.006;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="15" target="24">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="92" y="97" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="15" value="GNSS Receiver" style="points=[];aspect=fixed;html=1;align=center;shadow=0;dashed=0;image;image=img/lib/allied_telesis/media_converters/Media_Converter_Standalone.svg;" vertex="1" parent="1">
+                    <mxGeometry x="51" y="251" width="74.78" height="61" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="Publishes to" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="17" target="11">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="Raspberry Pi&lt;br&gt;(GNSS Publisher)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="259" y="251" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="AIS&amp;nbsp;Receiver" style="points=[];aspect=fixed;html=1;align=center;shadow=0;dashed=0;image;image=img/lib/allied_telesis/media_converters/Media_Converter_Standalone.svg;" vertex="1" parent="1">
+                    <mxGeometry x="511.61" y="7" width="74.78" height="61" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="22" target="11">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="ADS-B&amp;nbsp;Receiver" style="points=[];aspect=fixed;html=1;align=center;shadow=0;dashed=0;image;image=img/lib/allied_telesis/media_converters/Media_Converter_Standalone.svg;" vertex="1" parent="1">
+                    <mxGeometry x="703" y="102.5" width="74.78" height="61" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="Sends&lt;br&gt;stabilised&lt;br&gt;PPS to" style="edgeStyle=none;html=1;entryX=0;entryY=0;entryDx=0;entryDy=0;endArrow=classic;endFill=1;" edge="1" parent="1" source="24" target="26">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="Atomic clock&lt;br&gt;(Precision time signal)" style="points=[];aspect=fixed;html=1;align=center;shadow=0;dashed=0;image;image=img/lib/allied_telesis/media_converters/Media_Converter_Standalone.svg;" vertex="1" parent="1">
+                    <mxGeometry x="51.00000000000003" y="72" width="74.78" height="61" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=classic;endFill=1;" edge="1" parent="1" source="26" target="11">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="Oscilloscope" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="259" y="103" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="Viewed by" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="37" target="32">
+                    <mxGeometry x="-0.0543" relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="947" y="279"/>
+                            <mxPoint x="947" y="279"/>
+                        </Array>
+                        <mxPoint as="offset"/>
+                        <mxPoint x="778.9990625" y="562.9996874999999" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="32" value="" style="shape=actor;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="1014" y="249" width="40" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" value="Windows Desktop&lt;br&gt;(UI)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="769" y="249" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" value="Publishes to&lt;br&gt;(Details out of scope)" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="20" target="11">
+                    <mxGeometry x="0.2459" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="40" value="User" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="1010.5" y="311" width="47" height="26" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
