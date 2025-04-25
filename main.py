@@ -4,8 +4,8 @@ import contextlib
 import signal
 import sys
 import threading
+from collections.abc import Callable
 from datetime import datetime, timedelta
-from typing import Callable
 
 from dotenv import load_dotenv
 from PyQt6.QtGui import QScreen

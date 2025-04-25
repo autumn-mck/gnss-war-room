@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 from pynmeagps import NMEAMessage, NMEAReader
 from serial import Serial

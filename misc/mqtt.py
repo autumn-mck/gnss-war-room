@@ -2,8 +2,9 @@ import json
 import os
 import socket
 import time
+from collections.abc import Callable
 from datetime import datetime, timedelta
-from typing import Any, Callable
+from typing import Any
 
 import paho.mqtt.enums as mqttEnums
 from paho.mqtt.client import Client as MqttClient
