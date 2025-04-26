@@ -18,16 +18,14 @@ Create a virtual environment: `python -m venv .venv` and activate it.
 On Linux: `source .venv/bin/activate`
 On Windows: `.venv\Scripts\Activate.ps1`
 
-Install dependencies: `pip install -r requirements.txt`
-
+Install dependencies: `pip install -r requirements.txt`  
 Copy `config.example.json5` to `config.json5`, then edit as needed.
 
 ### If running MQTT broker locally
 
-TODO: Windows?
-Start up the container for the MQTT broker: `podman compose up`
+Start up the container for the MQTT broker: `podman compose up` (Note: docker will also work)
 
-Now, while the container is running, set a password for publishing to the broker: `podman exec mosquitto mosquitto_passwd -b /etc/mosquitto/passwd gnssreceiver <password>`, replacing `<password>` with a password of your choosing (e.g. "Joshua"). Create a file called `.env`, with the contents `GNSS_PUBLISHER_PASSWORD=<password>`.
+Now, while the container is running, set a password for publishing to the broker: `podman exec mosquitto mosquitto_passwd -b /etc/mosquitto/passwd gnssreceiver <password>`, replacing `<password>` with a password of your choosing (e.g. "Joshua"). Create a file called `.env` in the root folder of the project, with the contents `GNSS_PUBLISHER_PASSWORD=<password>`.
 
 Finally, restart the broker container for it to read the new password.
 
@@ -65,7 +63,6 @@ Globe:
 - R: toggle rotation
 - Scroll: zoom in/out
 - Click: pan camera
--
 
 ### Web UI
 
@@ -76,6 +73,8 @@ To run the web frontend: `sh webStart.sh` (will default to port 2024)
 To send live data to the system, modify `config.json5` to set `gnssSerialPort` to the correct serial port, and run `python -m receiver.publishLive`.
 
 For prerecorded samples that can be replayed to test the system at any time using `python -m receiver.publishLog`, see https://github.com/autumn-mck/gnss-nmea-samples
+
+This can be set to publish faster than real-time, i.e. using `GNSS_SPEED_MULT=20 python -m receiver.publishLog`
 
 ![](./docs/readme-imgs/dataflow.svg)
 
