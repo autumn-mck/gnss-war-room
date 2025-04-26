@@ -1,3 +1,8 @@
+[project]
+"name" = "gnss-war-room"
+requires-python = ">=3.12"
+version = "2025.04.28"
+
 [tool.codespell]
 skip = "*.geojson,*.nmea,*.tsv,*.lock,*.svg,./views/map/*.txt,dist,node_modules"
 
