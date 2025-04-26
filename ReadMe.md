@@ -5,8 +5,6 @@ A space-based positioning, navigation, and timing (PNT) dashboard heavily inspir
 ![](./docs/readme-imgs/gnss.png)
 _Running locally on a single display_
 
-The whole system will be covered in further detail in the dissertation.
-
 ![](./docs/readme-imgs/cpsl.png)
 _Running at the Cyber Physical Systems Lab, Queen's University Belfast_
 
