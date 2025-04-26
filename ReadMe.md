@@ -1,8 +1,9 @@
 # GNSS and Precision Time War Room
 
-![](./docs/readme-imgs/gnss.png)
+A space-based positioning, navigation, and timing (PNT) dashboard heavily inspired by the movie _WarGames_ (1983).
 
-A project for displaying Global Navigation Satellite System (GNSS) and precision time data.
+![](./docs/readme-imgs/gnss.png)
+_Running locally on a single display_
 
 The whole system will be covered in further detail in the dissertation.
 
