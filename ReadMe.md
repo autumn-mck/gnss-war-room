@@ -2,6 +2,8 @@
 
 A space-based positioning, navigation, and timing (PNT) dashboard heavily inspired by the movie _WarGames_ (1983).
 
+Thanks to Dr. David Laverty for supervising this project - for providing such a fantastic idea, and allowing me to have so much fun with it.
+
 ![](./docs/readme-imgs/gnss.png)
 _Running locally on a single display_
 
